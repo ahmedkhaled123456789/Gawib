@@ -1,4 +1,3 @@
-// components/CustomModal.tsx
 
 type Props = {
   isOpen: boolean;
