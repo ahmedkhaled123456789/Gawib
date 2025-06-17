@@ -104,8 +104,7 @@ const SalesRecovered = () => {
 
  
  {/* Header Controls */}
-    {/* Header */}
-     
+      
 <div className="flex  p-4  bg-white md:flex-row items-center justify-between gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
           <div className="text-xl ml-16 font-bold text-[#0765AA]">المبيعات  </div>

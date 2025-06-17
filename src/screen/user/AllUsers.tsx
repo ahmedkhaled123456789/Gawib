@@ -106,9 +106,6 @@ const handleConfirmStatus = () => {
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
-        {/* <div className="text-center mb-5 px-4 py-2 bg-[#257180] text-white rounded-lg shadow-md hover:bg-primary-dark transition duration-300">
-          <Link to="/addproduct">إضافة منتج</Link>
-        </div> */}
 
 <div className="text-center mb-6">
     <Link
