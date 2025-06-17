@@ -1,4 +1,4 @@
-import { useState } from "react";
+ import { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import CustomDropdown from "../../components/CustomDropdown";
@@ -113,7 +113,7 @@ const ProductRow = ({ product, index ,setShowModal,setShowSalesModal}) => {
 };
 
 const Posted_questions = () => {
-  const [products, setProducts] = useState(dummyProducts);
+  const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showPriceModal, setShowPriceModal] = useState(false);

@@ -81,7 +81,7 @@ const ProductRow = ({ product, index ,onStatusClick}) => {
 };
 
 const AllUsers = () => {
-  const [products, setProducts] = useState(dummyProducts);
+  const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 

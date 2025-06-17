@@ -71,28 +71,10 @@ const ProductRow = ({ product, index }) => {
 };
 
 const Prices = () => {
-  const [products, setProducts] = useState(dummyProducts);
+  const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showPriceModal, setShowPriceModal] = useState(false);
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
- const [modalOpen, setModalOpen] = useState(false);
-const [selectedProduct, setSelectedProduct] = useState(null);
-
-const handleStatusClick = (product) => {
-  setSelectedProduct(product);
-  setModalOpen(true);
-};
-
-const handleConfirmStatus = () => {
-   setModalOpen(false);
-  alert(`تم تعديل حالة المستخدم ${selectedProduct?.name}`);
-};
-
 
   return (
     <div className="overflow-x-hidden">
@@ -155,7 +137,7 @@ const handleConfirmStatus = () => {
             <tbody className="divide-y text-center divide-gray-200">
               {products.length > 0 ? (
                 products.map((product, index) => (
-                  <ProductRow key={product._id} product={product} index={index}   onStatusClick={() => handleStatusClick(product)} />
+                  <ProductRow key={product._id} product={product} index={index}    />
                 ))
               ) : (
                 <tr>

@@ -96,7 +96,7 @@ const ProductRow = ({ product, index , setShowModal}) => {
 };
 
 const Sales = () => {
-  const [products, setProducts] = useState(dummyProducts);
+  const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showModal, setShowModal] = useState(false);

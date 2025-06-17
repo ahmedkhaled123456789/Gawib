@@ -11,8 +11,7 @@ import Sales from "../screen/sales/Sales";
 import SalesRecovered from "../screen/salesRecovered/SalesRecovered";
 import SettingsPage from "../screen/settings/SettingsPage";
 import SocialMedia from "../screen/SocialMedia";
- import AddProduct from "../screen/user/AddProduct";
-import AllUsers from "../screen/user/AllUsers";
+ import AllUsers from "../screen/user/AllUsers";
    import ProductDetalis from "../screen/user/ProductDetalis";
 
  
@@ -72,14 +71,6 @@ export const ROUTES = [
   {
     path: "/discount",
     element: <Discount />,
-  },
-  {
-    path: "/addproduct",
-    element: <AddProduct />,
-  },
-  {
-    path: "/editproduct/:id",
-    element: <AddProduct />,
   },
   {
     path: "/productDetails",

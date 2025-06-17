@@ -80,7 +80,7 @@ const ProductRow = ({ product, index }) => {
 
 const Game = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [products, setProducts] = useState(dummyProducts);
+  const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showPriceModal, setShowPriceModal] = useState(false);

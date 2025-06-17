@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
-import Form from "./ContactForm";
 import ContactForm from "./ContactForm";
  
 const dummyProducts = [
@@ -57,7 +56,7 @@ const ProductRow = ({ product, index ,setShowModal}) => {
 };
 
 const ContactUs = () => {
-  const [products, setProducts] = useState(dummyProducts);
+  const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showModal, setShowModal] = useState(false);
