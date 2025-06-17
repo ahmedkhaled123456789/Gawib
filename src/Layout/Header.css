@@ -1,0 +1,36 @@
+
+ 
+
+ .sidebar img{
+  width: 40px;
+  height: 40px;
+ }
+ .hides_icon{
+  display: none;
+ }
+ 
+
+
+
+@media only screen and (max-width: 600px) {
+  
+   .sidebar{
+     width: 80px !important;
+   }
+   .logo_img{
+    display: none;
+   }
+   .show_icon{
+    display: none;
+
+   }
+   .ele_hide{
+    display: none;
+
+   }
+   .hides_icon{
+    display: block;
+    margin-left: 12px;
+    }
+  
+}
