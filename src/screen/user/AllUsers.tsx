@@ -49,22 +49,22 @@ const ProductRow = ({ product, index ,onStatusClick}) => {
     <tr key={product._id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
       <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product._id}`}>{product.name}</Link>
+        <Link to={`/productDetails/${product._id}`}><div className="w-24">{product.name}</div></Link>
       </td>
-      <td className="px-4 py-2 text-gray-700">{product.email}</td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-40">{product.email}</div></td>
       <td className="px-4 py-2 text-gray-700">{product.phone}</td>
       <td className="px-4 py-2 text-gray-700">{product.nationality}</td>
             <td className="px-4 py-2 text-gray-700">{product.Date}</td>
 
-            <td className="px-4 py-2 text-gray-700">{product.count}</td>
-            <td className="px-4 py-2 text-gray-700">
-              <div  className={` w-2 h-2 p-2 rounded-md ${
+            <td className="px-4 py-2 text-gray-700"><div className="w-24">{product.count}</div></td>
+            <td className="px-4 py-2    text-gray-700"> <div className="w-14"> <div  className={` w-2 h-2 p-2  rounded-md ${
             product.status === 'نشط' ? 'bg-[#588a17]' : 'bg-transparent'
           }`}
-              ></div>
+              ></div></div>
+             
             </td>
 
-      <td className="px-4 py-2 text-gray-700">{product.total}</td>
+      <td className="px-4 py-2 text-gray-700"> <div className="w-32">{product.total}</div></td>
        <td  className="px-4 py-2 text-white">
   <button
           onClick={onStatusClick}
@@ -107,14 +107,14 @@ const handleConfirmStatus = () => {
     <div className="overflow-x-hidden">
       <div className="mx-2">
 
-<div className="text-center mb-6">
+{/* <div className="text-center mb-6">
     <Link
       to="/addproduct"
       className="inline-block w-1/2 bg-[#0765AA] text-white font-semibold py-2 px-6 rounded-md shadow hover:bg-[#0165AA] transition"
     >
       إضافة مستخدم
     </Link>
-  </div>
+  </div> */}
  {/* Header Controls */}
       <div className="flex flex-col p-4  bg-white md:flex-row items-center justify-between gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
@@ -123,7 +123,7 @@ const handleConfirmStatus = () => {
           <div className="relative w-full md:w-64 border rounded-md  border-[#0765AA]">
             <input
               type="text"
-              placeholder="بحث باسم المنتج..."
+              placeholder="بحث"
               value={searchQuery}
               onChange={handleSearch}
               className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-md  focus:outline-none  "
@@ -134,9 +134,13 @@ const handleConfirmStatus = () => {
           {/* Dropdown */}
         <CustomDropdown
   options={[
-    { value: "", label: "كل الحالات" },
-    { value: "متاح", label: "متاح" },
-    { value: "غير متاح", label: "غير متاح" },
+    { value: "", label: "الأحدث  " },
+    { value: "الجنسية", label: "الجنسية" },
+    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
+        { value: " عدد الألعاب", label: " عدد الألعاب" },
+    { value: " المشتريات", label: " المشتريات" },
+    { value: "  حالة الحساب", label: "  حالة الحساب" },
+
   ]}
   selected={statusFilter}
   onChange={setStatusFilter}
@@ -157,7 +161,7 @@ const handleConfirmStatus = () => {
         <div className="overflow-x-auto">
           <table className="w-full table-auto divide-y-2 divide-[#0765AA] bg-white text-sm">
             <thead className="text-right">
-              <tr className="px-4 py-2 font-medium text-[#0765AA]">
+              <tr className="px-4 py-2 font-medium text-center text-[#0765AA]">
                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
                 <th className="px-4 py-2  font-medium">الأسم  </th>
                 <th className="px-4 py-2 font-medium">البريد الإلكتروني</th>

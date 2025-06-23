@@ -5,30 +5,28 @@ import ButtonGroup from "../../components/ButtonGroup";
 
 interface InputFieldProps {
   label: string;
-  placeholder: string;
-  set: React.Dispatch<React.SetStateAction<string>>;
+   set: React.Dispatch<React.SetStateAction<string>>;
   val: string;
   type: string;
 }
 
-const InputField = ({ label, placeholder, set, val, type }: InputFieldProps) => (
-  <div className="flex flex-col text-[#0765AA] mb-4 w-[48%]">
-    <label className="mb-1 text-lg font-bold">{label}</label>
+const InputField = ({ label, set, val, type }: InputFieldProps) => (
+  <div className="flex flex-col  mb-4 w-[48%]">
+    <label className="mb-1 text-lg text-[#0765AA] font-bold">{label}</label>
     <input
       value={val}
       onChange={(e) => set(e.target.value)}
       type={type}
-      placeholder={placeholder}
-      className="w-full rounded border border-[#0765AA] p-3 text-sm shadow-md outline-none text-right"
+      className="w-full text-black rounded border border-[#0765AA] p-3 text-sm shadow-md outline-none text-right"
     />
   </div>
 );
 
 const AddGroup = ({ onClose }: { onClose: () => void }) => {
-  const [name, setName] = useState("");
-  const [type, setType] = useState("");
-  const [admin, setAdmin] = useState("");
-  const [role, setRole] = useState("");
+  const [name, setName] = useState("دول وعواصم");
+  const [type, setType] = useState("جغرافيا والعالم");
+  const [admin, setAdmin] = useState("ماهر البوعلي");
+  const [role, setRole] = useState("هذه الفئة تختص بدولة ما وعاصمتها وعملتها ولغتها ");
   const [image, setImage] = useState<File | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -63,22 +61,21 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
     <div className="w-[70%] p-5    ">
       <div className="bg-white rounded-md p-10 ">
         {/* Product Type */}
-        <div className="flex flex-col  w-full  text-[#0765AA]">
-          <label className="mb-1 text-lg font-bold">نوع المنتج</label>
+        <div className="flex flex-col  w-full  ">
+          <label className="mb-1 text-lg text-[#0765AA] font-bold">نوع الفئة </label>
           
     <input
       value={type}
       onChange={(e) => setType(e.target.value)}
       type={type}
-      placeholder="جغرافيا والعالم"
-      className="w-full bg-[#D5D5D5]  rounded border border-[#0765AA] p-3 text-sm shadow-md outline-none text-right"
+       className="w-full bg-[#D5D5D5]  rounded border border-[#0765AA] p-3 text-sm shadow-md outline-none text-right"
     />
          </div>
 
         {/* Form Fields */}
         <form className="flex flex-wrap justify-between gap-4 pt-5 text-[#0765AA]">
-          <InputField val={name} set={setName} type="text" label="أسم الفئة" placeholder="أدخل أسم الفئة" />
-          <InputField val={admin} set={setAdmin} type="text" label="أسم المشرف" placeholder="أدخل أسم المشرف" />
+          <InputField val={name} set={setName} type="text" label="أسم الفئة"  />
+          <InputField val={admin} set={setAdmin} type="text" label="أسم المشرف"  />
 
   
           {/* Instructions + Image Upload Row */}
@@ -87,8 +84,7 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
             <div className="w-full md:w-[48%] ">
               <label className="mb-3 text-lg font-bold block">تعليمات الفئة</label>
               <textarea
-                placeholder="أدخل التعليمات هنا"
-                className="w-full h-[120px]  border border-[#0765AA] rounded-lg p-3 text-sm outline-none text-right  shadow-md"
+                className="w-full h-[120px] text-black border border-[#0765AA] rounded-lg p-3 text-sm outline-none text-right  shadow-md"
               >
                 هذه الفئة تختص بدولة ما وعاصمتها وعملتها ولغتها
               </textarea>

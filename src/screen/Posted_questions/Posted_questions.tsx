@@ -142,7 +142,7 @@ const [edit, setEdit] = useState("في هذا السوال يوجد خطاء ع�
           <div className="relative w-full md:w-48 border rounded-md  border-[#0765AA]">
             <input
               type="text"
-              placeholder="بحث باسم المنتج..."
+              placeholder="بحث"
               value={searchQuery}
                            onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full py-2 pl-8 pr-4 border border-gray-300 rounded-md  focus:outline-none  "
@@ -153,9 +153,13 @@ const [edit, setEdit] = useState("في هذا السوال يوجد خطاء ع�
           {/* Dropdown */}
         <CustomDropdown
   options={[
-    { value: "", label: "كل الحالات" },
-    { value: "متاح", label: "متاح" },
-    { value: "غير متاح", label: "غير متاح" },
+    { value: "", label: "الأحدث  " },
+    { value: "الجنسية", label: "الجنسية" },
+    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
+        { value: " عدد الألعاب", label: " عدد الألعاب" },
+    { value: " المشتريات", label: " المشتريات" },
+    { value: "  حالة الحساب", label: "  حالة الحساب" },
+
   ]}
   selected={statusFilter}
   onChange={setStatusFilter}

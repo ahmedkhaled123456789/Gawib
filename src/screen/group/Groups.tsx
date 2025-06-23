@@ -158,7 +158,7 @@ const handleConfirmForm = () => {
           <div className="relative w-full md:w-64 border rounded-md  border-[#0765AA]">
             <input
               type="text"
-              placeholder="بحث باسم المنتج..."
+              placeholder="بحث"
               value={searchQuery}
                            onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-md  focus:outline-none  "
@@ -168,10 +168,14 @@ const handleConfirmForm = () => {
 
           {/* Dropdown */}
         <CustomDropdown
-  options={[
-    { value: "", label: "كل الحالات" },
-    { value: "متاح", label: "متاح" },
-    { value: "غير متاح", label: "غير متاح" },
+   options={[
+    { value: "", label: "الأحدث  " },
+    { value: "الجنسية", label: "الجنسية" },
+    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
+        { value: " عدد الألعاب", label: " عدد الألعاب" },
+    { value: " المشتريات", label: " المشتريات" },
+    { value: "  حالة الحساب", label: "  حالة الحساب" },
+
   ]}
   selected={statusFilter}
   onChange={setStatusFilter}
@@ -247,8 +251,7 @@ const handleConfirmForm = () => {
          <label className="mb-4 text-[#0765AA] font-bold text-lg"> أسم المجموعة </label>
       <input
         type="text"
-        placeholder="اسم المجموعة"
-        className="w-full border border-[#0765AA] rounded mt-4  p-3 text-sm shadow-md outline-none text-right"
+          className="w-full border border-[#0765AA] rounded mt-4  p-3 text-sm shadow-md outline-none text-right"
       />
         <div className="flex justify-center gap-4 mt-6">
              <button
@@ -259,7 +262,7 @@ const handleConfirmForm = () => {
           </button>
           <button
             onClick={() => setModalFormOpen(false)}
-            className="px-4 py-2 border border-blue-500 text-[#0765AA] rounded hover:bg-blue-50"
+            className="px-4 py-2 border border-[#0765AA] text-[#0765AA] rounded hover:bg-blue-50"
           >
             إغلاق
           </button>
