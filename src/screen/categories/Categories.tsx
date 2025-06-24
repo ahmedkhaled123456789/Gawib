@@ -98,8 +98,7 @@ const CategoriesRow = ({ product, index,setShowCatModal }) => {
        </td>
       <td className="px-4 py-2">
         <span
-          className={`px-3 py-1 rounded text-white font-bold ${
-            product.status === "منشورة" ? "bg-green-700" : "bg-pink-600"
+          className={`px-3 py-1 rounded  font-bold ${ product.status === "منشورة" ? "text-[#588a17" : "text-[#db2777]"
           }`}
         >
           {product.status}
@@ -187,7 +186,7 @@ const [products] = useState(data);
 <div className="flex items-center justify-between ">
   <span>200</span>
   <span>400</span>
-  <span>300</span>
+  <span>600</span>
   <span>الكل</span>
 </div>
                 </th>
@@ -198,7 +197,7 @@ const [products] = useState(data);
 <div className="flex items-center justify-between ">
   <span>200</span>
   <span>400</span>
-  <span>300</span>
+  <span>600</span>
   <span>الكل</span>
 </div>
                    </th>
