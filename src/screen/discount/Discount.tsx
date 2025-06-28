@@ -11,6 +11,7 @@ const dummyProducts = [
     _id: "1",
     code: " باقة لعبة واحدة  ",
     Package: "ABC",
+    nowPrice:20,
     price: "باقة 3 العاب",
     codePrice: 200,
      startDate: "29/08/2025",
@@ -22,6 +23,7 @@ const dummyProducts = [
     _id: "2",
     code: " باقة لعبة واحدة  ",
     Package: "ABC",
+    nowPrice:20,
     price: "باقة 3 العاب",
     codePrice: 200,
      startDate: "29/08/2025",
@@ -33,6 +35,7 @@ const dummyProducts = [
     _id: "3",
     code: " باقة لعبة واحدة  ",
     Package: "ABC",
+    nowPrice:20,
     price: "باقة 3 العاب",
     codePrice: 200,
      startDate: "29/08/2025",
@@ -49,16 +52,19 @@ const ProductRow = ({ product, index ,setShowModal}) => {
     <tr key={product._id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
       <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product._id}`}>{product.code}</Link>
+        <Link to={`/productDetails/${product._id}`}><div className="w-32">{product.code}</div> </Link>
       </td>
-      <td className="px-4 py-2 text-gray-700">{product.Package}</td>
-      <td className="px-4 py-2 text-gray-700">{product.price}</td>
-      <td className="px-4 py-2 text-gray-700">{product.codePrice}</td>
-      <td className="px-4 py-2 text-gray-700">{product.startDate}</td>
-            <td className="px-4 py-2 text-gray-700">{product.endDate}</td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.Package}</div></td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.price}</div></td>
+            <td className="px-4 py-2 text-gray-700">
+           <div className="w-32"> {product.nowPrice}%</div>  </td>
+
+      <td className="px-4 py-2 text-gray-700"><div className="w-32"></div>{product.codePrice}</td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-32"></div>{product.startDate}</td>
+            <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.endDate}</div></td>
   
       
-       <td className="px-4 py-2 text-gray-700">{product.codeType}</td>
+       <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.codeType}</div></td>
 <td
   className={`px-4 py-2 ${
     product.status === "نشط"
@@ -68,11 +74,11 @@ const ProductRow = ({ product, index ,setShowModal}) => {
       : "text-[#ff426e]"
   }`}
 >
-  {product.status}
+ <div className="w-32">{product.status}</div> 
 </td>      
 
          <td className="px-4 py-2">
-            <div className="flex  items-center justify-center gap-2">
+            <div className="flex w-32  items-center justify-center gap-2">
                 <span className="p-1 border cursor-pointer rounded bg-[#0765AA]">
                 <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
@@ -122,11 +128,8 @@ const Discount = () => {
         <CustomDropdown
    options={[
     { value: "", label: "الأحدث  " },
-    { value: "الجنسية", label: "الجنسية" },
-    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-        { value: " عدد الألعاب", label: " عدد الألعاب" },
-    { value: " المشتريات", label: " المشتريات" },
-    { value: "  حالة الحساب", label: "  حالة الحساب" },
+    { value: "تاريخ البداية", label: "تاريخ البداية" },
+   
 
   ]}
   selected={statusFilter}
@@ -153,6 +156,7 @@ const Discount = () => {
            
                 <th className="px-4 py-2 font-medium">كود الخصم    </th>
                  <th className="px-4 py-2 font-medium">الباقة    </th>
+                <th className="px-4 py-2 font-medium">السعر الحالي    </th>
                 <th className="px-4 py-2 font-medium">السعر الحالي    </th>
                 <th className="px-4 py-2 font-medium">سعر كود الخصم    </th>
                 <th className="px-4 py-2 font-medium">تاريخ البداية    </th>
@@ -194,15 +198,15 @@ const Discount = () => {
         <div className="flex justify-center gap-4">
              <button
             onClick={() => setShowModal(false)}
-            className={`px-4 py-2 text-white rounded bg-[#ff426e]`}
+            className={`px-8 py-2 text-white rounded bg-[#588A17] `}
           >
-            حذف
+            نعم
           </button>
           <button
             onClick={() => setShowModal(false)}
-            className="px-4 py-2 border border-blue-500 text-blue-600 rounded hover:bg-blue-50"
+            className="px-8 py-2 text-white  bg-[#ff426e] rounded "
           >
-            إغلاق
+            لا
           </button>
          
         </div>

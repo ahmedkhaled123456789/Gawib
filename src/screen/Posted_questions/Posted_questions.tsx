@@ -75,7 +75,7 @@ const ProductRow = ({ product, index ,setShowPriceModal,setShowSalesModal, setSh
             <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.admin}</div></td>
               <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-40 gap-2">
-                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" onClick={() => setShowPriceModal(true)} >
+                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" onClick={() => setShowModal(true)} >
                 <img src="/images/group/see.png" alt="" className="w-5 h-5" />
             </span>
                              
@@ -98,7 +98,7 @@ const ProductRow = ({ product, index ,setShowPriceModal,setShowSalesModal, setSh
                  <img src="/images/group/true.png" alt="" className={`w-5 h-5 ${product.status === 'نشط' ? 'opacity-100' : 'opacity-0'}`} />
             
              </span>
-                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" onClick={() => setShowModal(true)}>
+                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" onClick={() => setShowPriceModal(true)}>
                 <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
                              <span className="p-1 border cursor-pointer rounded bg-[#0765AA]"
@@ -122,12 +122,6 @@ const Posted_questions = () => {
       const [showPriceModal, setShowPriceModal] = useState(false);
       const [showModal, setShowModal] = useState(false);
             const [showSalesModal, setShowSalesModal] = useState(false);
-
-const [edit, setEdit] = useState("في هذا السوال يوجد خطاء عاصمة مصر القاهرة وليس طرابلس");
- 
-console.log(edit)
- 
-
 
   return (
     <div className="overflow-x-hidden">
@@ -267,18 +261,14 @@ console.log(edit)
       </div>
     </div>
       </CustomModal>
-      
+
       <CustomModal isOpen={showModal}>
          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-blue-300">
-       <form >
-        <input
-              type="text"
-              value={edit}
-              onChange={(e) => setEdit(e.target.value)}
-               className="w-full  border border-[#0765AA] p-3 outline-none   text-sm text-right"
-            />   
-       </form>
+        <div className="text-center mb-6 w-full text-[#0765AA] font-bold  border border-[#0765AA] p-14  ">
+         في هذا السوال يوجد خطاء عاصمة مصر القاهرة وليس طرابلس
+        </div>
+      
         <p className="text-center mb-6"> هل تم تعديل الخطاء  </p>
         <div className="flex justify-center gap-4">
              <button

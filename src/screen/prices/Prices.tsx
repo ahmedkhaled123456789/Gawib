@@ -104,11 +104,9 @@ const Prices = () => {
         <CustomDropdown
    options={[
     { value: "", label: "الأحدث  " },
-    { value: "الجنسية", label: "الجنسية" },
-    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-        { value: " عدد الألعاب", label: " عدد الألعاب" },
-    { value: " المشتريات", label: " المشتريات" },
-    { value: "  حالة الحساب", label: "  حالة الحساب" },
+    { value: "عدد مرات الشراء ", label: "عدد مرات الشراء " },
+    { value: "  مبلغ الشراء  ", label: " مبلغ الشراء  " },
+        
 
   ]}
   selected={statusFilter}

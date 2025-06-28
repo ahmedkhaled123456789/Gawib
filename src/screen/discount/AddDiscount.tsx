@@ -82,9 +82,9 @@ const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عا
           <InputField val={price} set={setPrice} type="number" label="السعر الحالي  " placeholder="أدخل السعر الحالي  " />
           <InputField val={code} set={setCode} type="number" label="نسبة كود الخصم  " placeholder="أدخل   نسبة كود الخصم" />
           <InputField val={codePrice} set={setCodePrice} type="number" label="سعر كود الخصم  " placeholder="أدخل سعر كود الخصم" />
-            <InputField val={startDate} set={setStartDate} type="number" label="تاريخ البداية  " placeholder="أدخل تاريخ البداية" />
-          <InputField val={endDate} set={setEndDate} type="number" label="تاريخ النهاية  " placeholder="أدخل تاريخ النهاية" />
-          <InputField val={Package} set={setPackage} type="number" label="اسم كود الخصم  " placeholder="أدخل اسم كود الخصم" />
+            <InputField val={startDate} set={setStartDate} type="date" label="تاريخ البداية  " placeholder="أدخل تاريخ البداية" />
+          <InputField val={endDate} set={setEndDate} type="date" label="تاريخ النهاية  " placeholder="أدخل تاريخ النهاية" />
+          <InputField val={Package} set={setPackage} type="text" label="اسم كود الخصم  " placeholder="أدخل اسم كود الخصم" />
          <div className="flex flex-col text-[#0765AA] w-[48%]">
       <label className="mb-1 text-lg font-bold">نوع كود الخصم</label>
       <div className="flex items-center justify-between p-2 border border-[#0765AA] gap-2">
@@ -93,9 +93,9 @@ const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عا
           onClick={() => setDiscountType("عام")}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="p-1 border rounded border-[#0765AA]">
+          <span className="p-1 w-6 h-6 border rounded border-[#0765AA]">
             {discountType === "عام" && (
-              <img src="/images/group/true.png" alt="selected" className="w-3 h-3" />
+              <img src="/images/group/true.png" alt="selected" className="w-4 h-4" />
             )}
           </span>
           <span>عام</span>
@@ -106,9 +106,9 @@ const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عا
           onClick={() => setDiscountType("خاص")}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="p-1 border rounded border-[#0765AA]">
+          <span className="p-1 w-6 h-6 border rounded border-[#0765AA]">
             {discountType === "خاص" && (
-              <img src="/images/group/true.png" alt="selected" className="w-3 h-3" />
+              <img src="/images/group/true.png" alt="selected" className="w-4 h-4" />
             )}
           </span>
           <span>خاص</span>

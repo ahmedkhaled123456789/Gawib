@@ -7,7 +7,7 @@ const AddPosted_questions = ({ onClose }: { onClose: () => void }) => {
   const [activePoints, setActivePoints] = useState<number | null>(400);
   const [category, setCategory] = useState("");
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("القاهرة   ");
+  const [answer, setAnswer] = useState("القاهرة");
   const [cat, setCat] = useState("دول وعواصم");
     const [age, setAge] = useState("دول وعواصم");
   const [see, setSee] = useState("دول وعواصم");

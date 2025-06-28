@@ -32,7 +32,7 @@ const ContactForm = ({ onClose }: { onClose: () => void }) => {
       <div className="bg-white rounded-md p-10 mb-5">
         <form className="flex flex-wrap  gap-5 pt-5">
           <label className="mb-1 text-lg font-bold text-right text-[#0765AA] " >الرد على الرسالة</label>
-         <textarea name="" id="" cols={25} rows={10} className="w-full rounded border border-[#0765AA]  p-3 text-sm shadow-md outline-none text-right" >
+         <textarea name="" id=""  cols={25} rows={10} className="w-full rounded resize-none border border-[#0765AA]  p-3 text-sm shadow-md outline-none text-right" >
           سنرى ماذا يمكننا ان نفعل وسنضع ذلك في عين الاعتبار 
          </textarea>
   

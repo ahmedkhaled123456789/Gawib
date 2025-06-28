@@ -13,8 +13,8 @@ interface InputFieldProps {
 
 const InputField = ({ label, placeholder, set, val,type }: InputFieldProps) => {
   return (
-    <div className="flex flex-col text-[#0765AA] mb-4 w-full ">
-      <label className="mb-1 text-lg text-center font-bold ">{label}</label>
+    <div className="flex flex-col  mb-4 w-full ">
+      <label className="mb-1 text-lg text-center  ">{label}</label>
       <input
         value={val}
         onChange={(e) => set(e.target.value)}
@@ -44,13 +44,17 @@ const AddSales = ({ onClose }: { onClose: () => void }) => {
   };
  
   return (
-    <div className="w-[60%] p-5 mb-4">
-      <div className="bg-white rounded-md p-10 mb-5">
+    <div className="w-[40%] p-5 mb-4">
+      <div className="bg-white rounded-md p-5 mb-5">
         <form className="flex flex-wrap items-center justify-center gap-5 pt-5">
-          <InputField val={count} set={setCount} type="number" label="رقم عملية الاسترداد  " placeholder="رقم عملية الاسترداد  " />
+          <InputField val={count} set={setCount} type="number" label="رقم عملية الاسترداد  " placeholder=" " />
           <InputField val={date} set={setDate} type="date" label="تاريخ الاسترداد  " placeholder="تاريخ الاسترداد  " />
    
         </form>
+        <p className="text-center  text-xl ">
+          هل تريد استرداد المبلغ<br />
+( 150.7 )
+        </p>
   <div className="w-full  mt-5 flex justify-between gap-4 bg-white btn_save">
       <button
         onClick={submitData}

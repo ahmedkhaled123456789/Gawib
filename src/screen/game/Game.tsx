@@ -118,12 +118,9 @@ const Game = () => {
           {/* Dropdown */}
         <CustomDropdown
   options={[
-    { value: "", label: "الأحدث  " },
-    { value: "الجنسية", label: "الجنسية" },
-    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-        { value: " عدد الألعاب", label: " عدد الألعاب" },
-    { value: " المشتريات", label: " المشتريات" },
-    { value: "  حالة الحساب", label: "  حالة الحساب" },
+{ value: "", label: "الأحدث  " },
+    { value: "الفئة", label: "الفئة" },
+    { value: "  المشرف  ", label: " المشرف  " },
 
   ]}
   selected={statusFilter}

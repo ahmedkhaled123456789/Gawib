@@ -43,8 +43,9 @@ const ProductRow = ({ product, index ,setShowModal}) => {
         <td  className="px-4 py-2 text-white">
   <button
          onClick={() => setShowModal(true)}
-          className={`px-4 py-2 w-full rounded font-semibold cursor-pointer ${
-            product.status === 'جديد' ? 'bg-[#0765AA]' : 'text-[#0765AA] border border-[#0765AA]'
+ disabled={product.status === "منتهي"}       
+    className={`px-4 py-2 w-full rounded font-semibold cursor-pointer ${
+            product.status === 'جديد' ? 'bg-[#0765AA]' : 'text-[#0765AA]  border border-[#0765AA]'
           }`}
         >
           {product.status}
@@ -88,11 +89,7 @@ const ContactUs = () => {
         <CustomDropdown
   options={[
     { value: "", label: "الأحدث  " },
-    { value: "الجنسية", label: "الجنسية" },
-    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-        { value: " عدد الألعاب", label: " عدد الألعاب" },
-    { value: " المشتريات", label: " المشتريات" },
-    { value: "  حالة الحساب", label: "  حالة الحساب" },
+   
 
   ]}
   selected={statusFilter}
@@ -107,7 +104,7 @@ const ContactUs = () => {
       </div>
         <div className="overflow-x-auto">
           <table className="w-full table-auto divide-y-2 divide-[#0765AA] bg-white text-sm">
-            <thead className="text-right">
+            <thead className="text-center">
               <tr className="px-4 py-2 font-medium text-[#0765AA]">
                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
                 <th className="px-4 py-2  font-medium">الأسم  </th>

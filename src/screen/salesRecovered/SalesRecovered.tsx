@@ -14,11 +14,11 @@ const dummyProducts = [
     phone: "966505963256",
     nationality: "السعودية",
     num: 10,
-    Date: "#27/08/2025",
+    Date: "27/08/2025",
     pay: "ماستر كارد",    
     subtotal: 55,
      price: 20,
-    total: "#27/08/2025",
+    total: "27/08/2025",
      amount: "EW12531586456436",
 
    
@@ -30,11 +30,11 @@ const dummyProducts = [
     phone: "966505963256",
     nationality: "السعودية",
     num: 10,
-    Date: "#27/08/2025",
+    Date: "27/08/2025",
     pay: "ماستر كارد",    
     subtotal: 55,
      price: 20,
-     total: "#27/08/2025",
+     total: "27/08/2025",
      amount: "EW12531586456436",
 
    
@@ -46,11 +46,11 @@ const dummyProducts = [
     phone: "966505963256",
     nationality: "السعودية",
     num: 10,
-    Date: "#27/08/2025",
+    Date: "27/08/2025",
     pay: "ماستر كارد",    
     subtotal: 55,
      price: 20,
-    total: "#27/08/2025",
+    total: "27/08/2025",
      amount: "EW12531586456436",
  
    
@@ -72,12 +72,12 @@ const ProductRow = ({ product, index , setShowModal}) => {
       <td className="px-4 py-2 text-gray-700">   {product.phone}</td>
       <td className="px-4 py-2 text-gray-700">  {product.nationality}</td>
       <td className="px-4 py-2 text-gray-700"> <div className="w-24">{product.num}</div>  </td>
-       <td className="px-4 py-2 text-gray-700">  {product.Date}</td>
+       <td className="px-4 py-2 text-gray-700"> <div className="w-24">{product.Date}</div> </td>
       <td className="px-4 py-2 text-gray-700"> <div className="w-24">{product.pay}</div>  </td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-24">{product.total}</div>  </td>
-            <td className="px-4 py-2 text-gray-700"> <div className="w-24">{product.amount}</div> </td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-24">{product.subtotal}</div>  </td>
+            <td className="px-4 py-2 text-gray-700"> <div className="w-24">{product.total}</div> </td>
 
-      <td className="px-4 py-2 text-gray-700"><div className="w-28">{product.subtotal}</div>  </td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-28">{product.amount}</div>  </td>
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-28 gap-2" onClick={() => setShowModal(true)}>
                 <span className="p-1 border cursor-pointer rounded bg-[#0765AA]">
@@ -126,11 +126,10 @@ const SalesRecovered = () => {
    options={[
     { value: "", label: "الأحدث  " },
     { value: "الجنسية", label: "الجنسية" },
-    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-        { value: " عدد الألعاب", label: " عدد الألعاب" },
-    { value: " المشتريات", label: " المشتريات" },
-    { value: "  حالة الحساب", label: "  حالة الحساب" },
-
+    { value: " تاريخ الفاتورة  ", label: " تاريخ الفاتورة  " },
+        { value: " طريقة الدفع  ", label: " طريقة الدفع  " },
+    { value: " تاريخ ا لاسترداد", label: " تاريخ ا لاسترداد" },
+ 
   ]}
   selected={statusFilter}
   onChange={setStatusFilter}

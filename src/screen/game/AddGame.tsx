@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Dropdown from "../../components/DropDown";
@@ -7,8 +7,11 @@ const AddGame = ({ onClose }: { onClose: () => void }) => {
   const [activePoints, setActivePoints] = useState<number | null>(400);
   const [category, setCategory] = useState("");
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [age, setAge] = useState("");
+  const [answer, setAnswer] = useState("القاهرة");
+  const [cat, setCat] = useState("دول وعواصم");
+    const [age, setAge] = useState("دول وعواصم");
+  const [see, setSee] = useState("دول وعواصم");
+
   const [statusFilter, setStatusFilter] = useState("");
 
   const handleSubmit = () => {
@@ -27,6 +30,27 @@ const AddGame = ({ onClose }: { onClose: () => void }) => {
     setAge("");
   };
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const fileInputRef2 = useRef<HTMLInputElement | null>(null);
+
+  const [image, setImage] = useState<File | null>(null);
+  const [image2, setImage2] = useState<File | null>(null);
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+  const handleImageClick2 = () => {
+    fileInputRef2.current?.click();
+  };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setImage(file);
+  };
+
+   const handleImageChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setImage2(file);
+  };
   return (
     <div className="w-full p-5">
       <div className="bg-white rounded-md p-4 border shadow">
@@ -51,9 +75,9 @@ const AddGame = ({ onClose }: { onClose: () => void }) => {
              <label className="text-[#0765AA] font-bold" >أسم الفئة</label>
         <Dropdown
   options={[
-    { value: "", label: "كل الحالات" },
-    { value: "متاح", label: "متاح" },
-    { value: "غير متاح", label: "غير متاح" },
+    { value: "", label: "دول وعواصم  " },
+    { value: "فن أجنبي  ", label: "فن أجنبي" },
+    { value: " خمن الصورة ", label: " خمن الصورة " },
   ]}
   selected={statusFilter}
   onChange={setStatusFilter}
@@ -66,11 +90,10 @@ const AddGame = ({ onClose }: { onClose: () => void }) => {
               type="text"
               value={age}
               onChange={(e) => setAge(e.target.value)}
-              placeholder="دول وعواصم"
-              className="w-full  outline-none   text-sm text-right"
+               className="w-full  outline-none   text-sm text-right"
             />              
               <span className="text-red-500 text-xl cursor-pointer">
-                <img src="/public/images/group/close.png" alt="" className="w-5 h-5" />
+                <img src="/images/group/close.png" alt="" className="w-5 h-5" />
               </span>
             </div>
 
@@ -79,13 +102,12 @@ const AddGame = ({ onClose }: { onClose: () => void }) => {
             <div className="border  border-[#0765AA] flex items-center justify-between px-2 py-3 rounded text-sm text-right">
                 <input
               type="text"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              placeholder="دول وعواصم"
-              className="w-full  outline-none   text-sm text-right"
+              value={cat}
+              onChange={(e) => setCat(e.target.value)}
+               className="w-full  outline-none   text-sm text-right"
             />
               <span className="text-red-500 text-xl cursor-pointer">
-                                <img src="/public/images/group/close.png" alt="" className="w-5 h-5" />
+                                <img src="/images/group/close.png" alt="" className="w-5 h-5" />
 
               </span>
             </div>
@@ -94,10 +116,9 @@ const AddGame = ({ onClose }: { onClose: () => void }) => {
             <label className="text-[#0765AA] font-bold" >التلميح</label>
             <input
               type="text"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              placeholder="التلميح"
-              className="w-full rounded outline-none  border  border-[#0765AA] p-3 text-sm text-right"
+              value={see}
+              onChange={(e) => setSee(e.target.value)}
+               className="w-full rounded outline-none  border  border-[#0765AA] p-3 text-sm text-right"
             />
 
             {/* الأزرار */}
@@ -129,18 +150,56 @@ const AddGame = ({ onClose }: { onClose: () => void }) => {
             {/* السؤال */}
             <div className="flex flex-col w-1/2 border  border-[#0765AA] p-2 rounded">
               <h3 className="text-center border p-4  border-[#0765AA] font-bold text-[#0765AA]  mb-2">السؤال</h3>
-              <div className="border p-4  border-[#0765AA]  mb-2 text-right">{question || "   ماهي عاصمة مصر"}</div>
+              <div className="border p-4  border-[#0765AA]  mb-2 text-right">{question || "مصر"}</div>
               <div className="border p-4  border-[#0765AA] flex justify-center items-center h-72">
-                <img src="/public/images/group/img.png" alt="question" className="h-10" />
+ <div
+                className="w-full h-[200px]    flex items-center justify-center cursor-pointer  "
+                onClick={handleImageClick}
+              >
+                {image ? (
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Preview"
+                    className="w-[60px] h-[60px] "
+                  />
+                ) : (
+                  <img src="/images/group/img.png" alt="Placeholder" className="w-[60px] h-[60px]" />
+                )}
               </div>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                className="hidden"
+              />              </div>
             </div>
             {/* الجواب */}
             <div className=" flex flex-col w-1/2 border   border-[#0765AA]  p-2 rounded">
               <h3 className="text-center font-bold text-[#0765AA] border p-4  border-[#0765AA]  mb-2">الجواب</h3>
               <div className="border p-4  border-[#0765AA]  mb-2 text-right">{answer || "القاهرة"}</div>
               <div className="border p-4  border-[#0765AA] flex justify-center items-center h-72">
-                <img src="/public/images/group/img.png" alt="question" className="h-10" />
+ <div
+                className="w-full h-[200px]    flex items-center justify-center cursor-pointer  "
+                onClick={handleImageClick2}
+              >
+                {image2 ? (
+                  <img
+                    src={URL.createObjectURL(image2)}
+                    alt="Preview"
+                    className="w-[60px] h-[60px] "
+                  />
+                ) : (
+                  <img src="/images/group/img.png" alt="Placeholder" className="w-[60px] h-[60px]" />
+                )}
               </div>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef2}
+                onChange={handleImageChange2}
+                className="hidden"
+              />              </div>
             </div>
           </div>
 

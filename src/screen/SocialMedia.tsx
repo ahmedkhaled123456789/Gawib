@@ -207,29 +207,22 @@ const SocialMedia = () => {
                 onChange={(e) => updateUrl(platform.id, e.target.value)}
                 onFocus={() => !platform.checked && toggleCheckbox(platform.id)}
                 placeholder={platform.placeholder}
-                className="flex-1 px-4 py-3 border border-[#0765AA] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-left"
+                className="flex-1 px-4 py-3 border border-[#0765AA] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
                 dir="ltr"
               />
 
               {/* Checkbox */}
               <div className="">
-               <div className="flex items-center justify-center px-4 py-3 border border-[#0765AA] ">
-                 <button
+                  <button
                   onClick={() => toggleCheckbox(platform.id)}
-                  className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
-                    platform.checked
-                      ? 'bg-green-500 border-green-500 text-white'
-                      : 'bg-white border-gray-300 hover:border-gray-400'
-                  }`}
+                  className={` w-12 h-12   mr-2  border border-[#0765AA] flex items-center justify-center transition-all`}
                 >
                   {platform.checked && (
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                                 <img src="/images/group/true.png" alt="selected" className="w-6 h-6" />
+
                   )}
                 </button>
                </div>
-              </div>
             </div>
           ))}
         </div>
