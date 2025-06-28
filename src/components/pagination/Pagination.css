@@ -7,7 +7,47 @@
    padding: 5px;
  } */
 
-.active {
-  background: #0765AA !important;
-  color: #fff !important;
+/* Pagination.css */
+
+.pagination {
+  display: flex;
+  justify-content: start;
+  align-items: start;
+  gap: 32px;
+  padding: 1rem;
+   border-top: 1px solid #ccc;
+  padding: 40px 0;
+  margin: 20px;
+
 }
+
+.page-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  background-color: #eee;
+  transition: all 0.2s ease;
+}
+
+.page-link:hover {
+  background-color: #dce4ea;
+}
+
+.active .page-link {
+  background-color: #0765AA !important;
+  color: #fff !important;
+  border-color: #0765AA;
+}
+
+.page-item.disabled .page-link {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+

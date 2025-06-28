@@ -1,6 +1,6 @@
 import ReactPaginate from "react-paginate";
 import "./Pagination.css";
-import { t } from "i18next";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 const Pagination = ({ pageCount, onPress }) => {
   const handlePageClick = (data: { selected: number }) => {
     onPress(data.selected + 1);
@@ -9,24 +9,23 @@ const Pagination = ({ pageCount, onPress }) => {
   return (
     <ReactPaginate
       breakLabel="..."
-      nextLabel={t("next")}
+      nextLabel=<ChevronLeft />
+      previousLabel=<ChevronRight />
       onPageChange={handlePageClick}
-      marginPagesDisplayed={1}
-      pageRangeDisplayed={1}
       pageCount={pageCount}
-      previousLabel={t("prev")}
-      containerClassName={"pagination text flex justify-center gap-4 p-3"}
-      pageClassName={"bg-white"}
-      pageLinkClassName={
-        "page-link block size-8 rounded border border-gray-100 text-center leading-8"
-      }
-      previousClassName={"page-item"}
-      nextClassName={"page-item"}
-      previousLinkClassName={"page-link"}
-      nextLinkClassName={"page-link"}
-      breakClassName={"page-item"}
-      breakLinkClassName={"page-link"}
-      activeClassName={"active"}
+      marginPagesDisplayed={1}
+      pageRangeDisplayed={3}
+      containerClassName="pagination"
+      pageClassName="page-item"
+      pageLinkClassName="page-link"
+      previousClassName="page-item"
+      previousLinkClassName="page-link"
+      nextClassName="page-item"
+      nextLinkClassName="page-link"
+      breakClassName="page-item"
+      breakLinkClassName="page-link"
+      activeClassName="active"
+      disabledClassName="disabled"
     />
   );
 };

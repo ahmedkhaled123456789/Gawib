@@ -191,7 +191,7 @@ const SocialMedia = () => {
               className="flex items-center py-3 px-2 border-b border-gray-100 hover:bg-gray-50 transition-colors rounded"
             >
               {/* Social Icon */}
-                             <div className="flex items-center justify-center p-2 border border-[#0765AA] ">
+                             <div className="flex items-center justify-center p-2 border border-[#0765AA] border-l-0 ">
 <div className={`  flex items-center justify-center  `}>
     <img src={platform.icon} alt="img" className="w-8 h-8" />
                

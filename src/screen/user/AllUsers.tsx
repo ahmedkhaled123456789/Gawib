@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/CustomModal";
+import Dashboard from "../../components/Dashboard/Dashboard";
 
 const dummyProducts = [
   {
@@ -107,14 +108,9 @@ const handleConfirmStatus = () => {
     <div className="overflow-x-hidden">
       <div className="mx-2">
 
-{/* <div className="text-center mb-6">
-    <Link
-      to="/addproduct"
-      className="inline-block w-1/2 bg-[#0765AA] text-white font-semibold py-2 px-6 rounded-md shadow hover:bg-[#0165AA] transition"
-    >
-      إضافة مستخدم
-    </Link>
-  </div> */}
+{/* <div className="">
+         <Dashboard/>
+        </div> */}
  {/* Header Controls */}
       <div className="flex flex-col p-4  bg-white md:flex-row items-center justify-between gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
@@ -146,17 +142,7 @@ const handleConfirmStatus = () => {
   onChange={setStatusFilter}
 />
     </div>
-        <div className="flex gap-4 items-center w-full md:w-auto">
-         
-
-          {/* Add Product */}
-          {/* <Link
-            to="/addproduct"
-            className="bg-[#0765AA] text-white font-semibold py-2 px-4 rounded-md shadow hover:bg-[#0765AA] transition"
-          >
-            إضافة منتج
-          </Link> */}
-        </div>
+        
       </div>
         <div className="overflow-x-auto">
           <table className="w-full table-auto divide-y-2 divide-[#0765AA] bg-white text-sm">
