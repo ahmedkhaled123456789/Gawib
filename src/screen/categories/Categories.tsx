@@ -14,7 +14,7 @@ const data = [
     approvedQuestions: { total: 4164, q600: 4164, q400: 694, q200: 694 },
     publishedQuestions: { total: 4164, q600: 4164, q400: 694, q200: 694 },
     users: 30,
-    status: "موقوفة",
+    status:"موقوفة",
     img:"/images/group/see.png"
   },
   {
@@ -25,7 +25,7 @@ const data = [
     approvedQuestions: { total: 4164, q600: 4164, q400: 694, q200: 694 },
     publishedQuestions: { total: 4164, q600: 4164, q400: 694, q200: 694 },
     users: 1500,
-    status: "منشورة",
+    status:"منشورة",
     img:"/images/group/see.png"
   },
   {
@@ -36,14 +36,14 @@ const data = [
     approvedQuestions: { total: 4164, q600: 4164, q400: 694, q200: 694 },
     publishedQuestions: { total: 4164, q600: 4164, q400: 694, q200: 694 },
     users: 200,
-    status: "منشورة",
+    status:"منشورة",
     img:"/images/group/see.png"
   },
 ];
 const QuestionStats = ({ stats }) => {
-  const colors = ['bg-blue-700', 'bg-purple-700', 'bg-pink-700', 'bg-green-700'];
+  const colors = ['bg-[#309222]', 'bg-[#9647c4]', 'bg-[#ae1113]', 'bg-[#292d32]'];
   const keys = ['total', 'q600', 'q400', 'q200'];
-    const colorsText = ['text-blue-700', 'text-purple-700', 'text-pink-700', 'text-green-700'];
+    const colorsText = ['text-[#309222]', 'text-[#9647c4]', 'text-[#ae1113]', 'text-[#292d32]'];
 
 
   return (
@@ -96,16 +96,18 @@ const CategoriesRow = ({ product, index,setShowCatModal }) => {
  {product.users}
         </div>
        </td>
+   <td className="px-4 py-2">
+  <span
+    className={`px-3 py-1 rounded font-bold ${
+      product.status === "منشورة" ? "text-[#588a17]" : "text-[#db2777]"
+    }`}
+  >
+    {product.status}
+  </span>
+</td>
+
       <td className="px-4 py-2">
-        <span
-          className={`px-3 py-1 rounded  font-bold ${ product.status === "منشورة" ? "text-[#588a17" : "text-[#db2777]"
-          }`}
-        >
-          {product.status}
-        </span>
-      </td>
-      <td className="px-4 py-2">
-        <button className="px-4 py-2 w-32 bg-blue-700 text-white rounded cursor-pointer"
+        <button className=" py-2 w-24 bg-[#085e9c] text-white rounded cursor-pointer"
         onClick={() => setShowCatModal(true)}>
           إضافة صورة
         </button>

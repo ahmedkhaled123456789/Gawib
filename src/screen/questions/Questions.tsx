@@ -45,7 +45,7 @@ const dummyProducts = [
 
  ];
 
-const ProductRow = ({ product, index ,setShowModal}) => {
+const ProductRow = ({ product, index ,setShowPriceModal}) => {
     
   return (
     <tr key={product._id}>
@@ -69,13 +69,14 @@ const ProductRow = ({ product, index ,setShowModal}) => {
   
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-40 gap-2">
-                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]">
-                <img src="/public/images/group/edit.png" alt="" className="w-5 h-5" />
+                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]"
+                 onClick={() => setShowPriceModal(true)}>
+                <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
                              <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" 
-                             onClick={() => setShowModal(true)}
+                             onClick={() => setShowPriceModal(true)}
                              >
-                <img src="/public/images/group/see.png" alt="" className="w-5 h-5" />
+                <img src="/images/group/see.png" alt="" className="w-5 h-5" />
             </span>
                     <span className=" text-[#0765AA] border border-[#0765AA] rounded px-3 py-1 ">اعتماد</span>
 
@@ -125,11 +126,9 @@ const Questions = () => {
         <CustomDropdown
   options={[
     { value: "", label: "الأحدث  " },
-    { value: "الجنسية", label: "الجنسية" },
-    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-        { value: " عدد الألعاب", label: " عدد الألعاب" },
-    { value: " المشتريات", label: " المشتريات" },
-    { value: "  حالة الحساب", label: "  حالة الحساب" },
+    { value: "الفئة", label: "الفئة" },
+    { value: "  المشرف  ", label: " المشرف  " },
+        
 
   ]}
   selected={statusFilter}
@@ -174,7 +173,7 @@ const Questions = () => {
             <tbody className="divide-y text-center divide-gray-200">
               {products.length > 0 ? (
                 products.map((product, index) => (
-                  <ProductRow key={product._id} product={product} index={index}   setShowModal={setShowModal} />
+                  <ProductRow key={product._id} product={product} index={index}   setShowPriceModal={setShowPriceModal} />
                 ))
               ) : (
                 <tr>

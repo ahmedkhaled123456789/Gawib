@@ -57,11 +57,11 @@ const ProductRow = ({ product, index }) => {
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center gap-2">
                 <span className="p-1 border cursor-pointer rounded bg-[#0765AA]">
-                <img src="/public/images/group/edit.png" alt="" className="w-5 h-5" />
+                <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
                              <span className="p-1 border cursor-pointer rounded border-[#0765AA]" >
 
-                 <img src="/public/images/group/true.png" alt="" className={`w-5 h-5 ${product.status === 'نشط' ? 'opacity-100' : 'opacity-0'}`} />
+                 <img src="/images/group/true.png" alt="" className={`w-5 h-5 ${product.status === 'نشط' ? 'opacity-100' : 'opacity-0'}`} />
             
              </span>
             </div>

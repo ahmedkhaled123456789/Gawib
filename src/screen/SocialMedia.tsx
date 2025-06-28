@@ -15,7 +15,7 @@ const SocialMedia = () => {
     {
       id: 'instagram',
       name: 'Instagram',
-      icon: "/public/images/media/1.png",
+      icon: "/images/media/1.png",
       placeholder: 'https://www.instagram.com/username',
       checked: true,
       url: 'https://www.instagram.com/aljazeera/',
@@ -24,7 +24,7 @@ const SocialMedia = () => {
     {
       id: 'tiktok',
       name: 'TikTok',
-      icon: "/public/images/media/2.png",
+      icon: "/images/media/2.png",
       placeholder: 'https://www.tiktok.com/@username',
       checked: false,
       url: '',
@@ -33,7 +33,7 @@ const SocialMedia = () => {
     {
       id: 'facebook',
       name: 'Facebook',
-      icon: "/public/images/media/3.png",
+      icon: "/images/media/3.png",
       placeholder: 'https://www.facebook.com/username',
       checked: true,
       url: '',
@@ -42,7 +42,7 @@ const SocialMedia = () => {
     {
       id: 'youtube',
       name: 'YouTube',
-      icon: "/public/images/media/4.png",
+      icon: "/images/media/4.png",
       placeholder: 'https://www.youtube.com/channel/username',
       checked: true,
       url: '',
@@ -51,7 +51,7 @@ const SocialMedia = () => {
     {
       id: 'twitter',
       name: 'Twitter/X',
-      icon: "/public/images/media/5.png",
+      icon: "/images/media/5.png",
       placeholder: 'https://twitter.com/username',
       checked: false,
       url: '',
@@ -60,7 +60,7 @@ const SocialMedia = () => {
     {
       id: 'whatsapp',
       name: 'WhatsApp',
-      icon: "/public/images/media/6.png",
+      icon: "/images/media/6.png",
       placeholder: 'https://wa.me/1234567890',
       checked: false,
       url: '',
@@ -69,7 +69,7 @@ const SocialMedia = () => {
     {
       id: 'pinterest',
       name: 'Pinterest',
-      icon: "/public/images/media/7.png",
+      icon: "/images/media/7.png",
       placeholder: 'https://pinterest.com/username',
       checked: false,
       url: '',
@@ -78,7 +78,7 @@ const SocialMedia = () => {
     {
       id: 'linkedin',
       name: 'LinkedIn',
-      icon: "/public/images/media/8.png",
+      icon: "/images/media/8.png",
       placeholder: 'https://linkedin.com/in/username',
       checked: false,
       url: '',
@@ -87,7 +87,7 @@ const SocialMedia = () => {
     {
       id: 'snapchat',
       name: 'Snapchat',
-      icon: "/public/images/media/9.png",
+      icon: "/images/media/9.png",
       placeholder: 'https://snapchat.com/add/username',
       checked: true,
       url: '',
@@ -96,7 +96,7 @@ const SocialMedia = () => {
     {
       id: 'fiverr',
       name: 'Fiverr',
-      icon: "/public/images/media/11.png",
+      icon: "/images/media/11.png",
       placeholder: 'https://fiverr.com/username',
       checked: true,
       url: '',
@@ -105,7 +105,7 @@ const SocialMedia = () => {
     {
       id: 'email',
       name: 'Email',
-      icon: "/public/images/media/12.png",
+      icon: "/images/media/12.png",
       placeholder: 'mailto:example@email.com',
       checked: false,
       url: '',
@@ -114,7 +114,7 @@ const SocialMedia = () => {
     {
       id: 'phone',
       name: 'Phone',
-      icon: "/public/images/media/13.png",
+      icon: "/images/media/13.png",
       placeholder: '+1234567890',
       checked: true,
       url: '',
@@ -123,7 +123,7 @@ const SocialMedia = () => {
     {
       id: 'location',
       name: 'Location',
-      icon: "/public/images/media/14.png",
+      icon: "/images/media/14.png",
       placeholder: 'Address or Google Maps link',
       checked: false,
       url: '',

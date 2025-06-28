@@ -52,7 +52,7 @@ const dummyProducts = [
 
  ];
 
-const ProductRow = ({ product, index ,setShowModal,setShowSalesModal}) => {
+const ProductRow = ({ product, index ,setShowPriceModal,setShowSalesModal, setShowModal}) => {
     
   return (
     <tr key={product._id}>
@@ -75,8 +75,8 @@ const ProductRow = ({ product, index ,setShowModal,setShowSalesModal}) => {
             <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.admin}</div></td>
               <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-40 gap-2">
-                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]">
-                <img src="/public/images/group/see.png" alt="" className="w-5 h-5" />
+                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" onClick={() => setShowPriceModal(true)} >
+                <img src="/images/group/see.png" alt="" className="w-5 h-5" />
             </span>
                              
  
@@ -85,23 +85,26 @@ const ProductRow = ({ product, index ,setShowModal,setShowSalesModal}) => {
             <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.copy}</div></td>
 
          <td className="px-4 py-2">
-            <div className="flex  items-center justify-center w-60 gap-2" onClick={() => setShowSalesModal(true)}>
-                  <span className="p-1 border  cursor-pointer rounded bg-[#ffc629]" 
+            <div className="flex  items-center justify-center w-60 gap-2" >
+                  <span className="p-1 border  cursor-pointer rounded bg-[#ffc629]"
+                  onClick={() => setShowSalesModal(true)}
+                  
                             
                              >
-                <img src="/public/images/group/copy.png" alt="" className="w-5 h-5 " />
+                <img src="/images/group/copy.png" alt="" className="w-5 h-5 " />
             </span>
              <span className="p-1 border cursor-pointer rounded border-[#0765AA]" >
 
-                 <img src="/public/images/group/true.png" alt="" className={`w-5 h-5 ${product.status === 'نشط' ? 'opacity-100' : 'opacity-0'}`} />
+                 <img src="/images/group/true.png" alt="" className={`w-5 h-5 ${product.status === 'نشط' ? 'opacity-100' : 'opacity-0'}`} />
             
              </span>
-                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]"  onClick={() => setShowModal(true)}>
-                <img src="/public/images/group/edit.png" alt="" className="w-5 h-5" />
+                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" onClick={() => setShowModal(true)}>
+                <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
-                             <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" 
+                             <span className="p-1 border cursor-pointer rounded bg-[#0765AA]"
+                             onClick={() => setShowPriceModal(true)} 
                               >
-                <img src="/public/images/group/see.png" alt="" className="w-5 h-5" />
+                <img src="/images/group/see.png" alt="" className="w-5 h-5" />
             </span>
 
                     <span className={`${product.share === 'نشر' ? 'text-[#0765AA] border  border-[#0765AA]' : 'text-[#fff]   bg-[#0765AA]'} w-16 cursor-pointer rounded px-3 py-1`}>{product.share}</span>
@@ -122,7 +125,7 @@ const Posted_questions = () => {
 
 const [edit, setEdit] = useState("في هذا السوال يوجد خطاء عاصمة مصر القاهرة وليس طرابلس");
  
-
+console.log(edit)
  
 
 
@@ -135,9 +138,9 @@ const [edit, setEdit] = useState("في هذا السوال يوجد خطاء ع�
  {/* Header Controls */}
     {/* Header */}
      
-<div className="flex  p-4  bg-white md:flex-row items-center justify-between gap-4 ">
+<div className="flex  p-4  bg-white md:flex-row items-center  gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
-          <div className="text-md  font-bold text-[#0765AA]">الأسئلة المعتمدة    </div>
+          <div className="text-md  font-bold text-[#0765AA]">الأسئلة المنشورة      </div>
  {/* Search */}
           <div className="relative w-full md:w-48 border rounded-md  border-[#0765AA]">
             <input
@@ -154,11 +157,11 @@ const [edit, setEdit] = useState("في هذا السوال يوجد خطاء ع�
         <CustomDropdown
   options={[
     { value: "", label: "الأحدث  " },
-    { value: "الجنسية", label: "الجنسية" },
-    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-        { value: " عدد الألعاب", label: " عدد الألعاب" },
-    { value: " المشتريات", label: " المشتريات" },
-    { value: "  حالة الحساب", label: "  حالة الحساب" },
+    { value: "الفئة", label: "الفئة" },
+    { value: " المشرف  ", label: " المشرف  " },
+        { value: " البلاغات  ", label: " البلاغات  " },
+    { value: " المجانية", label: " المجانية" },
+    { value: "  حالة الفئة  ", label: "  حالة الفئة  " },
 
   ]}
   selected={statusFilter}
@@ -171,16 +174,11 @@ const [edit, setEdit] = useState("في هذا السوال يوجد خطاء ع�
       <span className="text-[#ffc629]  font-bold border border-[#0765AA] rounded px-4 py-2 ">600</span>
       <span className="text-[#0765AA] flex gap-1 border border-[#0765AA] rounded p-2 ">
         <span className=" border border-[#0765AA] rounded px-3  "></span>
-        <span className=" text-[#0765AA] border border-[#0765AA] rounded px-3  ">اعتماد</span>
+        <span className=" text-[#0765AA] border border-[#0765AA] rounded px-3  ">نشر</span>
       </span>
 
     </div>
-      <div className="flex items-center  space-x-4 space-x-reverse">
-              <button className="bg-yellow-500 hover:bg-yellow-600 text-[#0765AA] border border-[#0765AA] px-4 py-2 rounded text-sm font-medium transition-colors"
-               onClick={() => setShowPriceModal(true)}
-              >
-إضافة سؤال           </button>
-            </div>
+     
       </div>
         <div className="overflow-x-auto">
           <table className="w-full table-auto divide-y-2 divide-[#0765AA] bg-white text-sm">
@@ -205,7 +203,7 @@ const [edit, setEdit] = useState("في هذا السوال يوجد خطاء ع�
             <tbody className="divide-y text-center divide-gray-200">
               {products.length > 0 ? (
                 products.map((product, index) => (
-                  <ProductRow key={product._id} product={product} index={index} setShowSalesModal={setShowSalesModal}   setShowModal={setShowModal} />
+                  <ProductRow key={product._id} product={product} setShowModal={setShowModal} index={index} setShowSalesModal={setShowSalesModal}   setShowPriceModal={setShowPriceModal} />
                 ))
               ) : (
                 <tr>
@@ -269,6 +267,7 @@ const [edit, setEdit] = useState("في هذا السوال يوجد خطاء ع�
       </div>
     </div>
       </CustomModal>
+      
       <CustomModal isOpen={showModal}>
          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-blue-300">

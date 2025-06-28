@@ -81,7 +81,7 @@ const ProductRow = ({ product, index , setShowModal}) => {
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-28 gap-2">
                 <span className="p-1 border cursor-pointer rounded bg-[#0765AA]">
-                <img src="/public/images/group/print.png" alt="" className="w-5 h-5" />
+                <img src="/images/group/print.png" alt="" className="w-5 h-5" />
             </span>
                              <span className="p-1 px-3 border cursor-pointer text-white rounded bg-[#0765AA]" 
                              onClick={() => setShowModal(true)}

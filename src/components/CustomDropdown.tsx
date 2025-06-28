@@ -10,12 +10,13 @@ const CustomDropdown = ({ options, selected, onChange }) => {
   };
 
   return (
-    <div className="relative w-48 border rounded-md  border-[#0765AA]">
+    <div className="relative w-1/2 border rounded-md  border-[#0765AA]">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full py-2 px-4 border border-gray-300 rounded-md bg-white text-right flex justify-between items-center focus:outline-none"
       >
+        <span className="ml-2 text-gray-500">ترتيب حسب :</span>
         <span>{selected || "الأحدث "}</span>
         <FiChevronDown />
       </button>
