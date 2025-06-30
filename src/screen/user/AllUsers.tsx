@@ -5,12 +5,12 @@ import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/CustomModal";
 import Dashboard from "../../components/Dashboard/Dashboard";
-
+ 
 const dummyProducts = [
   {
     _id: "1",
     name: " علي حسين",
-    email: "ماهر اليوعلي ماهر    ",
+    email: "ماهر اليوعلي ماهر ",
     phone: "966505963256",
     nationality: "السعودية",
     Date: "#27/08/2025",
@@ -108,9 +108,9 @@ const handleConfirmStatus = () => {
     <div className="overflow-x-hidden">
       <div className="mx-2">
 
-{/* <div className="">
+<div className="">
          <Dashboard/>
-        </div> */}
+        </div>
  {/* Header Controls */}
       <div className="flex flex-col p-4  bg-white md:flex-row items-center justify-between gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
