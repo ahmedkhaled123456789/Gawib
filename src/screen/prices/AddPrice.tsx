@@ -14,14 +14,14 @@ interface InputFieldProps {
 
 const InputField = ({ label, placeholder, set, val,type }: InputFieldProps) => {
   return (
-    <div className="flex flex-col text-[#0765AA] mb-4 w-full ">
+    <div className="flex flex-col text-[#085E9C] mb-4 w-full ">
       <label className="mb-1 text-lg font-bold ">{label}</label>
       <input
         value={val}
         onChange={(e) => set(e.target.value)}
         type={type}
         placeholder={placeholder}
-        className="w-full rounded border border-[#0765AA]  p-3 text-sm shadow-md outline-none text-right"
+        className="w-full rounded border border-[#085E9C]  p-3 text-sm shadow-md outline-none text-right"
       />
     </div>
   );

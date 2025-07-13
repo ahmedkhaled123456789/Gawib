@@ -163,19 +163,19 @@ const SocialMedia = () => {
   return (
     <div  className='min-h-screen bg-gray-50 p-4' dir="rtl">
       {/* Top Info Bar */}
-      <div className=" px-6 mb-4 border-b border-[#0765AA] py-3 text-right text-[#0765AA] text-lg font-bold ">
+      <div className=" px-6 mb-4 border-b border-[#085E9C] py-3 text-right text-[#085E9C] text-lg font-bold ">
           التواصل الاجتماعي
       </div>
-<div className='m-6 rounded border border-[#0765AA] overflow-hidden'>
+<div className='m-6 rounded border border-[#085E9C] overflow-hidden'>
 {/* Header */}
-      <div className="bg-white text-gray-800  border-b border-[#0765AA] ">
+      <div className="bg-white text-gray-800  border-b border-[#085E9C] ">
         <div className="flex items-center justify-between">
                       <h2 className="text-xl font-bold">   </h2>
 
-          <h2 className="text-xl text-[#0765AA] font-bold">التواصل الاجتماعي</h2>
+          <h2 className="text-xl text-[#085E9C] font-bold">التواصل الاجتماعي</h2>
           <button
             onClick={handleSave}
-            className="bg-[#0765AA]  text-white px-5 py-4  font-medium transition-colors"
+            className="bg-[#085E9C]  text-white px-5 py-4  font-medium transition-colors"
           >
             حفظ
           </button>
@@ -191,7 +191,7 @@ const SocialMedia = () => {
               className="flex items-center py-3 px-2 border-b border-gray-100 hover:bg-gray-50 transition-colors rounded"
             >
               {/* Social Icon */}
-                             <div className="flex items-center justify-center p-2 border border-[#0765AA] border-l-0 ">
+                             <div className="flex items-center justify-center p-2 border border-[#085E9C] border-l-0 ">
 <div className={`  flex items-center justify-center  `}>
     <img src={platform.icon} alt="img" className="w-8 h-8" />
                
@@ -207,7 +207,7 @@ const SocialMedia = () => {
                 onChange={(e) => updateUrl(platform.id, e.target.value)}
                 onFocus={() => !platform.checked && toggleCheckbox(platform.id)}
                 placeholder={platform.placeholder}
-                className="flex-1 px-4 py-3 border border-[#0765AA] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
+                className="flex-1 px-4 py-3 border border-[#085E9C] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
                 dir="ltr"
               />
 
@@ -215,7 +215,7 @@ const SocialMedia = () => {
               <div className="">
                   <button
                   onClick={() => toggleCheckbox(platform.id)}
-                  className={` w-12 h-12   mr-2  border border-[#0765AA] flex items-center justify-center transition-all`}
+                  className={` w-12 h-12   mr-2  border border-[#085E9C] flex items-center justify-center transition-all`}
                 >
                   {platform.checked && (
                                  <img src="/images/group/true.png" alt="selected" className="w-6 h-6" />

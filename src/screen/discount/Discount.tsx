@@ -79,10 +79,10 @@ const ProductRow = ({ product, index ,setShowModal}) => {
 
          <td className="px-4 py-2">
             <div className="flex w-32  items-center justify-center gap-2">
-                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]">
+                <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
                 <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
-                             <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" 
+                             <span className="p-1 border cursor-pointer rounded bg-[#085E9C]" 
                              onClick={() => setShowModal(true)}
                              >
                 <img src="/images/group/delete.png" alt="" className="w-5 h-5" />
@@ -111,9 +111,9 @@ const Discount = () => {
      
 <div className="flex  p-4  bg-white md:flex-row items-center justify-between gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
-          <div className="text-xl ml-16 font-bold text-[#0765AA]">كود خصم  </div>
+          <div className="text-xl ml-16 font-bold text-[#085E9C]">كود خصم  </div>
  {/* Search */}
-          <div className="relative w-full md:w-48 border rounded-md  border-[#0765AA]">
+          <div className="relative w-full md:w-48 border rounded-md  border-[#085E9C]">
             <input
               type="text"
               placeholder="بحث"
@@ -137,21 +137,21 @@ const Discount = () => {
 />
     </div>
     <div className="flex items-center gap-2 ">
-      <span className="text-[#588A17]   border border-[#0765AA] bg-[#d5d5d5] rounded px-4 py-1 " >نشط</span>
-      <span className="text-[#7e7e7e] border border-[#0765AA] bg-[#d5d5d5] rounded px-4 py-1 ">منتهي</span>
-      <span className="text-[#ff426e] border border-[#0765AA] rounded px-4 py-1 ">محذوف</span>
+      <span className="text-[#588A17]   border border-[#085E9C] bg-[#d5d5d5] rounded px-4 py-1 " >نشط</span>
+      <span className="text-[#7e7e7e] border border-[#085E9C] bg-[#d5d5d5] rounded px-4 py-1 ">منتهي</span>
+      <span className="text-[#ff426e] border border-[#085E9C] rounded px-4 py-1 ">محذوف</span>
     </div>
       <div className="flex items-center space-x-4 space-x-reverse">
-              <button className="bg-yellow-500 hover:bg-yellow-600 text-[#0765AA] border border-[#0765AA] px-4 py-1 rounded text-sm font-medium transition-colors"
+              <button className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-4 py-1 rounded text-sm font-medium transition-colors"
                onClick={() => setShowPriceModal(true)}
               >
 إضافة كود خصم              </button>
             </div>
       </div>
         <div className="overflow-x-auto">
-          <table className="w-full table-auto divide-y-2 divide-[#0765AA] bg-white text-sm">
+          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm">
             <thead className="text-center">
-              <tr className="px-4 py-2 font-medium text-[#0765AA]">
+              <tr className="px-4 py-2 font-medium text-[#085E9C]">
                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
            
                 <th className="px-4 py-2 font-medium">كود الخصم    </th>

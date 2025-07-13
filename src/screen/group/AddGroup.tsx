@@ -11,13 +11,13 @@ interface InputFieldProps {
 }
 
 const InputField = ({ label, set, val, type }: InputFieldProps) => (
-  <div className="flex flex-col  mb-4 w-[48%]">
-    <label className="mb-1 text-lg text-[#0765AA] font-bold">{label}</label>
+  <div className="flex flex-col  mb-2 w-[48%]">
+    <label className="mb-2 text-lg text-[#085E9C] font-bold">{label}</label>
     <input
       value={val}
       onChange={(e) => set(e.target.value)}
       type={type}
-      className="w-full text-black rounded border border-[#0765AA] p-3 text-sm shadow-md outline-none text-right"
+      className="w-full text-black rounded-sm border border-[#085E9C] p-3 text-sm shadow-md outline-none text-right"
     />
   </div>
 );
@@ -58,22 +58,22 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <div className="w-[70%] p-5    ">
-      <div className="bg-white rounded-md p-10 ">
+    <div className="w-[70%] px-5 font-medium   ">
+      <div className="bg-white rounded-md p-6 ">
         {/* Product Type */}
         <div className="flex flex-col  w-full  ">
-          <label className="mb-1 text-lg text-[#0765AA] font-bold">نوع الفئة </label>
+          <label className="mb-2 text-lg text-[#085E9C] font-bold">نوع الفئة </label>
           
     <input
       value={type}
       onChange={(e) => setType(e.target.value)}
       type={type}
-       className="w-full bg-[#D5D5D5]  rounded border border-[#0765AA] p-3 text-sm shadow-md outline-none text-right"
+       className="w-full bg-[#D5D5D5]  rounded-sm border border-[#085E9C] p-3 text-sm shadow-md outline-none text-right"
     />
          </div>
 
         {/* Form Fields */}
-        <form className="flex flex-wrap justify-between gap-4 pt-5 text-[#0765AA]">
+        <form className="flex flex-wrap justify-between gap-4 pt-5 text-[#085E9C]">
           <InputField val={name} set={setName} type="text" label="أسم الفئة"  />
           <InputField val={admin} set={setAdmin} type="text" label="أسم المشرف"  />
 
@@ -82,9 +82,9 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
           <div className="flex flex-wrap   justify-between  w-full gap-4 ">
             {/* Instructions */}
             <div className="w-full md:w-[48%] ">
-              <label className="mb-3 text-lg font-bold block">تعليمات الفئة</label>
+              <label className="mb-2 text-lg font-bold block">تعليمات الفئة</label>
               <textarea
-                className="w-full h-[120px] text-black border border-[#0765AA] rounded-lg p-3 text-sm outline-none text-right  shadow-md"
+                className="w-full resize-none h-[190px] text-black border border-[#085E9C] rounded-sm p-3 text-sm outline-none text-right  shadow-md"
               >
                 هذه الفئة تختص بدولة ما وعاصمتها وعملتها ولغتها
               </textarea>
@@ -92,9 +92,9 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
 
             {/* Image Upload */}
             <div className="w-full md:w-[48%] flex flex-col ">
-              <label className="mb-3 text-lg font-bold">صورة الفئة الرئيسية</label>
+              <label className="mb-2 text-lg font-bold">صورة الفئة الرئيسية</label>
               <div
-                className="w-full h-[120px]   border border-[#0765AA] flex items-center justify-center cursor-pointer rounded-md hover:shadow-lg transition"
+                className="w-full h-[190px]   border border-[#085E9C] flex items-center justify-center cursor-pointer rounded-sm hover:shadow-lg transition"
                 onClick={handleImageClick}
               >
                 {image ? (
@@ -119,7 +119,7 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
         </form>
 
         {/* Buttons */}
-        <div className="mt-8">
+        <div className="">
           <ButtonGroup handleSubmit={submitData} resetHandle={resetHandle} onClose={onClose} />
         </div>
       </div>

@@ -69,16 +69,16 @@ const ProductRow = ({ product, index ,setShowPriceModal}) => {
   
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-40 gap-2">
-                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]"
+                <span className="p-1 border cursor-pointer rounded bg-[#085E9C]"
                  onClick={() => setShowPriceModal(true)}>
                 <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
-                             <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" 
+                             <span className="p-1 border cursor-pointer rounded bg-[#085E9C]" 
                              onClick={() => setShowPriceModal(true)}
                              >
                 <img src="/images/group/see.png" alt="" className="w-5 h-5" />
             </span>
-                    <span className=" text-[#0765AA] border border-[#0765AA] rounded px-3 py-1 ">اعتماد</span>
+                    <span className=" text-[#085E9C] border border-[#085E9C] rounded px-3 py-1 ">اعتماد</span>
 
             </div>
       </td>
@@ -107,11 +107,11 @@ const Questions = () => {
  {/* Header Controls */}
     {/* Header */}
      
-<div className="flex  p-4  bg-white md:flex-row items-center justify-between gap-4 ">
-    <div className="flex gap-4 items-center w-full md:w-auto">
-          <div className="text-md  font-bold text-[#0765AA]">الأسئلة المعتمدة    </div>
+<div className="flex  p-4  bg-white md:flex-row items-center justify-between gap-2 ">
+    <div className="flex gap-2 items-center w-full md:w-auto">
+          <div className="text-md w-32 font-bold text-[#085E9C]">الأسئلة المعتمدة    </div>
  {/* Search */}
-          <div className="relative w-full md:w-48 border rounded-md  border-[#0765AA]">
+          <div className="relative w-full md:w-48 border rounded-md  border-[#085E9C]">
             <input
               type="text"
               placeholder="بحث"
@@ -136,26 +136,26 @@ const Questions = () => {
 />
     </div>
     <div className="flex items-center gap-2 ">
-      <span className="text-[#ffc629] font-bold   border bg-[#0765AA] border-[#0765AA] rounded px-4 py-2 " >200</span>
-      <span className="text-[#ffc629]  font-bold border border-[#0765AA]  rounded px-4 py-2 ">400</span>
-      <span className="text-[#ffc629]  font-bold border border-[#0765AA] rounded px-4 py-2 ">600</span>
-      <span className="text-[#0765AA] flex gap-1 border border-[#0765AA] rounded p-2 ">
-        <span className=" border border-[#0765AA] rounded px-3  "></span>
-        <span className=" text-[#0765AA] border border-[#0765AA] rounded px-3  ">اعتماد</span>
+      <span className="text-[#ffc629] font-bold   border bg-[#085E9C] border-[#085E9C] rounded px-4 py-2 " >200</span>
+      <span className="text-[#ffc629]  font-bold border border-[#085E9C]  rounded px-4 py-2 ">400</span>
+      <span className="text-[#ffc629]  font-bold border border-[#085E9C] rounded px-4 py-2 ">600</span>
+      <span className="text-[#085E9C] flex gap-1 border border-[#085E9C] rounded p-2 ">
+        <span className=" border border-[#085E9C] rounded px-3  "></span>
+        <span className=" text-[#085E9C] border border-[#085E9C] rounded px-3  ">اعتماد</span>
       </span>
 
     </div>
       <div className="flex items-center  space-x-4 space-x-reverse">
-              <button className="bg-yellow-500 hover:bg-yellow-600 text-[#0765AA] border border-[#0765AA] px-4 py-2 rounded text-sm font-medium transition-colors"
+              <button className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-4 py-2 rounded text-sm font-medium transition-colors"
                onClick={() => setShowPriceModal(true)}
               >
 إضافة سؤال           </button>
             </div>
       </div>
         <div className="overflow-x-auto">
-          <table className="w-full table-auto divide-y-2 divide-[#0765AA] bg-white text-sm">
+          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm">
             <thead className="text-center">
-              <tr className="px-4 py-2 font-medium text-[#0765AA]">
+              <tr className="px-4 py-2 font-medium text-[#085E9C]">
                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
            
                 <th className="px-4 py-2 font-medium">  أسم الفئة    </th>

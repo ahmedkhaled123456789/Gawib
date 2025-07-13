@@ -13,10 +13,10 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({
   onClose
 }) => {
   return (
-    <div className="p-4 mt-5 flex justify-between gap-4 bg-white btn_save">
+    <div className="p-4 mt-4 flex justify-between gap-4 bg-white btn_save">
       <button
         onClick={handleSubmit}
-        className="px-7 py-2 bg-[#0765AA] text-white rounded-md"
+        className="px-7 py-2 bg-[#085E9C] text-white rounded-md"
       >
         حفظ
       </button>
@@ -30,7 +30,7 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({
        <button
         type="button"
         onClick={onClose}
-        className="px-7 py-2 border  border-[#0765AA] text-[#0765AA] rounded-md"
+        className="px-7 py-2 border  border-[#085E9C] text-[#085E9C] rounded-md"
       >
        إغلاق
       </button>

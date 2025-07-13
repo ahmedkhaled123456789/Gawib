@@ -68,7 +68,7 @@ const Sidebar: React.FC = () => {
           isOpen ? "w-52" : "w-20"
         } h-screen bg-gray-200 relative overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out`}
       >
-        <div className="flex items-center gap-2 px-2 py-3 bg-[#0765AA] text-white">
+        <div className="flex items-center gap-2 px-2 py-3 bg-[#085E9C] text-white">
           <button
             onClick={toggleSidebar}
             aria-label="Toggle Sidebar"
@@ -95,7 +95,7 @@ const Sidebar: React.FC = () => {
             <li
               key={index}
  className={`shadow flex items-center gap-x-2 my-4 p-2 rounded-md cursor-pointer transition-all ${
-    location.pathname === item.path ? "bg-[#0765AA] text-white" : "hover:bg-[#0765AA] hover:text-white"
+    location.pathname === item.path ? "bg-[#085E9C] text-white" : "hover:bg-[#085E9C] hover:text-white"
   }`}              onClick={() => navigate(item.path)}
             >
               {item.icon}

@@ -23,11 +23,11 @@ const supervisors = [
 const SupervisorCard = ({ supervisor }) => {
   return (
     <div className="border border-[##085E9C] p-4 rounded shadow bg-white space-y-4">
-      <div className="grid grid-cols-4 gap-2 items-center text-[#085E9C]">
-        <div className="col-span-1 border rounded border-[##085E9C] p-4 text-center font-bold ">{supervisor.name}</div>
-        <div className="col-span-1 bg-yellow-400 text-center  border rounded border-[##085E9C] p-4 font-bold">{supervisor.phone}</div>
-        <div className="col-span-1 bg-yellow-400 text-center  border rounded border-[##085E9C] p-4 font-bold">{supervisor.email}</div>
-        <div className="col-span-1 bg-yellow-400 text-center  border rounded border-[##085E9C] p-4 font-bold">{supervisor.role}</div>
+      <div className="grid grid-cols-4 gap-2 items-center font-bold text-[#085E9C]">
+        <div className="col-span-1 border rounded border-[#085E9C] p-4 text-center  ">{supervisor.name}</div>
+        <div className="col-span-1 bg-yellow-400 text-center  border rounded border-[#085E9C] p-4 ">{supervisor.phone}</div>
+        <div className="col-span-1 bg-yellow-400 text-center  border rounded border-[#085E9C] p-4 ">{supervisor.email}</div>
+        <div className="col-span-1 bg-yellow-400 text-center  border rounded border-[#085E9C] p-4 ">{supervisor.role}</div>
       </div>
 
       <div className="grid grid-cols-4 gap-2">
@@ -48,7 +48,7 @@ export default function Admins() {
       <div className="flex justify-between items-center bg-white border-b-[#085E9C] border-b p-2">
         <h1 className="text-xl font-bold text-[#085E9C]">المشرفين</h1>
         
-                <button className="bg-yellow-400 border border-[#085E9C] text-[#085E9C] px-4 py-2 rounded shadow text-sm font-bold"
+                <button className="bg-yellow-400 border border-[#085E9C] text-[#085E9C] px-4 py-2 rounded shadow text-md font-bold"
                   onClick={() => setShowAdminModal(true)}>إضافة مشرف</button>
  
       <CustomModal isOpen={showAdminModal}>

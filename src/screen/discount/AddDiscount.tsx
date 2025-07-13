@@ -14,14 +14,14 @@ interface InputFieldProps {
 
 const InputField = ({ label, placeholder, set, val,type }: InputFieldProps) => {
   return (
-    <div className="flex flex-col text-[#0765AA]   w-[48%] ">
+    <div className="flex flex-col text-[#085E9C]   w-[48%] ">
       <label className="mb-1 text-lg font-bold ">{label}</label>
       <input
         value={val}
         onChange={(e) => set(e.target.value)}
         type={type}
         placeholder={placeholder}
-        className="w-full rounded border border-[#0765AA]  p-2 text-sm shadow-md outline-none text-right"
+        className="w-full rounded border border-[#085E9C]  p-2 text-sm shadow-md outline-none text-right"
       />
     </div>
   );
@@ -69,9 +69,9 @@ const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عا
         <form className="flex flex-wrap items-center justify-center gap-5 pt-5">
 
             {/* Dropdown */}
-           <div className="flex flex-col text-[#0765AA]   w-[48%] ">
+           <div className="flex flex-col text-[#085E9C]   w-[48%] ">
              <label className="mb-1 text-lg font-bold">الباقة</label>
-                 <select className="w-full rounded border border-[#0765AA]  p-2 text-sm shadow-md outline-none text-right">
+                 <select className="w-full rounded border border-[#085E9C]  p-2 text-sm shadow-md outline-none text-right">
             <option value="">باقة 3 العاب</option>
             <option value="">باقة 3 العاب</option>
             <option value="">باقة 3 العاب</option>
@@ -85,15 +85,15 @@ const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عا
             <InputField val={startDate} set={setStartDate} type="date" label="تاريخ البداية  " placeholder="أدخل تاريخ البداية" />
           <InputField val={endDate} set={setEndDate} type="date" label="تاريخ النهاية  " placeholder="أدخل تاريخ النهاية" />
           <InputField val={Package} set={setPackage} type="text" label="اسم كود الخصم  " placeholder="أدخل اسم كود الخصم" />
-         <div className="flex flex-col text-[#0765AA] w-[48%]">
+         <div className="flex flex-col text-[#085E9C] w-[48%]">
       <label className="mb-1 text-lg font-bold">نوع كود الخصم</label>
-      <div className="flex items-center justify-between p-2 border border-[#0765AA] gap-2">
+      <div className="flex items-center justify-between p-2 border border-[#085E9C] gap-2">
         {/* عام */}
         <div
           onClick={() => setDiscountType("عام")}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="p-1 w-6 h-6 border rounded border-[#0765AA]">
+          <span className="p-1 w-6 h-6 border rounded border-[#085E9C]">
             {discountType === "عام" && (
               <img src="/images/group/true.png" alt="selected" className="w-4 h-4" />
             )}
@@ -106,7 +106,7 @@ const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عا
           onClick={() => setDiscountType("خاص")}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="p-1 w-6 h-6 border rounded border-[#0765AA]">
+          <span className="p-1 w-6 h-6 border rounded border-[#085E9C]">
             {discountType === "خاص" && (
               <img src="/images/group/true.png" alt="selected" className="w-4 h-4" />
             )}
@@ -115,14 +115,14 @@ const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عا
         </div>
       </div>
     </div>
- <div className="flex flex-col text-[#0765AA]   w-full ">
+ <div className="flex flex-col text-[#085E9C]   w-full ">
              <label className="mb-1 text-lg font-bold">البريد الإلكتروني </label>
                  <input
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         type='email'
         placeholder='email'
-        className="w-full rounded border border-[#0765AA]  p-2 text-sm shadow-md outline-none text-right"
+        className="w-full rounded border border-[#085E9C]  p-2 text-sm shadow-md outline-none text-right"
       /> 
            </div>
         </form>

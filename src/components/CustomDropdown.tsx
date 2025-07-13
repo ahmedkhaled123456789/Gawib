@@ -10,7 +10,7 @@ const CustomDropdown = ({ options, selected, onChange }) => {
   };
 
   return (
-    <div className="relative w-1/2 border rounded-md  border-[#0765AA]">
+    <div className="relative w-1/2 border rounded-md  border-[#085E9C]">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}

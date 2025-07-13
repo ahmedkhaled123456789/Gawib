@@ -45,7 +45,7 @@ const ProductRow = ({ product, index ,setShowModal}) => {
          onClick={() => setShowModal(true)}
  disabled={product.status === "منتهي"}       
     className={`px-4 py-2 w-full rounded font-semibold cursor-pointer ${
-            product.status === 'جديد' ? 'bg-[#0765AA]' : 'text-[#0765AA]  border border-[#0765AA]'
+            product.status === 'جديد' ? 'bg-[#085E9C]' : 'text-[#085E9C]  border border-[#085E9C]'
           }`}
         >
           {product.status}
@@ -72,9 +72,9 @@ const ContactUs = () => {
  {/* Header Controls */}
       <div className="flex flex-col p-4  bg-white md:flex-row items-center justify-between gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
-          <div className="text-xl ml-16 font-bold text-[#0765AA]">اتصل بنا</div>
+          <div className="text-xl ml-16 font-bold text-[#085E9C]">اتصل بنا</div>
  {/* Search */}
-          <div className="relative w-full md:w-64 border rounded-md  border-[#0765AA]">
+          <div className="relative w-full md:w-64 border rounded-md  border-[#085E9C]">
             <input
               type="text"
               placeholder="بحث"
@@ -103,9 +103,9 @@ const ContactUs = () => {
         </div>
       </div>
         <div className="overflow-x-auto">
-          <table className="w-full table-auto divide-y-2 divide-[#0765AA] bg-white text-sm">
+          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm">
             <thead className="text-center">
-              <tr className="px-4 py-2 font-medium text-[#0765AA]">
+              <tr className="px-4 py-2 font-medium text-[#085E9C]">
                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
                 <th className="px-4 py-2  font-medium">الأسم  </th>
                 <th className="px-4 py-2 font-medium">البريد الإلكتروني</th>

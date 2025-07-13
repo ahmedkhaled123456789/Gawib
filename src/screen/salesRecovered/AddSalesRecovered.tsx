@@ -20,7 +20,7 @@ const InputField = ({ label, placeholder, set, val,type }: InputFieldProps) => {
         onChange={(e) => set(e.target.value)}
         type={type}
         placeholder={placeholder}
-        className="w-full rounded border border-[#0765AA]  p-3 text-sm shadow-md outline-none text-right"
+        className="w-full rounded border border-[#085E9C]  p-3 text-sm shadow-md outline-none text-right"
       />
     </div>
   );
@@ -58,7 +58,7 @@ const AddSalesRecovered = ({ onClose }: { onClose: () => void }) => {
      <div className="w-full  mt-5 flex justify-between gap-4 bg-white btn_save">
          <button
            onClick={submitData}
-           className="w-[45%] px-7 py-2 bg-[#0765AA] text-white rounded-md"
+           className="w-[45%] px-7 py-2 bg-[#085E9C] text-white rounded-md"
          >
            استرداد
          </button>
@@ -66,7 +66,7 @@ const AddSalesRecovered = ({ onClose }: { onClose: () => void }) => {
           <button
            type="button"
            onClick={onClose}
-           className="w-[45%] px-7 py-2 border  border-[#0765AA] text-[#0765AA] rounded-md"
+           className="w-[45%] px-7 py-2 border  border-[#085E9C] text-[#085E9C] rounded-md"
          >
           إغلاق
          </button>

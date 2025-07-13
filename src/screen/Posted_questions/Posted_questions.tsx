@@ -75,7 +75,7 @@ const ProductRow = ({ product, index ,setShowPriceModal,setShowSalesModal, setSh
             <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.admin}</div></td>
               <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-40 gap-2">
-                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" onClick={() => setShowModal(true)} >
+                <span className="p-1 border cursor-pointer rounded bg-[#085E9C]" onClick={() => setShowModal(true)} >
                 <img src="/images/group/see.png" alt="" className="w-5 h-5" />
             </span>
                              
@@ -93,21 +93,21 @@ const ProductRow = ({ product, index ,setShowPriceModal,setShowSalesModal, setSh
                              >
                 <img src="/images/group/copy.png" alt="" className="w-5 h-5 " />
             </span>
-             <span className="p-1 border cursor-pointer rounded border-[#0765AA]" >
+             <span className="p-1 border cursor-pointer rounded border-[#085E9C]" >
 
                  <img src="/images/group/true.png" alt="" className={`w-5 h-5 ${product.status === 'نشط' ? 'opacity-100' : 'opacity-0'}`} />
             
              </span>
-                <span className="p-1 border cursor-pointer rounded bg-[#0765AA]" onClick={() => setShowPriceModal(true)}>
+                <span className="p-1 border cursor-pointer rounded bg-[#085E9C]" onClick={() => setShowPriceModal(true)}>
                 <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
-                             <span className="p-1 border cursor-pointer rounded bg-[#0765AA]"
+                             <span className="p-1 border cursor-pointer rounded bg-[#085E9C]"
                              onClick={() => setShowPriceModal(true)} 
                               >
                 <img src="/images/group/see.png" alt="" className="w-5 h-5" />
             </span>
 
-                    <span className={`${product.share === 'نشر' ? 'text-[#0765AA] border  border-[#0765AA]' : 'text-[#fff]   bg-[#0765AA]'} w-16 cursor-pointer rounded px-3 py-1`}>{product.share}</span>
+                    <span className={`${product.share === 'نشر' ? 'text-[#085E9C] border  border-[#085E9C]' : 'text-[#fff]   bg-[#085E9C]'} flex items-center justify-center w-16 cursor-pointer rounded px-3 py-1`}>{product.share}</span>
 
             </div>
       </td>
@@ -134,9 +134,9 @@ const Posted_questions = () => {
      
 <div className="flex  p-4  bg-white md:flex-row items-center  gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
-          <div className="text-md  font-bold text-[#0765AA]">الأسئلة المنشورة      </div>
+          <div className="text-md w-32 font-bold text-[#085E9C]">الأسئلة المنشورة      </div>
  {/* Search */}
-          <div className="relative w-full md:w-48 border rounded-md  border-[#0765AA]">
+          <div className="relative w-full md:w-48 border rounded-md  border-[#085E9C]">
             <input
               type="text"
               placeholder="بحث"
@@ -163,21 +163,21 @@ const Posted_questions = () => {
 />
     </div>
     <div className="flex items-center gap-2 ">
-      <span className="text-[#ffc629] font-bold   border bg-[#0765AA] border-[#0765AA] rounded px-4 py-2 " >200</span>
-      <span className="text-[#ffc629]  font-bold border border-[#0765AA]  rounded px-4 py-2 ">400</span>
-      <span className="text-[#ffc629]  font-bold border border-[#0765AA] rounded px-4 py-2 ">600</span>
-      <span className="text-[#0765AA] flex gap-1 border border-[#0765AA] rounded p-2 ">
-        <span className=" border border-[#0765AA] rounded px-3  "></span>
-        <span className=" text-[#0765AA] border border-[#0765AA] rounded px-3  ">نشر</span>
+      <span className="text-[#ffc629] font-bold   border bg-[#085E9C] border-[#085E9C] rounded px-4 py-2 " >200</span>
+      <span className="text-[#ffc629]  font-bold border border-[#085E9C]  rounded px-4 py-2 ">400</span>
+      <span className="text-[#ffc629]  font-bold border border-[#085E9C] rounded px-4 py-2 ">600</span>
+      <span className="text-[#085E9C] flex gap-2 border border-[#085E9C] rounded p-2 ">
+        <span className=" border border-[#085E9C] rounded px-3  "></span>
+        <span className=" text-[#085E9C] text-center font-bold border border-[#085E9C] rounded px-6  ">نشر</span>
       </span>
 
     </div>
      
       </div>
         <div className="overflow-x-auto">
-          <table className="w-full table-auto divide-y-2 divide-[#0765AA] bg-white text-sm">
+          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm">
             <thead className="text-center">
-              <tr className="px-4 py-2 font-medium text-[#0765AA]">
+              <tr className="px-4 py-2 font-medium text-[#085E9C]">
                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
            
                 <th className="px-4 py-2 font-medium">  أسم الفئة    </th>
@@ -252,7 +252,7 @@ const Posted_questions = () => {
            <button
             type="button"
             onClick={() => setShowSalesModal(false)}
-            className="col-span-1 text-[#0765AA] border border-[#0765AA] py-2 rounded hover:bg-blue-100"
+            className="col-span-1 text-[#085E9C] border border-[#085E9C] py-2 rounded hover:bg-blue-100"
           >
             إلغاء وإغلاق
           </button>
@@ -264,22 +264,22 @@ const Posted_questions = () => {
 
       <CustomModal isOpen={showModal}>
          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-blue-300">
-        <div className="text-center mb-6 w-full text-[#0765AA] font-bold  border border-[#0765AA] p-14  ">
-         في هذا السوال يوجد خطاء عاصمة مصر القاهرة وليس طرابلس
+      <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-[#085E9C]">
+        <div className="text-center text-lg mb-6 w-full text-[#085E9C] font-medium rounded  border border-[#085E9C] px-20 py-10  ">
+         في هذا السوال يوجد خطاء عاصمة <br /> مصر القاهرة وليس طرابلس
         </div>
       
-        <p className="text-center mb-6"> هل تم تعديل الخطاء  </p>
-        <div className="flex justify-center gap-4">
+        <p className="text-center text-lg font-medium mb-6"> هل تم تعديل الخطاء  </p>
+        <div className="flex justify-center gap-2">
              <button
             onClick={() => setShowModal(false)}
-            className={`px-4 py-2 text-white rounded bg-[#588a17]`}
+            className={`px-10 py-1 text-white rounded bg-[#588a17]`}
           >
             نعم
           </button>
           <button
             onClick={() => setShowModal(false)}
-            className="px-4 py-2 text-white rounded bg-[#ff426e]"
+            className="px-10 py-1 text-white rounded bg-[#ff426e]"
           >
             لا
           </button>

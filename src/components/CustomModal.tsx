@@ -27,7 +27,7 @@ const CustomModal = ({ isOpen, onClose, onConfirm, status }: Props) => {
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-[#0765AA] text-[#0765AA] rounded hover:bg-[#0765AA] hover:text-white"
+            className="px-4 py-2 border border-[#085E9C] text-[#085E9C] rounded hover:bg-[#085E9C] hover:text-white"
           >
             إغلاق
           </button>

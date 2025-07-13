@@ -63,7 +63,7 @@ const AddPosted_questions = ({ onClose }: { onClose: () => void }) => {
                   key={point}
                   onClick={() => setActivePoints(point)}
                   className={`w-14 h-10 border rounded ${
-                    activePoints === point ? "bg-[#0765AA] text-white" : ""
+                    activePoints === point ? "bg-[#085E9C] text-white" : ""
                   }`}
                 >
                   {point}
@@ -72,7 +72,7 @@ const AddPosted_questions = ({ onClose }: { onClose: () => void }) => {
             </div>
 
              {/* Dropdown */}
-             <label className="text-[#0765AA] font-bold" >أسم الفئة</label>
+             <label className="text-[#085E9C] font-bold" >أسم الفئة</label>
         <Dropdown
   options={[
     { value: "", label: "دول وعواصم  " },
@@ -84,8 +84,8 @@ const AddPosted_questions = ({ onClose }: { onClose: () => void }) => {
 />
 
             {/* الفئة النشطة */}
-            <label className="text-[#0765AA] font-bold" >الفئة النشطة</label>
-            <div className="border  border-[#0765AA] flex items-center justify-between px-2 py-3 rounded text-sm text-right">
+            <label className="text-[#085E9C] font-bold" >الفئة النشطة</label>
+            <div className="border  border-[#085E9C] flex items-center justify-between px-2 py-3 rounded text-sm text-right">
  <input
               type="text"
               value={age}
@@ -98,8 +98,8 @@ const AddPosted_questions = ({ onClose }: { onClose: () => void }) => {
             </div>
 
             {/* السؤال النشط */}
-            <label className="text-[#0765AA] font-bold" >السؤال النشط</label>
-            <div className="border  border-[#0765AA] flex items-center justify-between px-2 py-3 rounded text-sm text-right">
+            <label className="text-[#085E9C] font-bold" >السؤال النشط</label>
+            <div className="border  border-[#085E9C] flex items-center justify-between px-2 py-3 rounded text-sm text-right">
                 <input
               type="text"
               value={cat}
@@ -113,19 +113,19 @@ const AddPosted_questions = ({ onClose }: { onClose: () => void }) => {
             </div>
 
             {/* التلميح */}
-            <label className="text-[#0765AA] font-bold" >التلميح</label>
+            <label className="text-[#085E9C] font-bold" >التلميح</label>
             <input
               type="text"
               value={see}
               onChange={(e) => setSee(e.target.value)}
-               className="w-full rounded outline-none  border  border-[#0765AA] p-3 text-sm text-right"
+               className="w-full rounded outline-none  border  border-[#085E9C] p-3 text-sm text-right"
             />
 
             {/* الأزرار */}
             <div className="flex justify-between gap-2 pt-2">
               <button
                 onClick={handleSubmit}
-                className="flex-1 bg-[#0765AA] text-white rounded p-2"
+                className="flex-1 bg-[#085E9C] text-white rounded p-2"
               >
                 حفظ
               </button>
@@ -137,7 +137,7 @@ const AddPosted_questions = ({ onClose }: { onClose: () => void }) => {
               </button>
               <button
                 onClick={onClose}
-                className="flex-1 border border-[#0765AA] text-[#0765AA] rounded p-2"
+                className="flex-1 border border-[#085E9C] text-[#085E9C] rounded p-2"
               >
                 إغلاق
               </button>
@@ -148,10 +148,10 @@ const AddPosted_questions = ({ onClose }: { onClose: () => void }) => {
             
 
             {/* السؤال */}
-            <div className="flex flex-col w-1/2 border  border-[#0765AA] p-2 rounded">
-              <h3 className="text-center border p-4  border-[#0765AA] font-bold text-[#0765AA]  mb-2">السؤال</h3>
-              <div className="border p-4  border-[#0765AA]  mb-2 text-right">{question || "مصر"}</div>
-              <div className="border p-4  border-[#0765AA] flex justify-center items-center h-72">
+            <div className="flex flex-col w-1/2 border  border-[#085E9C] p-2 rounded">
+              <h3 className="text-center border p-4  border-[#085E9C] font-bold text-[#085E9C]  mb-2">السؤال</h3>
+              <div className="border p-4  border-[#085E9C]  mb-2 text-right">{question || "مصر"}</div>
+              <div className="border p-4  border-[#085E9C] flex justify-center items-center h-72">
  <div
                 className="w-full h-[200px]    flex items-center justify-center cursor-pointer  "
                 onClick={handleImageClick}
@@ -175,10 +175,10 @@ const AddPosted_questions = ({ onClose }: { onClose: () => void }) => {
               />              </div>
             </div>
             {/* الجواب */}
-            <div className=" flex flex-col w-1/2 border   border-[#0765AA]  p-2 rounded">
-              <h3 className="text-center font-bold text-[#0765AA] border p-4  border-[#0765AA]  mb-2">الجواب</h3>
-              <div className="border p-4  border-[#0765AA]  mb-2 text-right">{answer || "القاهرة"}</div>
-              <div className="border p-4  border-[#0765AA] flex justify-center items-center h-72">
+            <div className=" flex flex-col w-1/2 border   border-[#085E9C]  p-2 rounded">
+              <h3 className="text-center font-bold text-[#085E9C] border p-4  border-[#085E9C]  mb-2">الجواب</h3>
+              <div className="border p-4  border-[#085E9C]  mb-2 text-right">{answer || "القاهرة"}</div>
+              <div className="border p-4  border-[#085E9C] flex justify-center items-center h-72">
  <div
                 className="w-full h-[200px]    flex items-center justify-center cursor-pointer  "
                 onClick={handleImageClick2}

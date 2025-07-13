@@ -44,20 +44,20 @@ const AddCategories = ({ onClose }: { onClose: () => void }) => {
           
     {/* Product Type */}
         <div className="flex flex-col  w-full  ">
-          <label className="mb-1 text-lg font-bold text-[#0765AA]">  أسم الفئة  </label>
+          <label className="mb-1 text-lg font-bold text-[#085E9C]">  أسم الفئة  </label>
           
     <input
       value={name}
       onChange={(e) => setName(e.target.value)}
       type="text"
-       className="w-full bg-[#D5D5D5]  rounded border border-[#0765AA] p-3 text-sm shadow-md outline-none text-right"
+       className="w-full bg-[#D5D5D5]  rounded border border-[#085E9C] p-3 text-sm shadow-md outline-none text-right"
     />
          </div>
          {/* Image Upload */}
             <div className="w-full  flex flex-col ">
-              <label className="mb-3 text-lg font-bold text-[#0765AA]">صورة الفئة  </label>
+              <label className="mb-3 text-lg font-bold text-[#085E9C]">صورة الفئة  </label>
               <div
-                className="w-full h-[200px]   border border-[#0765AA] flex items-center justify-center cursor-pointer rounded-md hover:shadow-lg transition"
+                className="w-full h-[200px]   border border-[#085E9C] flex items-center justify-center cursor-pointer rounded-md hover:shadow-lg transition"
                 onClick={handleImageClick}
               >
                 {image ? (

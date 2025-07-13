@@ -83,7 +83,7 @@ const CategoriesRow = ({ product, index,setShowCatModal }) => {
         <QuestionStats stats={product.approvedQuestions} />
       </td>
       <td className="px-4 py-2">
-        <div className=" bg-[#0765AA]  rounded flex items-center justify-center">
+        <div className=" bg-[#085E9C]  rounded flex items-center justify-center">
                   <img src={product.img} alt={`${product.categoryName} logo`} className="w-6 h-6 rounded-full" />
 
         </div>
@@ -144,9 +144,9 @@ const [products] = useState(data);
  {/* Header Controls */}
       <div className="flex flex-col p-4  bg-white md:flex-row items-center justify-between gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
-          <div className="text-xl ml-16 font-bold text-[#0765AA]">    الفئات</div>
+          <div className="text-xl ml-16 font-bold text-[#085E9C]">    الفئات</div>
  {/* Search */}
-          <div className="relative w-full md:w-64 border rounded-md  border-[#0765AA]">
+          <div className="relative w-full md:w-64 border rounded-md  border-[#085E9C]">
             <input
               type="text"
               placeholder="بحث"
@@ -175,9 +175,9 @@ const [products] = useState(data);
       
       </div>
         <div className="overflow-auto">
-          <table className="min-w-full  divide-y-2 divide-[#0765AA] bg-white text-sm">
+          <table className="min-w-full  divide-y-2 divide-[#085E9C] bg-white text-sm">
              <thead className="text-center">
-              <tr className="px-4 py-2  text-sm text-[#0765AA]">
+              <tr className="px-4 py-2  text-sm text-[#085E9C]">
                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
                 <th className="px-4 py-2  font-medium">أسم المجموعة   </th>
                 <th className="px-4 py-2 font-medium">أسم الفئة  </th>
