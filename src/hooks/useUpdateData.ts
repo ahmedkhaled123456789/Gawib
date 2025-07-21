@@ -1,22 +1,41 @@
+import type { AxiosRequestConfig } from "axios";
 import baseUrl from "../Api/baseURL";
 
-const useInUpdateDataWithImage = async (url, parmas) => {
-  const config = {
+export const useInUpdateDataWithImage = async (
+  url: string,
+  params: FormData
+) => {
+  const config: AxiosRequestConfig = {
     headers: { "Content-Type": "multipart/form-data" },
   };
-  const res = await baseUrl.put(url, parmas, config);
+
+  const res = await baseUrl.put(url, params, config);
   console.log(res.status);
   return res;
 };
 
-const useInsUpdateData = async (url, parmas) => {
-  const config = {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  };
-  const res = await baseUrl.put(url, parmas, config);
-  return res;
-};
+// Generic update with typed response/request
+export const useInUpdateData = async <TResponse = unknown, TRequest = unknown>(
+  url: string,
+  data: TRequest,
+  config?: AxiosRequestConfig
+): Promise<TResponse> => {
+  try {
+    const token = localStorage.getItem("token");
 
-export { useInUpdateDataWithImage, useInsUpdateData };
+    const finalConfig: AxiosRequestConfig = {
+      ...config,
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+        "Content-Type": "application/json",
+        ...config?.headers,
+      },
+    };
+
+    const response = await baseUrl.put<TResponse>(url, data, finalConfig);
+    return response.data;
+  } catch (error: any) {
+    console.error(`PUT request failed for ${url}`, error);
+    throw error;
+  }
+};

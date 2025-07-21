@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import type { AxiosRequestConfig } from "axios";
 import baseUrl from "../Api/baseURL";
 
 const useInsertData = async <T>(
