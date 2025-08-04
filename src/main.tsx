@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
  import { Provider } from "react-redux";
-import { store } from "./Redux/store";
+import store from "./store/index.ts";
 import { ToastContainer } from "react-toastify";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

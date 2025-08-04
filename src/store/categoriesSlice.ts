@@ -2,10 +2,9 @@ import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/tool
 import { AxiosError } from "axios";
 import { useGetData } from "../hooks/useGetData";
 import { useInUpdateData } from "../hooks/useUpdateData";
-import { insertData } from "../utils/api";
+import { insertData, useGetDataToken } from "../utils/api";
 import useDeleteData from "../hooks/useDeleteData";
 
- 
 interface CategoryData {
  name: string;
  description: string;
@@ -36,7 +35,7 @@ export const getCategory = createAsyncThunk<
   "category/getCategory",
   async ({ id }, thunkAPI) => {
     try {
-      const res = await useGetData<CategoryData>(`categories/${id}`);
+      const res = await useGetData<CategoryData>(`admin/categories/${id}`);
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -49,13 +48,13 @@ export const getCategory = createAsyncThunk<
 // ================ getCategory ===============
 export const getCategories = createAsyncThunk<
   CategoryData,
-  { id: string }, // argument type
+ void,
   { rejectValue: string }
 >(
   "category/getCategories",
   async (_, thunkAPI) => {
     try {
-      const res = await useGetData<CategoryData>(`categories`);
+      const res = await useGetDataToken<CategoryData>(`admin/categories`);
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -70,7 +69,7 @@ export const addCategory = createAsyncThunk<CategoryData, Partial<CategoryData>>
   "category/addCategory",
   async (data, { rejectWithValue }) => {
     try {
-      const res = await insertData("/api/products", data);
+      const res = await insertData("admin/categories", data);
       return res as CategoryData;
     } catch (error) {
       console.error("Error adding Category:", error);
@@ -89,7 +88,7 @@ export const updateCategory = createAsyncThunk<
   async ({ id, formData }, { rejectWithValue }) => {
     try {
       const res = await useInUpdateData<CategoryData, Partial<CategoryData>>(
-        `/api/products/${id}`,
+        `admin/categories/${id}`,
         formData
       );
       return res;
@@ -105,7 +104,7 @@ export const deleteCategory = createAsyncThunk<string, string>(
   "category/deleteCategory",
   async (id, { rejectWithValue }) => {
     try {
-      await useDeleteData(`/api/products/${id}`);
+      await useDeleteData(`admin/categories/${id}`);
       return id;
     } catch (error) {
       console.error("Error deleting Category:", error);

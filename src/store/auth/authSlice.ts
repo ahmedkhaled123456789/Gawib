@@ -5,6 +5,7 @@ import { useGetData } from "../../hooks/useGetData";
 import { useInUpdateData } from "../../hooks/useUpdateData";
  
 interface UserData {
+  data: any;
  firstName: string;
   lastName: string;
   email: string;
@@ -37,7 +38,7 @@ export const loginUser = createAsyncThunk<
   "auth/loginUser",
   async (data, thunkAPI) => {
     try {
-      const res = await insertData<typeof data, UserData>("auth/login", data);
+      const res = await insertData<typeof data, UserData>("auth/admin/login", data);
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -46,23 +47,7 @@ export const loginUser = createAsyncThunk<
   }
 );
  
-// ================ Signup ===============
-export const signupUser = createAsyncThunk<
-  UserData,
-  Record<string, unknown>,
-  { rejectValue: string }
->(
-  "auth/signupUser",
-  async (data, thunkAPI) => {
-    try {
-      const res = await insertData<typeof data, UserData>("auth/register", data);
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "Signup failed");
-    }
-  }
-);
+
 
 // ================ getUser ===============
 export const getUser = createAsyncThunk<
@@ -127,21 +112,26 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Login Cases
-      .addCase(loginUser.fulfilled, (state, action: PayloadAction<UserData>) => {
-        state.user = action.payload;
-        state.loading = false;
-        state.error = null;
-      })
+       .addCase(loginUser.fulfilled, (state, action: PayloadAction<UserData>) => {
+  state.user = action.payload;
+  state.loading = false;
+  state.error = null;
+
+   const token = action.payload.data?.access?.token;
+  if (token) {
+    localStorage.setItem("token", token);
+  }
+
+  // ✅ حفظ بيانات المستخدم (اختياري)
+  const userInfo = action.payload.data?.authenticatable;
+  if (userInfo) {
+    localStorage.setItem("user", JSON.stringify(userInfo));
+  }
+})
+
       
 
-      // Signup Cases
       
-      .addCase(signupUser.fulfilled, (state, action: PayloadAction<UserData>) => {
-        state.user = action.payload;
-        state.loading = false;
-        state.error = null;
-      })
-
       // get user 
      .addCase(getUser.fulfilled, (state, action: PayloadAction<UserData>) => {
         state.user = action.payload;

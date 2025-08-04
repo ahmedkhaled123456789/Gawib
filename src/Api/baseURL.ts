@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const baseURL = "https://vhost.ynafs.com:8443";
+export const baseURL = "https://test.jawib.net/api/";
 const axiosRequest = axios.create({ baseURL });
 
 export default axiosRequest;

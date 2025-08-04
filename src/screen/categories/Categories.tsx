@@ -1,9 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
 import AddCategories from "./AddCategories";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { getCategories } from "../../store/categoriesSlice";
  
 const data = [
   {
@@ -63,7 +66,12 @@ const QuestionStats = ({ stats }) => {
   );
 };
 const CategoriesRow = ({ product, index,setShowCatModal }) => {
-  
+   const dispatch = useDispatch<AppDispatch>();
+    const {categories } = useSelector((state: RootState) => state.category);
+    useEffect(() =>{
+dispatch(getCategories())
+    },[])
+    console.log(categories)
   return (
     <tr key={product._id} className="text-center">
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>

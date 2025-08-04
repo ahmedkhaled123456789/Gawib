@@ -1,33 +1,20 @@
- import Auth from "../Auth/Auth";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-// import {  useAppSelector } from "../Redux/store";
 import { useEffect } from "react";
 
-const DashboardLayout = ({ children }: React.PropsWithChildren<unknown>) => {
-   
-  // const user = useAppSelector((state) => state.auth.loginUser);
-const user =true;
-   const direction = "rtl";
+const DashboardLayout = () => {
+  const direction = "rtl";
 
-   useEffect(() => {
-    document.documentElement.dir = direction;  
+  useEffect(() => {
+    document.documentElement.dir = direction;
   }, [direction]);
 
   return (
-    <main
-      className={`flex  `}
-      dir={direction}
-    >
-      {user ? (
-        <>
-          <Sidebar />
-          <div className="p-4 w-full overflow-x-hidden">{children}</div>
-        </>
-      ) : (
-        <>
-          <Auth />
-         </>
-      )}
+    <main className="flex" dir={direction}>
+      <Sidebar />
+      <div className="p-4 w-full overflow-x-hidden">
+        <Outlet /> {/* هنا بيظهر المحتوى الخاص بكل صفحة */}
+      </div>
     </main>
   );
 };

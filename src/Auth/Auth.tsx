@@ -1,64 +1,63 @@
-import LoginHook from "../hook/auth/login-hook";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../store";
+import { loginUser } from "../store/auth/authSlice";
+import LoginForm from "./LoginForm";
+import { useNavigate } from "react-router-dom";
 
-const Auth = () => {
-  const { onSubmit, loading } = LoginHook();
+const Auth: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, error } = useSelector((state: RootState) => state.auth);
+const navigate = useNavigate();
+  const [loginMethod, setLoginMethod] = useState<"phone" | "email">("phone");
+ const user =localStorage.getItem("user");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    onSubmit(e);
+  const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    password: "",
+    password_confirmation: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleLogin = () => {
+    const payload =
+      loginMethod === "email"
+        ? { email: form.email, password: form.password }
+        : { phone: form.phone_number, password: form.password };
+
+    dispatch(loginUser(payload));
+  };
+useEffect(() => {
+  if (user) {
+    navigate("/");
+  }
+}, [user]);
   return (
-    <div className="wrapper h-screen w-full flex justify-center items-center bg-gray-100">
-      <div className="mx-auto max-w-xl px-6 lg:px-10">
-        <div className="mx-auto w-[400px] ">
-          <form
-            className="mb-0 mt-6 bg-[#257180] text-white space-y-6 rounded-lg p-8 shadow-xl"
-            onSubmit={handleSubmit}
-          >
-            <p className="text-center text-3xl font-semibold">تسجيل الدخول</p>
+    <div className="flex items-center justify-center h-screen bg-gray-50 px-4">
+      <div className="w-full max-w-md p-6 bg-white shadow-md rounded-md">
+        <h2 className="text-xl text-center font-bold mb-6 text-[#085E9C]">
+          تسجيل الدخول
+        </h2>
 
-            <div>
-              <label htmlFor="email" className="block mb-1 text-lg">
-                البريد الإلكتروني
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                className="w-full outline-none text-black rounded-lg border border-gray-300 p-3 text-lg"
-                placeholder="أدخل البريد الإلكتروني"
-                required
-              />
-            </div>
+        {error && (
+          <p className="text-red-500 text-sm text-center mb-4">{error}</p>
+        )}
 
-            <div>
-              <label htmlFor="password" className="block mb-1 text-lg">
-                كلمة المرور
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                className="w-full outline-none text-black rounded-lg border border-gray-300 p-3 text-lg"
-                placeholder="أدخل كلمة المرور"
-                required
-              />
-            </div>
-
-            <p className="text-start underline cursor-pointer text-sm">
-              هل نسيت كلمة المرور؟
-            </p>
-
-            <button
-              type="submit"
-              className="block w-full cursor-pointer rounded-lg bg-white px-6 py-3 text-lg font-medium text-[#257180] transition hover:bg-gray-200"
-              disabled={loading}
-            >
-              {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
-            </button>
-          </form>
-        </div>
+        <LoginForm
+          loginMethod={loginMethod}
+          setLoginMethod={setLoginMethod}
+          form={form}
+          setForm={setForm}
+          handleChange={handleChange}
+          handleLogin={handleLogin}
+          loading={loading}
+        />
       </div>
     </div>
   );
