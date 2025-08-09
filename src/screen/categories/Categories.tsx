@@ -67,7 +67,7 @@ const QuestionStats = ({ stats }) => {
 };
 const CategoriesRow = ({ product, index,setShowCatModal }) => {
    const dispatch = useDispatch<AppDispatch>();
-    const {categories } = useSelector((state: RootState) => state.category);
+    const {categories } = useSelector((state: RootState) => state.categories);
     useEffect(() =>{
 dispatch(getCategories())
     },[])

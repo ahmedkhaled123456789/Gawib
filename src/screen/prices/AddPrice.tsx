@@ -2,7 +2,9 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ButtonGroup from "../../components/ButtonGroup";
- 
+ import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
+import { createGamePackage } from "../../store/GamePackagesSlice";
 
 interface InputFieldProps {
   label: string;
@@ -29,6 +31,7 @@ const InputField = ({ label, placeholder, set, val,type }: InputFieldProps) => {
 
 // AddAdmins.tsx
 const AddPrice = ({ onClose }: { onClose: () => void }) => {
+  const dispatch = useDispatch<AppDispatch>();
  const [name, setName] = useState("");
   const [count, setCount] = useState("");
   const [price, setPrice] = useState("");
@@ -39,9 +42,24 @@ const AddPrice = ({ onClose }: { onClose: () => void }) => {
       return;
     }
 
-    // Submit logic here
-    toast.success("تمت إضافة المشرف بنجاح!");
-    onClose(); // close modal on success
+    const payload = {
+      name,
+      games_count: Number(count),
+      price: Number(price),
+      is_active: 1, // أو 0 حسب اختيارك
+      is_free: 0,   // أو 1 لو باقة مجانية
+    };
+
+    dispatch(createGamePackage(payload))
+      .unwrap()
+      .then(() => {
+        toast.success("تمت إضافة الباقة بنجاح!");
+        resetHandle();
+        onClose();
+      })
+      .catch((err) => {
+        toast.error(err || "حدث خطأ أثناء الإضافة");
+      });
   };
    const resetHandle = () => {
     setName("");

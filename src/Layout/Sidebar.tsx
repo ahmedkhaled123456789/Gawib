@@ -27,6 +27,7 @@ import {
 } from "react-icons/ri";
 import { PiQuestionMarkFill } from "react-icons/pi";
 import { TbSocial } from "react-icons/tb";
+import { LogOut } from "lucide-react";
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
@@ -43,7 +44,12 @@ const Sidebar: React.FC = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  const handleLogout = () => {
+    localStorage.removeItem("token"); 
+        localStorage.removeItem("user");  
 
+    navigate("/login");
+  };
   const menuItems = [
     { icon: <FaUsers className="size-6" />, label: "المستخدمين", path: "/" },
     { icon: <RiAdminLine className="size-6" />, label: "المشرفين", path: "/admins" },
@@ -104,6 +110,14 @@ const Sidebar: React.FC = () => {
               </span>
             </li>
           ))}
+         <li
+      onClick={handleLogout}
+      className={`shadow flex items-center gap-x-2 my-4 p-2 rounded-md cursor-pointer transition-all
+        hover:bg-[#085E9C] hover:text-white`}
+    >
+      <LogOut />
+      <span className={`${isOpen ? "inline" : "hidden"} text-md`}>خروج</span>
+    </li>
         </ul>
       </div>
     </div>

@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
  import { FiSearch } from 'react-icons/fi';
 import CustomDropdown from '../../components/CustomDropdown';
 import CustomModalGroup from '../../components/Modals/CustomModalGroup';
 import CustomModal from '../../components/Modals/CustomModal';
 import AddGroup from './AddGroup';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
+import { getCategories, updateCategory } from '../../store/categoriesSlice';
 
 interface GroupsData {
   _id: string;
@@ -16,6 +19,12 @@ interface GroupsData {
 }
 
 const Groups: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+const { categories } = useSelector((state: RootState) => state.categories);
+
+useEffect(() => {
+  dispatch(getCategories());
+}, [dispatch]);
    const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState("");
 const [modalOpen, setModalOpen] = useState(false);
@@ -25,12 +34,24 @@ const [selectedGroup, setSelectedGroup] = useState(null);
   const [showGroupModal, setShowGroupModal] = useState(false);
 
 const handleStatusClick = (Group) => {
+  console.log("Clicked Group:", Group);
   setSelectedProduct(Group);
   setModalOpen(true);
 };
-const handleConfirmStatus = () => {
-   setModalOpen(false);
- };
+const handleConfirmStatus = (data: { id: string; is_active: false | true }) => {
+  dispatch(
+    updateCategory({
+      id: data.id,
+      formData: { is_active: data.is_active },
+    })
+  );
+  console.log({
+    id: data.id,
+    formData: { is_active: data.is_active },
+  });
+  setModalOpen(false);
+};
+
 
 
  const handleFormClick = (Group) => {
@@ -99,23 +120,28 @@ const handleConfirmForm = () => {
       </div>
 
       {/* Image Placeholder */}
-      <div className="text-center mb-3">
-        <div className=" border border-[#085E9C] text-[#000] rounded p-3 py-6 text-xs  min-h-[40px] flex items-center justify-center">
-          نزيل هنا صورة الفئة
-        </div>
-      </div>
+     <div className="text-center mb-3">
+  <div className="border border-[#085E9C] rounded text-xs min-h-[40px] flex items-center justify-center p-3">
+    {Group.image ? (
+      <img src={Group.image} alt="Group" className="rounded max-h-32 object-contain" />
+    ) : (
+      <span className="text-[#000] py-4">نزيل هنا صورة الفئة</span>
+    )}
+  </div>
+</div>
+
 
       {/* Description */}
       <div className="text-center mb-3 border p-3 border-[#085E9C] text-[#000]">
         <p className="text-xs leading-relaxed ">
-          {Group.description}
+{Group.description || "_"}
         </p>
       </div>
 
       {/* Question Count */}
       <div className="text-center mb-3">
         <div className=" border border-[#085E9C] text-[#000] rounded px-3 py-1 text-sm font-medium   " >
-          {Group.questionCount}
+          445
         </div>
       </div>
 
@@ -123,25 +149,25 @@ const handleConfirmForm = () => {
       <div className="text-center mb-3">
         <button className="bg-[#085E9C] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-blue-700 transition-colors w-full" 
          onClick={onStatusClick}>
-          {Group.buttonText}
+         نشر / إيقاف النشر
         </button>
       </div>
 
       {/* Status */}
       <div className="text-center mb-2" >
         <span className={`px-2 py-1 rounded text-xs font-medium ${
-          Group.status === 'منشورة' 
+          Group.is_active === true
             ? 'text-green-600' 
             : 'text-red-500'
         }`}>
-          {Group.status}
+          {Group.is_active ===true?"منشورة":"موقوفة"}
         </span>
       </div>
 
       {/* Supervisor */}
       <div className="text-center">
         <p className="text-xs text-gray-700 font-medium">
-          {Group.supervisor}
+       ماهر البوعلي
         </p>
       </div>
     </div>
@@ -220,9 +246,18 @@ const handleConfirmForm = () => {
           <div className="p-3 ">
             
               <div className="grid grid-cols-5 gap-4 justify-center">
-                {Groups.map((Group) => (
-                  <GroupsCard key={Group._id} Group={Group}  onStatusClick={() => handleStatusClick(Group)}/>
-                ))}
+                {Array.isArray(categories?.data?.data) && categories?.data?.data.length > 0 ? (
+  categories?.data?.data.map((Group) => (
+    <GroupsCard
+      key={Group._id}
+      Group={Group}
+      onStatusClick={() => handleStatusClick(Group)}
+    />
+  ))
+) : (
+  <p>لا توجد مجموعات حالياً</p>
+)}
+
               </div>
              
 
@@ -231,14 +266,15 @@ const handleConfirmForm = () => {
           </div>
         </div>
       </div>
-      {selectedProduct && (
-        <CustomModalGroup
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          onConfirm={handleConfirmStatus}
-          status={selectedProduct.status}
-        />
-      )}
+        {selectedProduct && (
+  <CustomModalGroup
+  isOpen={modalOpen}
+  onClose={() => setModalOpen(false)}
+  onConfirm={handleConfirmStatus}
+  status={selectedProduct.is_active}
+  id={selectedProduct.id}
+/>
+)}
 
 
 

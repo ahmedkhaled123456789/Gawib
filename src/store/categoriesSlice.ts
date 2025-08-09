@@ -2,8 +2,9 @@ import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/tool
 import { AxiosError } from "axios";
 import { useGetData } from "../hooks/useGetData";
 import { useInUpdateData } from "../hooks/useUpdateData";
-import { insertData, useGetDataToken } from "../utils/api";
+import {  useGetDataToken } from "../utils/api";
 import useDeleteData from "../hooks/useDeleteData";
+import  {useInsertDataWithImage}  from "../hooks/useInsertData";
 
 interface CategoryData {
  name: string;
@@ -65,15 +66,15 @@ export const getCategories = createAsyncThunk<
 
 
 // ========================== Create Category ==========================
-export const addCategory = createAsyncThunk<CategoryData, Partial<CategoryData>>(
+export const addCategory = createAsyncThunk<CategoryData, FormData>(
   "category/addCategory",
-  async (data, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
-      const res = await insertData("admin/categories", data);
-      return res as CategoryData;
+      const data = await useInsertDataWithImage<CategoryData>("admin/categories", formData);
+      return data;
     } catch (error) {
-      console.error("Error adding Category:", error);
-      return rejectWithValue("Failed to add Category");
+      console.error("❌ Error adding Category:", error);
+      return rejectWithValue("فشل في إضافة التصنيف");
     }
   }
 );
@@ -131,7 +132,17 @@ const categoriesSlice = createSlice({
         state.loading = false;
         state.error = null;
       })
-  
+  .addCase(addCategory.fulfilled, (state, action: PayloadAction<CategoryData>) => {
+        state.categories = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+       .addCase(updateCategory.fulfilled, (state, action: PayloadAction<CategoryData>) => {
+        state.categories = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+         
            
   },
 });

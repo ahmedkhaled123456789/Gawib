@@ -1,87 +1,156 @@
-import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { useGetData, useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
-import { useGetData } from "../hooks/useGetData";
+import {useInsertData} from "../hooks/useInsertData";
+import { useInUpdateData } from "../hooks/useUpdateData";
+import useDeleteData from "../hooks/useDeleteData";
 
- 
-interface GamePackagesData {
- category_id: number;
- name: string;
-  description: string;
-  image:string;
-  is_active: boolean,
+interface GamePackage {
+  is_active: number;
+  name: string;
+  is_free: number;
+  price: number;
+  games_count: number;
+}
 
- }
-
-interface GameState {
-  gamePackage: GamePackagesData | null;
-  gamePackages :  GamePackagesData | null;
+interface GamePackagesState {
+  gamePackages: GamePackage | null;
   loading: boolean;
   error: string | null;
 }
 
-const initialState: GameState = {
-  gamePackage: null,
-  gamePackages:null,
+const initialState: GamePackagesState = {
+  gamePackages: null,
   loading: false,
   error: null,
 };
 
-// ================ get game ===============
-export const getGamePackage = createAsyncThunk<
-  GamePackagesData,
-  { id: string }, 
-  { rejectValue: string }
->(
-  "gamePackage/getGamePackage",
-  async ({ id }, thunkAPI) => {
-    try {
-      const res = await useGetData<GamePackagesData>(`game-packages/${id}`);
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "getGamePackages failed");
-    }
-  }
-);
-
-
-// ================ get GamePackages ===============
+// ========== Get All ==========
 export const getGamePackages = createAsyncThunk<
-  GamePackagesData,
-  { id: string }, 
+  GamePackage,
+  void,
   { rejectValue: string }
->(
-  "gamePackages/getGamePackages",
-  async (_, thunkAPI) => {
-    try {
-      const res = await useGetData<GamePackagesData>(`game-packages`);
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "getGames failed");
-    }
+>("gamePackages/getGamePackages", async (_, thunkAPI) => {
+  try {
+    const res = await useGetDataToken<GamePackage>("admin/game-packages");
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(err.response?.data.message || "getGamePackages failed");
   }
-);
-// ================ Slice ===============
-const GamePackagesSlice = createSlice({
+});
+
+// ========== Get One ==========
+export const getGamePackageById = createAsyncThunk<
+  GamePackage,
+  string,
+  { rejectValue: string }
+>("gamePackages/getGamePackageById", async (id, thunkAPI) => {
+  try {
+    const res = await useGetData<GamePackage>(`admin/game-packages/${id}`);
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(err.response?.data.message || "getGamePackageById failed");
+  }
+});
+
+// ========== Create ==========
+export const createGamePackage = createAsyncThunk<
+  GamePackage,
+  GamePackage,
+  { rejectValue: string }
+>("gamePackages/createGamePackage", async (data, thunkAPI) => {
+  try {
+    const res = await useInsertData<GamePackage>(`admin/game-packages`, data);
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(err.response?.data.message || "createGamePackage failed");
+  }
+});
+
+// ========== Update ==========
+export const updateGamePackage = createAsyncThunk<
+  GamePackage,
+  { id: string; data: GamePackage },
+  { rejectValue: string }
+>("gamePackages/updateGamePackage", async ({ id, data }, thunkAPI) => {
+  try {
+    const res = await useInUpdateData<GamePackage>(`admin/game-packages/${id}`, data);
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(err.response?.data.message || "updateGamePackage failed");
+  }
+});
+
+// ========== Delete ==========
+export const deleteGamePackage = createAsyncThunk<
+  { message: string },
+  string,
+  { rejectValue: string }
+>("gamePackages/deleteGamePackage", async (id, thunkAPI) => {
+  try {
+    const res = await useDeleteData(`admin/game-packages/${id}`);
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(err.response?.data.message || "deleteGamePackage failed");
+  }
+});
+
+const gamePackagesSlice = createSlice({
   name: "gamePackages",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(getGamePackages.fulfilled, (state, action) => {
+      state.gamePackages = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
+
+    builder.addCase(getGamePackageById.fulfilled, (state, action) => {
+      state.gamePackages = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
+
+    builder.addCase(createGamePackage.fulfilled, (state, action) => {
+      state.gamePackages = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
+
+    builder.addCase(updateGamePackage.fulfilled, (state, action) => {
+      state.gamePackages = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
+
+    builder.addCase(deleteGamePackage.fulfilled, (state) => {
+      state.gamePackages = null;
+      state.loading = false;
+      state.error = null;
+    });
+
     builder
-      // getGamePackages
-     .addCase(getGamePackage.fulfilled, (state, action: PayloadAction<GamePackagesData>) => {
-        state.gamePackage = action.payload;
-        state.loading = false;
-        state.error = null;
-      })
-      // getGamePackages
-.addCase(getGamePackages.fulfilled, (state, action: PayloadAction<GamePackagesData>) => {
-        state.gamePackages = action.payload;
-        state.loading = false;
-        state.error = null;
-      })       
+      .addMatcher(
+        (action) => action.type.endsWith("/rejected"),
+        (state, action: any) => {
+          state.loading = false;
+          state.error = action.payload || "Something went wrong";
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith("/pending"),
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      );
   },
 });
 
-export default GamePackagesSlice.reducer;
+export default gamePackagesSlice.reducer;

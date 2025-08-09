@@ -2,6 +2,9 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ButtonGroup from "../../components/ButtonGroup";
+import { createDiscountCode } from "../../store/DiscountSlice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
   
 
 interface InputFieldProps {
@@ -29,7 +32,7 @@ const InputField = ({ label, placeholder, set, val,type }: InputFieldProps) => {
 
 // AddAdmins.tsx
 const AddDiscount = ({ onClose }: { onClose: () => void }) => {
-     
+      const dispatch = useDispatch<AppDispatch>();
  const [code, setCode] = useState("");
   const [codeType, setCodeType] = useState("");
   const [price, setPrice] = useState("");
@@ -40,16 +43,29 @@ const AddDiscount = ({ onClose }: { onClose: () => void }) => {
   const [email, setEmail] = useState("");
   const [Package, setPackage] = useState(""); 
 const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عام");
-  const submitData = () => {
-    if (!price || !code || !codeType || !codePrice || !startDate || !endDate || !status || !email || !Package) {
-      toast.warn("يرجى استكمال جميع الحقول!");
-      return;
-    }
+ const submitData = () => {
+  if (!price || !code || !codeType || !codePrice || !startDate || !endDate || !status || !email || !Package) {
+    toast.warn("يرجى استكمال جميع الحقول!");
+    return;
+  }
 
-    // Submit logic here
-    toast.success("تمت إضافة المشرف بنجاح!");
-    onClose(); // close modal on success
+  const newDiscount = {
+    code,
+    discount: Number(code), // assuming discount = percentage
+    is_percentage: 1, // أو 0 لو ثابت
+    isActive: status === "نشط" // حسب حالتك
   };
+
+  dispatch(createDiscountCode(newDiscount))
+    .unwrap()
+    .then(() => {
+      toast.success("تمت إضافة الكود بنجاح!");
+      onClose();
+    })
+    .catch((err) => {
+      toast.error(err);
+    });
+};
    const resetHandle = () => {
     setPrice("");
     setCode("");

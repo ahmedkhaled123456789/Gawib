@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
  import AddPrice from "./AddPrice";
 import CustomModal from "../../components/Modals/CustomModal";
+import { AppDispatch, RootState } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
+import { getGamePackages } from "../../store/GamePackagesSlice";
 
 const dummyProducts = [
   {
@@ -40,7 +43,7 @@ const dummyProducts = [
     status: "موقوف",
 
   },
- ];
+ ]; 
 
 const ProductRow = ({ product, index }) => {
     
@@ -50,10 +53,10 @@ const ProductRow = ({ product, index }) => {
       <td className="px-4 py-2 text-gray-700">
         <Link to={`/productDetails/${product._id}`}>{product.name}</Link>
       </td>
-      <td className="px-4 py-2 text-gray-700">{product.count}</td>
+      <td className="px-4 py-2 text-gray-700">{product.games_count}</td>
       <td className="px-4 py-2 text-gray-700">{product.price}</td>
       <td className="px-4 py-2 text-gray-700">{product.amount}</td>
-      <td className="px-4 py-2 text-gray-700">{product.total}</td>
+      <td className="px-4 py-2 text-gray-700">{product.price}</td>
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center gap-2">
                 <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
@@ -71,11 +74,28 @@ const ProductRow = ({ product, index }) => {
 };
 
 const Prices = () => {
+
   const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showPriceModal, setShowPriceModal] = useState(false);
 
+const dispatch = useDispatch<AppDispatch>();
+
+  const { gamePackages,loading ,error} = useSelector((state: RootState) => state.gamePackage);
+ 
+
+      
+  useEffect(() => {
+    dispatch(getGamePackages());
+  }, [dispatch]);
+
+  if (loading) return <div>جاري التحميل...</div>;
+  if (error) return <div>حدث خطأ: {error}</div>;
+
+  const filteredProducts = gamePackages?.data?.data?.filter((pkg) =>
+    pkg.name.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
@@ -136,19 +156,19 @@ const Prices = () => {
               </tr>
             </thead>
 
-            <tbody className="divide-y text-center divide-gray-200">
-              {products.length > 0 ? (
-                products.map((product, index) => (
-                  <ProductRow key={product._id} product={product} index={index}    />
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={13} className="px-4 py-2 text-gray-700">
-                    لم يتم العثور على منتجات.
-                  </td>
-                </tr>
-              )}
-            </tbody>
+             <tbody className="divide-y text-center divide-gray-200">
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product, index) => (
+            <ProductRow key={product._id} product={product} index={index} />
+          ))
+        ) : (
+          <tr>
+            <td colSpan={13} className="px-4 py-2 text-gray-700">
+              لم يتم العثور على منتجات.
+            </td>
+          </tr>
+        )}
+      </tbody>
           </table>
         </div>
       </div>

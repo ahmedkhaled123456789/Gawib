@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
 import AddDiscount from "./AddDiscount";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { getDiscountCodes } from "../../store/DiscountSlice";
 
 const dummyProducts = [
   {
@@ -94,7 +97,14 @@ const ProductRow = ({ product, index ,setShowModal}) => {
 };
 
 const Discount = () => {
-  const [products] = useState(dummyProducts);
+const dispatch = useDispatch<AppDispatch>();
+
+  const { discountCodes } = useSelector((state: RootState) => state.discountCodes);
+ 
+useEffect(() => {
+  dispatch(getDiscountCodes());
+}, [dispatch]);
+  // const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showPriceModal, setShowPriceModal] = useState(false);
@@ -170,17 +180,23 @@ const Discount = () => {
             </thead>
 
             <tbody className="divide-y text-center divide-gray-200">
-              {products.length > 0 ? (
-                products.map((product, index) => (
-                  <ProductRow key={product._id} product={product} index={index}   setShowModal={setShowModal} />
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={13} className="px-4 py-2 text-gray-700">
-                    لم يتم العثور على منتجات.
-                  </td>
-                </tr>
-              )}
+              {discountCodes?.length > 0 ? (
+  discountCodes.map((product, index) => (
+    <ProductRow
+      key={index}
+      product={product}
+      index={index}
+      setShowModal={setShowModal}
+    />
+  ))
+) : (
+  <tr>
+    <td colSpan={13} className="px-4 py-2 text-gray-700">
+      لم يتم العثور على أكواد خصم.
+    </td>
+  </tr>
+)}
+
             </tbody>
           </table>
         </div>

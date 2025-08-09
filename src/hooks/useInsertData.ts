@@ -7,15 +7,13 @@ const useInsertData = async <T>(
   config?: AxiosRequestConfig
 ): Promise<T> => {
   try {
-    // Add Authorization token to the config headers
     const defaultConfig: AxiosRequestConfig = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
-        ...config?.headers, // Merge any additional headers from the config
+        ...config?.headers,
       },
     };
 
-    // Make the POST request with the given url, params, and config
     const res = await baseUrl.post<T>(url, params, defaultConfig);
     return res.data;
   } catch (error) {
@@ -24,4 +22,26 @@ const useInsertData = async <T>(
   }
 };
 
-export default useInsertData;
+const useInsertDataWithImage = async <T>(
+  url: string,
+  formData: FormData,
+  config: AxiosRequestConfig = {}
+): Promise<T> => {
+  try {
+    const mergedConfig: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+         ...config.headers,
+      },
+      ...config,
+    };
+
+    const response = await baseUrl.post<T>(url, formData, mergedConfig);
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Error inserting image data to ${url}:`, error);
+    throw new Error("Failed to insert image data");
+  }
+};
+
+ export { useInsertData, useInsertDataWithImage };
