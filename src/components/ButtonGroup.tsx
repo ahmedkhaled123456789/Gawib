@@ -1,8 +1,7 @@
 import React from "react";
 
 interface ButtonGroupProps {
-  handleSubmit: () => void;
-  resetHandle: () => void;
+ handleSubmit: (e?: React.FormEvent) => void;  resetHandle: () => void;
   onClose: () => void;
 
 }

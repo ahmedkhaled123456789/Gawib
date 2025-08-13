@@ -1,21 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData } from "../utils/api";
+import { useGetData, useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
 import useDeleteData from "../hooks/useDeleteData";
 import { useInUpdateData } from "../hooks/useUpdateData";
- import { useGetDataToken } from "../hooks/useGetData";
-import {useInsertData}  from "../hooks/useInsertData";
+ import {useInsertData}  from "../hooks/useInsertData";
 
 interface AdminData {
- firstName: string;
-  lastName: string;
+  name: string;
   email: string;
-  phone: string;
+  phone_number: string;
   password: string;
-   name:string;
-     is_super_admin:number;
-    is_active: number;
- }
+  is_super_admin: number;
+  is_active: number;
+}
 
 interface AdminState {
   admins: AdminData | [];
@@ -67,12 +64,14 @@ export const createAdmin = createAsyncThunk<
 >("admin/createAdmin", async (data, thunkAPI) => {
   try {
     const res = await useInsertData<AdminData>(`admin/admins`, data);
+     thunkAPI.dispatch(getAdmins());
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(err.response?.data.message || "createAdmin failed");
   }
 });
+
 
 // ============ Update Admin ============
 export const updateAdmin = createAsyncThunk<
@@ -127,11 +126,11 @@ const adminSlice = createSlice({
   });
 
   // Create Admin
-  builder.addCase(createAdmin.fulfilled, (state, action) => {
-    state.admins = action.payload;
-    state.loading = false;
-    state.error = null;
-  });
+builder.addCase(createAdmin.fulfilled, (state) => {
+  state.loading = false;
+  state.error = null;
+});
+
 
   // Update Admin
   builder.addCase(updateAdmin.fulfilled, (state, action) => {

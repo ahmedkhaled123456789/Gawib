@@ -1,49 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
-import AddGame from "./AddGame";
-  
-const dummyProducts = [
-  {
-    _id: "1",
-    name: " دول وعوصم      ",
-    question: "ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان والتي لا تستطيع الوصول الى البحار الا عبر حدود برية",
-    answer: "  ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان  ",
-    count: 200,
-   see: "سنوات 2",
-   admin: "محمد الناصر",
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { getQuestions } from "../../store/questionsSlice";
+import AddQuestion from "../questions/AddQuestion";
  
-    status: "نشط",
-  },
-  {
-    _id: "2",
-    name: " دول وعوصم      ",
-    question: "ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان والتي لا تستطيع الوصول الى البحار الا عبر حدود برية",
-    answer: "  ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان  ",
-    count: 400,
-   see: "سنوات 2",
-   admin: "محمد الناصر",
  
-    status: "نشط",
-  },
-  {
-    _id: "3",
-    name: " دول وعوصم      ",
-    question: "ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان والتي لا تستطيع الوصول الى البحار الا عبر حدود برية",
-    answer: "  ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان  ",
-    count: 600,
-   see: " -",
-   admin: "محمد الناصر",
- 
-    status: "نشط",
-  },
-  
-  
 
- ];
 
 const ProductRow = ({ product, index }) => {
     
@@ -51,21 +18,21 @@ const ProductRow = ({ product, index }) => {
     <tr key={product._id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
       <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.name}</div></Link>
+        <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.game.name}</div></Link>
       </td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.question}</div></td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.answer}</div></td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.question.text}</div></td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.answer.text}</div></td>
       <td className="px-4 py-2 text-white"><div className={`w-16 px-4 py-1 rounded ${
-    product.count === 200
+    product.points === 200
       ? "bg-[#309222]"
-      : product.count === 400
+      : product.points === 400
       ? "bg-[#9647c4]"
       : "bg-[#ae1113]"
   }`}>
         
-        {product.count}</div></td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.see}</div></td>
-            <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.admin}</div></td>
+        {product.points}</div></td>
+        <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.see || "سنوات 2"}</div></td>
+            <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.admin|| "محمد الناصر"}</div></td>
   
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-24 gap-2">
@@ -80,8 +47,13 @@ const ProductRow = ({ product, index }) => {
 
 const Game = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [products] = useState(dummyProducts);
-  const [searchQuery, setSearchQuery] = useState("");
+const dispatch = useDispatch<AppDispatch>();
+
+  const { questions} = useSelector((state: RootState) => state.questions);
+
+  useEffect(() => {
+    dispatch(getQuestions());
+  }, [dispatch]);  const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showPriceModal, setShowPriceModal] = useState(false);
       const [showModal, setShowModal] = useState(false);
@@ -153,25 +125,31 @@ const Game = () => {
               </tr>
             </thead>
 
-            <tbody className="divide-y text-center divide-gray-200">
-              {products.length > 0 ? (
-                products.map((product, index) => (
-                  <ProductRow key={product._id} product={product} index={index}  />
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={13} className="px-4 py-2 text-gray-700">
-                    لم يتم العثور على منتجات.
-                  </td>
-                </tr>
-              )}
-            </tbody>
+             <tbody className="divide-y text-center divide-gray-200">
+  {questions?.data?.length > 0 ? (
+    questions.data
+      .filter(question => question?.game.is_free === false) // هنا التعديل
+      .map((question, index) => (
+        <ProductRow
+          key={question._id || question.id}
+          product={question}
+          index={index}
+         />
+      ))
+  ) : (
+    <tr>
+      <td colSpan={13} className="px-4 py-2 text-gray-700">
+        لم يتم العثور على منتجات.
+      </td>
+    </tr>
+  )}
+</tbody>
           </table>
         </div>
       </div>
               <Pagination pageCount={6} onPress={1} />
 <CustomModal isOpen={showPriceModal}>
-        <AddGame onClose={() => setShowPriceModal(false)} />
+        <AddQuestion onClose={() => setShowPriceModal(false)} />
       </CustomModal>
 
       <CustomModal isOpen={showModal}>

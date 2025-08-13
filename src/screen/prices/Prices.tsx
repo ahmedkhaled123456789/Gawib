@@ -55,7 +55,7 @@ const ProductRow = ({ product, index }) => {
       </td>
       <td className="px-4 py-2 text-gray-700">{product.games_count}</td>
       <td className="px-4 py-2 text-gray-700">{product.price}</td>
-      <td className="px-4 py-2 text-gray-700">{product.amount}</td>
+      <td className="px-4 py-2 text-gray-700">{product.amount||"_"}</td>
       <td className="px-4 py-2 text-gray-700">{product.price}</td>
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center gap-2">
@@ -64,7 +64,7 @@ const ProductRow = ({ product, index }) => {
             </span>
                              <span className="p-1 border cursor-pointer rounded border-[#085E9C]" >
 
-                 <img src="/images/group/true.png" alt="" className={`w-5 h-5 ${product.status === 'نشط' ? 'opacity-100' : 'opacity-0'}`} />
+                 <img src="/images/group/true.png" alt="" className={`w-5 h-5 ${product.is_active ? 'opacity-100' : 'opacity-0'}`} />
             
              </span>
             </div>

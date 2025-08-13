@@ -58,15 +58,22 @@ export const createSetting = createAsyncThunk<
   Setting,
   Setting,
   { rejectValue: string }
->("settings/create", async (data, thunkAPI) => {
-  try {
-    const res = await useInsertData<Setting>(`admin/settings`, data);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to create setting");
+>(
+  "settings/create",
+  async (data, thunkAPI) => {
+    try {
+      const res = await useInsertData<Setting>(`admin/settings`, data);
+       thunkAPI.dispatch(getSettings());
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "Failed to create setting"
+      );
+    }
   }
-});
+);
+
 
 // ========== Update ==========
 export const updateSetting = createAsyncThunk<
@@ -115,9 +122,8 @@ const settingsSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(createSetting.fulfilled, (state, action) => {
-      state.settings = [...(state.settings || []), action.payload];
-      state.loading = false;
+    builder.addCase(createSetting.fulfilled, (state) => {
+       state.loading = false;
       state.error = null;
     });
 

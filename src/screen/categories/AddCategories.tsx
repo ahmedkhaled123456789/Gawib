@@ -53,6 +53,8 @@ const AddCategories = ({ onClose }: { onClose: () => void }) => {
        className="w-full bg-[#D5D5D5]  rounded border border-[#085E9C] p-3 text-sm shadow-md outline-none text-right"
     />
          </div>
+
+         
          {/* Image Upload */}
             <div className="w-full  flex flex-col ">
               <label className="mb-3 text-lg font-bold text-[#085E9C]">صورة الفئة  </label>

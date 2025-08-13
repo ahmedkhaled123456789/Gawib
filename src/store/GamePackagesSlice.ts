@@ -60,15 +60,22 @@ export const createGamePackage = createAsyncThunk<
   GamePackage,
   GamePackage,
   { rejectValue: string }
->("gamePackages/createGamePackage", async (data, thunkAPI) => {
-  try {
-    const res = await useInsertData<GamePackage>(`admin/game-packages`, data);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "createGamePackage failed");
+>(
+  "gamePackages/createGamePackage",
+  async (data, thunkAPI) => {
+    try {
+      const res = await useInsertData<GamePackage>(`admin/game-packages`, data);
+       thunkAPI.dispatch(getGamePackages());
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "createGamePackage failed"
+      );
+    }
   }
-});
+);
+
 
 // ========== Update ==========
 export const updateGamePackage = createAsyncThunk<
@@ -117,9 +124,8 @@ const gamePackagesSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(createGamePackage.fulfilled, (state, action) => {
-      state.gamePackages = action.payload;
-      state.loading = false;
+    builder.addCase(createGamePackage.fulfilled, (state) => {
+       state.loading = false;
       state.error = null;
     });
 

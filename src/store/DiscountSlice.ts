@@ -59,15 +59,22 @@ export const createDiscountCode = createAsyncThunk<
   DiscountCode,
   DiscountCode,
   { rejectValue: string }
->("discountCodes/create", async (data, thunkAPI) => {
-  try {
-    const res = await useInsertData<DiscountCode>(`admin/discount-codes`, data);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to create discount code");
+>(
+  "discountCodes/create",
+  async (data, thunkAPI) => {
+    try {
+      const res = await useInsertData<DiscountCode>(`admin/discount-codes`, data);
+       thunkAPI.dispatch(getDiscountCodes());
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "Failed to create discount code"
+      );
+    }
   }
-});
+);
+
 
 // ========== Update ==========
 export const updateDiscountCode = createAsyncThunk<
@@ -116,9 +123,8 @@ const discountCodesSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(createDiscountCode.fulfilled, (state, action) => {
-      state.discountCodes = [...(state.discountCodes || []), action.payload];
-      state.loading = false;
+    builder.addCase(createDiscountCode.fulfilled, (state) => {
+       state.loading = false;
       state.error = null;
     });
 

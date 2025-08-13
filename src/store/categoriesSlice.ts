@@ -7,6 +7,7 @@ import useDeleteData from "../hooks/useDeleteData";
 import  {useInsertDataWithImage}  from "../hooks/useInsertData";
 
 interface CategoryData {
+  data: any;
  name: string;
  description: string;
   image: string;
@@ -68,16 +69,18 @@ export const getCategories = createAsyncThunk<
 // ========================== Create Category ==========================
 export const addCategory = createAsyncThunk<CategoryData, FormData>(
   "category/addCategory",
-  async (formData, { rejectWithValue }) => {
+  async (formData, thunkAPI) => {
     try {
       const data = await useInsertDataWithImage<CategoryData>("admin/categories", formData);
+       thunkAPI.dispatch(getCategories());
       return data;
     } catch (error) {
-      console.error("❌ Error adding Category:", error);
-      return rejectWithValue("فشل في إضافة التصنيف");
+      console.error(" Error adding Category:", error);
+      return thunkAPI.rejectWithValue("فشل في إضافة التصنيف");
     }
   }
 );
+
 
 // ========================== Update Category ==========================
 export const updateCategory = createAsyncThunk<
@@ -86,19 +89,21 @@ export const updateCategory = createAsyncThunk<
   { rejectValue: string }
 >(
   "category/updateCategory",
-  async ({ id, formData }, { rejectWithValue }) => {
+  async ({ id, formData }, thunkAPI) => {
     try {
       const res = await useInUpdateData<CategoryData, Partial<CategoryData>>(
         `admin/categories/${id}`,
         formData
       );
+      thunkAPI.dispatch(getCategories());
       return res;
     } catch (error) {
       console.error("Error updating Category:", error);
-      return rejectWithValue("Failed to update Category");
+      return thunkAPI.rejectWithValue("Failed to update Category");
     }
   }
 );
+
 
 // ========================== Delete Category ==========================
 export const deleteCategory = createAsyncThunk<string, string>(
@@ -132,9 +137,8 @@ const categoriesSlice = createSlice({
         state.loading = false;
         state.error = null;
       })
-  .addCase(addCategory.fulfilled, (state, action: PayloadAction<CategoryData>) => {
-        state.categories = action.payload;
-        state.loading = false;
+  .addCase(addCategory.fulfilled, (state) => {
+         state.loading = false;
         state.error = null;
       })
        .addCase(updateCategory.fulfilled, (state, action: PayloadAction<CategoryData>) => {

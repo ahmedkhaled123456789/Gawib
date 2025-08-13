@@ -60,15 +60,22 @@ export const createSocialLink = createAsyncThunk<
   SocialLink,
   SocialLink,
   { rejectValue: string }
->("socialLinks/create", async (data, thunkAPI) => {
-  try {
-    const res = await useInsertData<SocialLink>(`admin/social-links`, data);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to create social link");
+>(
+  "socialLinks/create",
+  async (data, thunkAPI) => {
+    try {
+      const res = await useInsertData<SocialLink>(`admin/social-links`, data);
+       thunkAPI.dispatch(getSocialLinks());
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "Failed to create social link"
+      );
+    }
   }
-});
+);
+
 
 // ========== Update ==========
 export const updateSocialLink = createAsyncThunk<
@@ -117,9 +124,8 @@ const socialLinksSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(createSocialLink.fulfilled, (state, action) => {
-      state.socialLinks = [...(state.socialLinks || []), action.payload];
-      state.loading = false;
+    builder.addCase(createSocialLink.fulfilled, (state) => {
+       state.loading = false;
       state.error = null;
     });
 

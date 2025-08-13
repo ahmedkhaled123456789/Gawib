@@ -8,7 +8,7 @@ import CustomModal from "../../components/CustomModal";
 import Dashboard from "../../components/Dashboard/Dashboard";
  import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { getUser } from "../../store/userSlice";
+import { getUser, updateUser } from "../../store/userSlice";
 
 
 const ProductRow = ({ product, index ,onStatusClick}) => {
@@ -51,7 +51,6 @@ const AllUsers = () => {
  const dispatch = useDispatch<AppDispatch>();
 
   const { user, loading } = useSelector((state: RootState) => state.user);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const handleSearch = (e) => {
@@ -69,15 +68,21 @@ const AllUsers = () => {
     setModalOpen(true);
   };
 
-  const handleConfirmStatus = () => {
-    setModalOpen(false);
-    alert(`تم تعديل حالة المستخدم ${selectedProduct?.name}`);
-  };
+ const handleConfirmStatus = (data: { id: string; status: 0 | 1 }) => {
+   dispatch(
+     updateUser({
+       id: data.id,
+       formData: { status: data.status },
+     }) 
+   );
+   console.log({
+     id: data.id,
+     formData: { status: data.status },
+   });
+   setModalOpen(false);
+ };
 
-  const filteredUsers = user?.data?.filter(
-  (item) =>
-    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
-) || [];
+
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
@@ -162,7 +167,8 @@ const AllUsers = () => {
     isOpen={modalOpen}
     onClose={() => setModalOpen(false)}
     onConfirm={handleConfirmStatus}
-    status={selectedProduct.status}
+    status={selectedProduct.status} 
+    id={selectedProduct.id}
   />
 )}
     </div>

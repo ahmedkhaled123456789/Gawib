@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
 import AddAdmins from "./AddAdmins";
 import CustomModal from "../../components/Modals/CustomModal";
 import { AppDispatch, RootState } from "../../store";
@@ -12,7 +11,7 @@ const SupervisorCard = ({ supervisor }) => {
     <div className="border border-[##085E9C] p-4 rounded shadow bg-white space-y-4">
       <div className="grid grid-cols-4 gap-2 items-center font-bold text-[#085E9C]">
         <div className="col-span-1 border rounded border-[#085E9C] p-4 text-center">{supervisor.name}</div>
-        <div className="col-span-1 bg-yellow-400 text-center border rounded border-[#085E9C] p-4">01023233434</div>
+        <div className="col-span-1 bg-yellow-400 text-center border rounded border-[#085E9C] p-4">{supervisor.phone_number}</div>
         <div className="col-span-1 bg-yellow-400 text-center border rounded border-[#085E9C] p-4">{supervisor.email}</div>
         <div className="col-span-1 bg-yellow-400 text-center border rounded border-[#085E9C] p-4">Admin</div>
       </div>

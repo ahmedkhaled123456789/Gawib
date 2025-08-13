@@ -2,8 +2,13 @@ import { useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Dropdown from "../../components/DropDown";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
+import { createQuestion } from "../../store/questionsSlice";
  
 const AddQuestion = ({ onClose }: { onClose: () => void }) => {
+    const dispatch = useDispatch<AppDispatch>();
+
   const [activePoints, setActivePoints] = useState<number | null>(400);
   const [category, setCategory] = useState("");
   const [question, setQuestion] = useState("");
@@ -14,15 +19,37 @@ const AddQuestion = ({ onClose }: { onClose: () => void }) => {
 
   const [statusFilter, setStatusFilter] = useState("");
 
-  const handleSubmit = () => {
-    if (!category || !question || !answer || !age) {
-      toast.warn("يرجى استكمال جميع الحقول!");
-      return;
-    }
-    toast.success("تم الحفظ بنجاح!");
-    onClose();
-  };
+ 
 
+  const handleSubmit = () => {
+  // if (!category || !question || !answer || !age) {
+  //   toast.warn("يرجى استكمال جميع الحقول!");
+  //   return;
+  // }
+
+  const formData = new FormData();
+  formData.append("points", activePoints?.toString() || "0");
+  formData.append("game_id", "1");
+  formData.append("question_text", question);
+  if (image) formData.append("question_image", image);
+  formData.append("answer_text", answer);
+  if (image2) formData.append("answer_image", image2);
+  formData.append("hint", see);
+  formData.append("activeCategory", age);
+    formData.append("is_active", "0");
+
+
+  dispatch(createQuestion(formData))
+    .unwrap()
+    .then(() => {
+      toast.success("تم الحفظ بنجاح!");
+      resetHandle();
+      onClose();
+    })
+    .catch((err) => {
+      toast.error(err || "فشل الحفظ!");
+    });
+};
   const resetHandle = () => {
     setCategory("");
     setQuestion("");
@@ -91,10 +118,13 @@ const AddQuestion = ({ onClose }: { onClose: () => void }) => {
               value={age}
               onChange={(e) => setAge(e.target.value)}
                className="w-full  outline-none   text-sm text-right"
-            />              
-              <span className="text-red-500 text-xl cursor-pointer">
-                <img src="/images/group/close.png" alt="" className="w-5 h-5" />
+            />  
+                 {age&&(
+ <span className="text-red-500 text-xl cursor-pointer">
+                <img onClick={() =>setAge("") } src="/images/group/close.png" alt="" className="w-5 h-5" />
               </span>
+                 )}       
+             
             </div>
 
             {/* السؤال النشط */}
@@ -106,10 +136,11 @@ const AddQuestion = ({ onClose }: { onClose: () => void }) => {
               onChange={(e) => setCat(e.target.value)}
                className="w-full  outline-none   text-sm text-right"
             />
-              <span className="text-red-500 text-xl cursor-pointer">
-                                <img src="/images/group/close.png" alt="" className="w-5 h-5" />
-
+              {cat&&(
+ <span className="text-red-500 text-xl cursor-pointer">
+                <img onClick={() =>setCat("") } src="/images/group/close.png" alt="" className="w-5 h-5" />
               </span>
+                 )}    
             </div>
 
             {/* التلميح */}
@@ -150,8 +181,13 @@ const AddQuestion = ({ onClose }: { onClose: () => void }) => {
             {/* السؤال */}
             <div className="flex flex-col w-1/2 border  border-[#085E9C] p-2 rounded">
               <h3 className="text-center border p-4  border-[#085E9C] font-bold text-[#085E9C]  mb-2">السؤال</h3>
-              <div className="border p-4  border-[#085E9C]  mb-2 text-right">{question || "مصر"}</div>
-              <div className="border p-4  border-[#085E9C] flex justify-center items-center h-72">
+<input
+  type="text"
+  value={question }
+  onChange={(e) => setQuestion(e.target.value)}
+  className="border p-4 focus:outline-none border-[#085E9C] mb-2 text-right w-full"
+  placeholder="مصر"
+/>              <div className="border p-4  border-[#085E9C] flex justify-center items-center h-72">
  <div
                 className="w-full h-[200px]    flex items-center justify-center cursor-pointer  "
                 onClick={handleImageClick}
@@ -177,7 +213,13 @@ const AddQuestion = ({ onClose }: { onClose: () => void }) => {
             {/* الجواب */}
             <div className=" flex flex-col w-1/2 border   border-[#085E9C]  p-2 rounded">
               <h3 className="text-center font-bold text-[#085E9C] border p-4  border-[#085E9C]  mb-2">الجواب</h3>
-              <div className="border p-4  border-[#085E9C]  mb-2 text-right">{answer || "القاهرة"}</div>
+<input
+  type="text"
+  value={answer }
+  onChange={(e) => setAnswer(e.target.value)}
+  className="border p-4 focus:outline-none border-[#085E9C] mb-2 text-right w-full"
+  placeholder="القاهرة"
+/>
               <div className="border p-4  border-[#085E9C] flex justify-center items-center h-72">
  <div
                 className="w-full h-[200px]    flex items-center justify-center cursor-pointer  "

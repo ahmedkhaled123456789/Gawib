@@ -1,13 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData } from "../utils/api";
+import { useGetData, useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
 import useDeleteData from "../hooks/useDeleteData";
 import { useInUpdateData } from "../hooks/useUpdateData";
-import {useInsertData} from "../hooks/useInsertData";
+import { useInsertDataWithImage} from "../hooks/useInsertData";
 
 interface GameData {
-  data: any;
-  name: string;
+   name: string;
   description: string;
   image: string;
   category_id:string;
@@ -34,7 +33,7 @@ export const getGames = createAsyncThunk<
   { rejectValue: string }
 >("game/getGames", async (_, thunkAPI) => {
   try {
-    const res = await useGetData<GameData>(`admin/games`);
+    const res = await useGetDataToken<GameData>(`admin/games`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -57,33 +56,42 @@ export const getGameById = createAsyncThunk<
   }
 });
 
-// ============ Create Game ============
+ // ============ Create Game ============
 export const createGame = createAsyncThunk<
   GameData,
-  GameData,
+  FormData,
   { rejectValue: string }
->("game/createGame", async (data, thunkAPI) => {
-  try {
-    const res = await useInsertData<GameData>(`admin/games`, data);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "createGame failed");
+>(
+  "game/createGame",
+  async (formData, thunkAPI) => {
+    try {
+      const res = await useInsertDataWithImage<FormData>(`admin/games`, formData);
+      thunkAPI.dispatch(getGames());
+      return res as unknown as GameData;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "createGame failed"
+      );
+    }
   }
-});
+);
+
 
 // ============ Update Game ============
 export const updateGame = createAsyncThunk<
-  GameData,
-  { id: string; data: GameData },
+  GameData, // النتيجة اللي بترجع
+  { id: string; data: FormData }, // هنا خليت data من النوع FormData
   { rejectValue: string }
 >("game/updateGame", async ({ id, data }, thunkAPI) => {
   try {
-    const res = await useInUpdateData<GameData>(`admin/games/${id}`, data);
-    return res;
+    const res = await useInUpdateData<FormData>(`admin/games/${id}`, data);
+    return res as unknown as GameData;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "updateGame failed");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "updateGame failed"
+    );
   }
 });
 
@@ -119,9 +127,8 @@ const gameSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(createGame.fulfilled, (state, action) => {
-      state.games = action.payload;
-      state.loading = false;
+    builder.addCase(createGame.fulfilled, (state) => {
+       state.loading = false;
       state.error = null;
     });
 
