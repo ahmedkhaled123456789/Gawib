@@ -55,7 +55,7 @@ const ProductRow = ({ product, index }) => {
       </td>
       <td className="px-4 py-2 text-gray-700">{product.games_count}</td>
       <td className="px-4 py-2 text-gray-700">{product.price}</td>
-      <td className="px-4 py-2 text-gray-700">{product.amount||"_"}</td>
+      <td className="px-4 py-2 text-gray-700">{product.number_of_buys||"_"}</td>
       <td className="px-4 py-2 text-gray-700">{product.price}</td>
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center gap-2">

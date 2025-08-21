@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData, useGetDataToken } from "../utils/api";
+import {  useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
 import {useInsertData} from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
@@ -18,12 +18,14 @@ import useDeleteData from "../hooks/useDeleteData";
 
 interface QuestionsState {
   questions: QuestionData | null;
+  question: QuestionData | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: QuestionsState = {
   questions: null,
+  question: null,
   loading: false,
   error: null,
 };
@@ -50,7 +52,7 @@ export const getQuestionById = createAsyncThunk<
   { rejectValue: string }
 >("questions/getQuestionById", async (id, thunkAPI) => {
   try {
-    const res = await useGetData<QuestionData>(`admin/questions/${id}`);
+    const res = await useGetDataToken<QuestionData>(`admin/questions/${id}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -89,7 +91,7 @@ export const updateQuestion = createAsyncThunk<
   "questions/updateQuestion",
   async ({ id, formData }, thunkAPI) => {
     try {
-      const res = await useInUpdateData<QuestionData>(`admin/questions/${id}`, formData);
+      const res = await useInsertData<QuestionData>(`admin/questions/${id}`, formData);
        thunkAPI.dispatch(getQuestions());
       return res;
     } catch (error) {
@@ -127,7 +129,7 @@ const questionsSlice = createSlice({
     });
 
     builder.addCase(getQuestionById.fulfilled, (state, action) => {
-      state.questions = action.payload;
+      state.question = action.payload;
       state.loading = false;
       state.error = null;
     });

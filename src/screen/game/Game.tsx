@@ -18,7 +18,7 @@ const ProductRow = ({ product, index }) => {
     <tr key={product._id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
       <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.game.name}</div></Link>
+        <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.game_name}</div></Link>
       </td>
       <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.question.text}</div></td>
       <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.answer.text}</div></td>

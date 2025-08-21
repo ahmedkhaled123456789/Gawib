@@ -29,7 +29,11 @@ const [descriptionGroup,setDescriptionGroap]= useState("");
  const [image, setImage] = useState<File | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
+const resetGroup=() =>{
+  setDescriptionGroap("");
+  setNameGroap("");
+  setImage(null);
+}
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
@@ -76,7 +80,7 @@ const handleConfirmForm = async(e) => {
           if (addCategory.fulfilled.match(resultAction)) {
             toast.success("تمت إضافة المجموعة بنجاح!");
                setModalFormOpen(false);
-
+                 resetGroup();
           } else {
             toast.error("حدث خطأ أثناء الإضافة");
           }

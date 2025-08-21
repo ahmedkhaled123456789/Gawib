@@ -1,80 +1,94 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Dropdown from "../../components/DropDown";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
-import { createQuestion } from "../../store/questionsSlice";
- 
-const AddQuestion = ({ onClose }: { onClose: () => void }) => {
-    const dispatch = useDispatch<AppDispatch>();
+import { createQuestion, updateQuestion, getQuestionById } from "../../store/questionsSlice"; // نفترض عندك API تجيب سؤال واحد
+
+const AddQuestion = ({ selectedId, onClose }: { selectedId?: string; onClose: () => void }) => {
+  const dispatch = useDispatch<AppDispatch>();
 
   const [activePoints, setActivePoints] = useState<number | null>(400);
   const [category, setCategory] = useState("");
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("ماهي عاصمة ");
-  const [cat, setCat] = useState("دول وعواصم");
-    const [age, setAge] = useState("دول وعواصم");
-  const [see, setSee] = useState("دول وعواصم");
-
+  const [answer, setAnswer] = useState("");
+  const [cat, setCat] = useState("");
+  const [age, setAge] = useState("");
+  const [see, setSee] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [image2, setImage2] = useState<File | null>(null);
 
- 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef2 = useRef<HTMLInputElement | null>(null);
+
+  // 🔹 جلب البيانات لو في selectedId
+  useEffect(() => {
+    if (selectedId) {
+      dispatch(getQuestionById(selectedId))
+        .unwrap()
+        .then((data) => {
+          setActivePoints(Number(data.data.points) || 0);
+           setQuestion(data.data.question.text || "");
+          setAnswer(data.data.answer.text || "");
+          setSee(data.data.hint || "");
+           setCat(data.data.question.text || "");
+          setImage(data.data.question.image);
+          setImage2(data.data.answer.image);
+        })
+        .catch(() => {
+          toast.error("فشل تحميل بيانات السؤال");
+        });
+    }
+  }, [selectedId, dispatch]);
 
   const handleSubmit = () => {
-  // if (!category || !question || !answer || !age) {
-  //   toast.warn("يرجى استكمال جميع الحقول!");
-  //   return;
-  // }
-
-  const formData = new FormData();
-  formData.append("points", activePoints?.toString() || "0");
-  formData.append("game_id", "1");
-  formData.append("question_text", question);
-  if (image) formData.append("question_image", image);
-  formData.append("answer_text", answer);
-  if (image2) formData.append("answer_image", image2);
-  formData.append("hint", see);
-  formData.append("activeCategory", age);
+    const formData = new FormData();
+    formData.append("points", activePoints?.toString() || "0");
+    formData.append("game_id", "1");
+    formData.append("question.text", question);
+    if (image) formData.append("question.image", image);
+    formData.append("answer.text", answer);
+    if (image2) formData.append("answer.image", image2);
+    formData.append("hint", see);
+    formData.append("activeCategory", age);
     formData.append("is_active", "0");
+if(selectedId){ formData.append("_method", "PUT");}
+    const action = selectedId
+      ? updateQuestion({ id: selectedId,formData })
+      : createQuestion(formData);
 
+    dispatch(action)
+      .unwrap()
+      .then(() => {
+        toast.success(selectedId ? "تم التحديث بنجاح!" : "تم الحفظ بنجاح!");
+        resetHandle();
+        onClose();
+      })
+      .catch((err) => {
+        toast.error(err || (selectedId ? "فشل التحديث!" : "فشل الحفظ!"));
+      });
+  };
 
-  dispatch(createQuestion(formData))
-    .unwrap()
-    .then(() => {
-      toast.success("تم الحفظ بنجاح!");
-      resetHandle();
-      onClose();
-    })
-    .catch((err) => {
-      toast.error(err || "فشل الحفظ!");
-    });
-};
   const resetHandle = () => {
     setCategory("");
     setQuestion("");
     setAnswer("");
     setAge("");
+    setSee("");
+    setCat("");
+    setImage(null);
+    setImage2(null);
   };
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const fileInputRef2 = useRef<HTMLInputElement | null>(null);
-
-  const [image, setImage] = useState<File | null>(null);
-  const [image2, setImage2] = useState<File | null>(null);
-
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
-  };
-  const handleImageClick2 = () => {
-    fileInputRef2.current?.click();
-  };
+  const handleImageClick = () => fileInputRef.current?.click();
+  const handleImageClick2 = () => fileInputRef2.current?.click();
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setImage(file);
   };
-
-   const handleImageChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setImage2(file);
   };

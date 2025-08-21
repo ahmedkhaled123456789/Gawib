@@ -11,13 +11,13 @@ import { getQuestions, updateQuestion } from "../../store/questionsSlice";
  
 
 
-const ProductRow = ({ product,setSelectedImg,handleConfirmStatus, index ,setShowPriceModal}) => {
+const ProductRow = ({ product,setSelectedImg,setSelectedId,handleConfirmStatus, index ,setShowPriceModal}) => {
     
   return (
     <tr key={product._id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
       <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.game.name}</div></Link>
+        <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.game_name}</div></Link>
       </td>
 <td className="px-4 py-2 text-gray-700">
   <div className="w-72">{product?.question?.text}</div>
@@ -40,10 +40,15 @@ const ProductRow = ({ product,setSelectedImg,handleConfirmStatus, index ,setShow
   
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-40 gap-2">
-                <span className="p-1 border cursor-pointer rounded bg-[#085E9C]"
-                 onClick={() => setShowPriceModal(true)}>
-                <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
-            </span>
+                <span
+  className="p-1 border cursor-pointer rounded bg-[#085E9C]"
+  onClick={() => {
+    setSelectedId(product._id || product.id); // حفظ الـ id
+    setShowPriceModal(true); // فتح المودال
+  }}
+>
+  <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
+</span>
             <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
                  <img
   src="/images/group/see.png"
@@ -64,7 +69,7 @@ const ProductRow = ({ product,setSelectedImg,handleConfirmStatus, index ,setShow
 const Questions = () => {
     const dispatch = useDispatch<AppDispatch>();
 
-  const { questions, loading, error } = useSelector((state: RootState) => state.questions);
+  const { questions} = useSelector((state: RootState) => state.questions);
 
   useEffect(() => {
     dispatch(getQuestions());
@@ -74,6 +79,7 @@ const Questions = () => {
       const [showPriceModal, setShowPriceModal] = useState(false);
       const [showModal, setShowModal] = useState(false);
 const [selectedImg, setSelectedImg] = useState(null);
+const [selectedId, setSelectedId] = useState(null);
 
  
 const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
@@ -175,6 +181,7 @@ const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
           setShowPriceModal={setShowPriceModal}
           handleConfirmStatus={() => handleConfirmStatus(question)}
           setSelectedImg={setSelectedImg}
+          setSelectedId={setSelectedId}
         />
       ))
   ) : (
@@ -205,7 +212,7 @@ const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
       </div>
               <Pagination pageCount={6} onPress={1} />
 <CustomModal isOpen={showPriceModal}>
-        <AddQuestion onClose={() => setShowPriceModal(false)} />
+        <AddQuestion selectedId={selectedId} onClose={() => setShowPriceModal(false)} />
       </CustomModal>
 
       <CustomModal isOpen={showModal}>

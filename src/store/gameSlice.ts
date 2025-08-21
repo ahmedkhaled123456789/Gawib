@@ -1,11 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData, useGetDataToken } from "../utils/api";
+import { useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
 import useDeleteData from "../hooks/useDeleteData";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import { useInsertDataWithImage} from "../hooks/useInsertData";
 
 interface GameData {
+  [x: string]: any;
    name: string;
   description: string;
   image: string;
@@ -16,12 +17,14 @@ interface GameData {
 
 interface GameState {
   games: GameData | null;
+  game: GameData | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: GameState = {
   games: null,
+  game: null,
   loading: false,
   error: null,
 };
@@ -48,7 +51,7 @@ export const getGameById = createAsyncThunk<
   { rejectValue: string }
 >("game/getGameById", async (id, thunkAPI) => {
   try {
-    const res = await useGetData<GameData>(`admin/games/${id}`);
+    const res = await useGetDataToken<GameData>(`admin/games/${id}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -122,7 +125,7 @@ const gameSlice = createSlice({
     });
 
     builder.addCase(getGameById.fulfilled, (state, action) => {
-      state.games = action.payload;
+      state.game = action.payload;
       state.loading = false;
       state.error = null;
     });
