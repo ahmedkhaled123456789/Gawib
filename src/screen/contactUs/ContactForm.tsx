@@ -6,25 +6,38 @@ import ButtonGroup from "../../components/ButtonGroup";
 
 
 // AddAdmins.tsx
-const ContactForm = ({ onClose }: { onClose: () => void }) => {
- const [name, setName] = useState("");
-  const [count, setCount] = useState("");
-  const [price, setPrice] = useState("");
+const ContactForm =  ({ selectedId, onClose }: { selectedId?: string; onClose: () => void }) => {
+ const [message, setMessage] = useState("");
 
-  const submitData = () => {
-    if (!name || !count || !price) {
-      toast.warn("يرجى استكمال جميع الحقول!");
-      return;
-    }
 
-    // Submit logic here
-    toast.success("تمت إضافة المشرف بنجاح!");
-    onClose(); // close modal on success
-  };
+ const submitData = () => {
+     if (!message) {
+       toast.warn("يرجى استكمال جميع الحقول!");
+       return;
+     }
+ 
+     const newDiscount = {
+       answer: message,
+     };
+ 
+     // 👇 هنا الشرط
+     const action = selectedId
+       ? updateDiscountCode({ id: selectedId, data: newDiscount }) // Update
+       : createDiscountCode(newDiscount); // Create
+ 
+     dispatch(action)
+       .unwrap()
+       .then(() => {
+         toast.success(selectedId ? "تم تحديث الكود بنجاح!" : "تمت إضافة الكود بنجاح!");
+         onClose();
+       })
+       .catch((err) => {
+         toast.error(err || "حدث خطأ أثناء الحفظ");
+       });
+   };
    const resetHandle = () => {
-    setName("");
-    setCount("");
-    setPrice("");
+    setMessage("");
+
 
   };
   return (

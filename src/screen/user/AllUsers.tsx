@@ -9,6 +9,7 @@ import Dashboard from "../../components/Dashboard/Dashboard";
  import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { getUser, updateUser } from "../../store/userSlice";
+import { getCounts } from "../../store/adminSlice";
 
 
 const ProductRow = ({ product, index ,onStatusClick}) => {
@@ -51,6 +52,8 @@ const AllUsers = () => {
  const dispatch = useDispatch<AppDispatch>();
 
   const { user, loading } = useSelector((state: RootState) => state.user);
+    const { counts } = useSelector((state: RootState) => state.admin);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const handleSearch = (e) => {
@@ -58,6 +61,8 @@ const AllUsers = () => {
   };
   useEffect(() => {
     dispatch(getUser());
+        dispatch(getCounts());
+
   }, [dispatch]);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -88,7 +93,7 @@ const AllUsers = () => {
       <div className="mx-2">
 
 <div className="">
-         <Dashboard/>
+         <Dashboard counts={counts}/>
         </div>
  {/* Header Controls */}
       <div className="flex flex-col p-4  bg-white md:flex-row items-center justify-between gap-4 ">

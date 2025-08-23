@@ -7,89 +7,61 @@ import CustomModal from "../../components/Modals/CustomModal";
 import AddDiscount from "./AddDiscount";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { getDiscountCodes } from "../../store/DiscountSlice";
+import { deleteDiscountCode, getDiscountCodes } from "../../store/DiscountSlice";
 
-const dummyProducts = [
-  {
-    _id: "1",
-    code: " باقة لعبة واحدة  ",
-    Package: "ABC",
-    nowPrice:20,
-    price: "باقة 3 العاب",
-    codePrice: 200,
-     startDate: "29/08/2025",
-     endDate: "29/08/2025",
-     codeType: "عام",
-    status: "نشط",
-  },
-  {
-    _id: "2",
-    code: " باقة لعبة واحدة  ",
-    Package: "ABC",
-    nowPrice:20,
-    price: "باقة 3 العاب",
-    codePrice: 200,
-     startDate: "29/08/2025",
-     endDate: "29/08/2025",
-     codeType: "خاص",
-    status: "محذوف",
-  },
-  {
-    _id: "3",
-    code: " باقة لعبة واحدة  ",
-    Package: "ABC",
-    nowPrice:20,
-    price: "باقة 3 العاب",
-    codePrice: 200,
-     startDate: "29/08/2025",
-     endDate: "29/08/2025",
-     codeType: "عام",
-    status: "منتهي",
-  },
 
- ];
 
-const ProductRow = ({ product, index ,setShowModal}) => {
+const ProductRow = ({ product,setSelectedId,setShowPriceModal, index ,setShowModal}) => {
     
   return (
-    <tr key={product._id}>
+    <tr key={product.id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
       <td className="px-4 py-2 text-gray-700">
         <Link to={`/productDetails/${product._id}`}><div className="w-32">{product.code}</div> </Link>
       </td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.Package}</div></td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.price}</div></td>
-            <td className="px-4 py-2 text-gray-700">
-           <div className="w-32"> {product.nowPrice}%</div>  </td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.game_package.name}</div></td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.game_package.price}</div></td>
+            {/* <td className="px-4 py-2 text-gray-700">
+           <div className="w-32"> {product.nowPrice}%</div>  </td> */}
 
-      <td className="px-4 py-2 text-gray-700"><div className="w-32"></div>{product.codePrice}</td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-32"></div>{product.startDate}</td>
-            <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.endDate}</div></td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-32"></div>{product.discounted_price}</td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-32"></div>{product.starts_at}</td>
+            <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.ends_at}</div></td>
   
       
-       <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.codeType}</div></td>
+       <td className="px-4 py-2 text-gray-700"><div className="w-32">{product.type ? "عام" : "خاص"}</div></td>
 <td
   className={`px-4 py-2 ${
-    product.status === "نشط"
+    product.status === "active"
       ? "text-[#588A17]"
-      : product.status === "منتهي"
-      ? "text-[#7e7e7e]"
-      : "text-[#ff426e]"
+      : product.status === "not active"
+      ? "text-[#ff426e]"
+      :  "text-[#7e7e7e]"
   }`}
 >
- <div className="w-32">{product.status}</div> 
+ <div className="w-32">{product.status === "active" ? "نشط" : "منتهي"}</div> 
 </td>      
 
          <td className="px-4 py-2">
             <div className="flex w-32  items-center justify-center gap-2">
-                <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
+                <span className="p-1 border cursor-pointer rounded bg-[#085E9C]"
+                  
+   onClick={() => {
+    setSelectedId(product._id || product.id); 
+    setShowPriceModal(true); 
+  }}
+                >
                 <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
-                             <span className="p-1 border cursor-pointer rounded bg-[#085E9C]" 
-                             onClick={() => setShowModal(true)}
-                             >
-                <img src="/images/group/delete.png" alt="" className="w-5 h-5" />
-            </span>
+                             <span
+  className="p-1 border cursor-pointer rounded bg-[#085E9C]" 
+  onClick={() => {
+    setSelectedId(product._id || product.id);   
+    setShowModal(true); 
+  }}
+>
+  <img src="/images/group/delete.png" alt="" className="w-5 h-5" />
+</span>
             </div>
       </td>
     </tr>
@@ -109,7 +81,17 @@ useEffect(() => {
   const [statusFilter, setStatusFilter] = useState("");
       const [showPriceModal, setShowPriceModal] = useState(false);
       const [showModal, setShowModal] = useState(false);
+const [selectedId, setSelectedId] = useState(null);
 
+
+const handleDelete = () => {
+  console.log(selectedId)
+  if (selectedId) {
+
+    dispatch(deleteDiscountCode(selectedId));
+  }
+  setShowModal(false);
+};
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
@@ -167,7 +149,7 @@ useEffect(() => {
                 <th className="px-4 py-2 font-medium">كود الخصم    </th>
                  <th className="px-4 py-2 font-medium">الباقة    </th>
                 <th className="px-4 py-2 font-medium">السعر الحالي    </th>
-                <th className="px-4 py-2 font-medium">السعر الحالي    </th>
+                {/* <th className="px-4 py-2 font-medium">السعر الحالي    </th> */}
                 <th className="px-4 py-2 font-medium">سعر كود الخصم    </th>
                 <th className="px-4 py-2 font-medium">تاريخ البداية    </th>
                 <th className="px-4 py-2 font-medium">تاريخ النهاية    </th>
@@ -180,13 +162,15 @@ useEffect(() => {
             </thead>
 
             <tbody className="divide-y text-center divide-gray-200">
-              {discountCodes?.length > 0 ? (
-  discountCodes.map((product, index) => (
+              {discountCodes?.data.length > 0 ? (
+  discountCodes?.data.map((product, index) => (
     <ProductRow
       key={index}
       product={product}
       index={index}
       setShowModal={setShowModal}
+      setSelectedId={setSelectedId}
+      setShowPriceModal={setShowPriceModal}
     />
   ))
 ) : (
@@ -203,7 +187,7 @@ useEffect(() => {
       </div>
               <Pagination pageCount={6} onPress={1} />
 <CustomModal isOpen={showPriceModal}>
-        <AddDiscount onClose={() => setShowPriceModal(false)} />
+        <AddDiscount  selectedId={selectedId} onClose={() => setShowPriceModal(false)} />
       </CustomModal>
 
       <CustomModal isOpen={showModal}>
@@ -213,17 +197,17 @@ useEffect(() => {
         <p className="text-center mb-6">  هل تريد حذف كود الخصم  </p>
         <div className="flex justify-center gap-4">
              <button
-            onClick={() => setShowModal(false)}
-            className={`px-8 py-2 text-white rounded bg-[#588A17] `}
-          >
-            نعم
-          </button>
-          <button
-            onClick={() => setShowModal(false)}
-            className="px-8 py-2 text-white  bg-[#ff426e] rounded "
-          >
-            لا
-          </button>
+  onClick={handleDelete}
+  className="px-8 py-2 text-white rounded bg-[#588A17]"
+>
+  نعم
+</button>
+<button
+  onClick={() => setShowModal(false)}
+  className="px-8 py-2 text-white bg-[#ff426e] rounded"
+>
+  لا
+</button>
          
         </div>
       </div>

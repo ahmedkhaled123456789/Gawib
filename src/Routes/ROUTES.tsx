@@ -8,14 +8,14 @@ import Admins from "../screen/admins/Admins";
 import Questions from "../screen/questions/Questions";
 import Posted_questions from "../screen/Posted_questions/Posted_questions";
 import SettingsPage from "../screen/settings/SettingsPage";
-import SocialMedia from "../screen/SocialMedia";
-import Game from "../screen/game/Game";
+ import Game from "../screen/game/Game";
 import Groups from "../screen/group/Groups";
 import Sales from "../screen/sales/Sales";
 import SalesRecovered from "../screen/salesRecovered/SalesRecovered";
 import ContactUs from "../screen/contactUs/ContactUs";
 import Discount from "../screen/discount/Discount";
 import ProductDetalis from "../screen/user/ProductDetalis";
+import SocialMedia from "../screen/socialLonk/SocialMedia";
 
 export const ROUTES = [
   {

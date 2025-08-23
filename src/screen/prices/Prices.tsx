@@ -7,45 +7,9 @@ import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
 import { AppDispatch, RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
-import { getGamePackages } from "../../store/GamePackagesSlice";
+import { getGamePackages, updateGamePackage } from "../../store/GamePackagesSlice";
 
-const dummyProducts = [
-  {
-    _id: "1",
-    name: " باقة لعبة واحدة  ",
-    amount: 3,
-    count: 10,
-    price: 20,
-    total: 200,
-    status: "نشط",
-
-   
-  },
-{
-    _id: "2",
-    name: " باقة لعبة واحدة  ",
-    amount: 3,
-    count: 10,
-    price: 20,
-    total: 200,
-    status: "نشط",
-
-     
-
-  },
-  {
-    _id: "3",
-    name: " باقة لعبة واحدة  ",
-    amount: 3,
-    count: 10,
-    price: 20,
-    total: 200,
-    status: "موقوف",
-
-  },
- ]; 
-
-const ProductRow = ({ product, index }) => {
+const ProductRow = ({ product,handleConfirmStatus,setSelectedId,setShowPriceModal, index }) => {
     
   return (
     <tr key={product._id}>
@@ -59,14 +23,30 @@ const ProductRow = ({ product, index }) => {
       <td className="px-4 py-2 text-gray-700">{product.price}</td>
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center gap-2">
-                <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
+                <span className="p-1 border cursor-pointer rounded bg-[#085E9C]"
+                 onClick={() => {
+    setSelectedId(product.id); 
+    setShowPriceModal(true); 
+  }}>
                 <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
             </span>
-                             <span className="p-1 border cursor-pointer rounded border-[#085E9C]" >
+                           <span
+  onClick={() =>
+    handleConfirmStatus({
+      id: product.id,
+      is_active: !product.is_active ,
+    })
+    
+  }
+  className="p-1 border cursor-pointer rounded border-[#085E9C]"
+>
+  <img
+    src="/images/group/true.png"
+    alt=""
+    className={`w-5 h-5 ${product.is_active ? "opacity-100" : "opacity-0"}`}
+  />
+</span>
 
-                 <img src="/images/group/true.png" alt="" className={`w-5 h-5 ${product.is_active ? 'opacity-100' : 'opacity-0'}`} />
-            
-             </span>
             </div>
       </td>
     </tr>
@@ -75,10 +55,10 @@ const ProductRow = ({ product, index }) => {
 
 const Prices = () => {
 
-  const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showPriceModal, setShowPriceModal] = useState(false);
+const [selectedId, setSelectedId] = useState(null);
 
 const dispatch = useDispatch<AppDispatch>();
 
@@ -93,9 +73,18 @@ const dispatch = useDispatch<AppDispatch>();
   if (loading) return <div>جاري التحميل...</div>;
   if (error) return <div>حدث خطأ: {error}</div>;
 
-  const filteredProducts = gamePackages?.data?.data?.filter((pkg) =>
-    pkg.name.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const handleConfirmStatus = (data: { id: string; is_active: boolean }) => {
+     dispatch(
+       updateGamePackage({
+         id: data.id,
+         data: { is_active: data.is_active },
+       }) 
+     );
+     console.log({
+       id: data.id,
+       formData: { is_active: data.is_active },
+     });
+    };
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
@@ -107,7 +96,7 @@ const dispatch = useDispatch<AppDispatch>();
      
 <div className="flex  p-4  bg-white md:flex-row items-center justify-between gap-4 ">
     <div className="flex gap-4 items-center w-full md:w-auto">
-          <div className="text-xl ml-16 font-bold text-[#085E9C]">باقات الأسعار</div>
+          <div className="text-xl ml-16 w-32 font-bold text-[#085E9C]">باقات الأسعار</div>
  {/* Search */}
           <div className="relative w-full md:w-64 border rounded-md  border-[#085E9C]">
             <input
@@ -157,9 +146,9 @@ const dispatch = useDispatch<AppDispatch>();
             </thead>
 
              <tbody className="divide-y text-center divide-gray-200">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product, index) => (
-            <ProductRow key={product._id} product={product} index={index} />
+        {gamePackages?.data?.data?.length > 0 ? (
+          gamePackages?.data?.data?.map((product, index) => (
+            <ProductRow  handleConfirmStatus={handleConfirmStatus} setSelectedId={setSelectedId} setShowPriceModal={setShowPriceModal} key={product.id} product={product} index={index} />
           ))
         ) : (
           <tr>
@@ -174,7 +163,7 @@ const dispatch = useDispatch<AppDispatch>();
       </div>
               <Pagination pageCount={6} onPress={1} />
 <CustomModal isOpen={showPriceModal}>
-        <AddPrice onClose={() => setShowPriceModal(false)} />
+        <AddPrice selectedId={selectedId} onClose={() => setShowPriceModal(false)} />
       </CustomModal>
     </div>
   );

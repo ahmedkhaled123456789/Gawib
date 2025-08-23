@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData, useGetDataToken } from "../utils/api";
+import { useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
 import {useInsertData} from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
@@ -15,12 +15,14 @@ interface GamePackage {
 
 interface GamePackagesState {
   gamePackages: GamePackage | null;
+  gamePackage: GamePackage | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: GamePackagesState = {
   gamePackages: null,
+    gamePackage: null,
   loading: false,
   error: null,
 };
@@ -47,7 +49,7 @@ export const getGamePackageById = createAsyncThunk<
   { rejectValue: string }
 >("gamePackages/getGamePackageById", async (id, thunkAPI) => {
   try {
-    const res = await useGetData<GamePackage>(`admin/game-packages/${id}`);
+    const res = await useGetDataToken<GamePackage>(`admin/game-packages/${id}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -85,6 +87,8 @@ export const updateGamePackage = createAsyncThunk<
 >("gamePackages/updateGamePackage", async ({ id, data }, thunkAPI) => {
   try {
     const res = await useInUpdateData<GamePackage>(`admin/game-packages/${id}`, data);
+           thunkAPI.dispatch(getGamePackages());
+
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -119,7 +123,8 @@ const gamePackagesSlice = createSlice({
     });
 
     builder.addCase(getGamePackageById.fulfilled, (state, action) => {
-      state.gamePackages = action.payload;
+      state.gamePackage = action.payload;
+      console.log( state.gamePackage)
       state.loading = false;
       state.error = null;
     });
@@ -129,9 +134,8 @@ const gamePackagesSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(updateGamePackage.fulfilled, (state, action) => {
-      state.gamePackages = action.payload;
-      state.loading = false;
+    builder.addCase(updateGamePackage.fulfilled, (state) => {
+       state.loading = false;
       state.error = null;
     });
 

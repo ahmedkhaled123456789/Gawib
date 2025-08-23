@@ -8,18 +8,25 @@ import { AxiosError } from "axios";
 interface DiscountCode {
   code: string;
   discount:number;
-  is_percentage: number;
-  isActive: boolean;
-}
+  game_package_id: number;
+  type: boolean;
+  starts_at: string;
+    email: string;
+  ends_at: string;
+
+
+ }
 
 interface DiscountCodesState {
   discountCodes: DiscountCode[] | null;
+  discountCode: DiscountCode[] | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: DiscountCodesState = {
   discountCodes: null,
+   discountCode: null,
   loading: false,
   error: null,
 };
@@ -46,7 +53,7 @@ export const getDiscountCodeById = createAsyncThunk<
   { rejectValue: string }
 >("discountCodes/getOne", async (id, thunkAPI) => {
   try {
-    const res = await useGetData<DiscountCode>(`admin/discount-codes/${id}`);
+    const res = await useGetDataToken<DiscountCode>(`admin/discount-codes/${id}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -99,6 +106,8 @@ export const deleteDiscountCode = createAsyncThunk<
 >("discountCodes/delete", async (id, thunkAPI) => {
   try {
     const res = await useDeleteData(`admin/discount-codes/${id}`);
+           thunkAPI.dispatch(getDiscountCodes());
+
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -118,7 +127,7 @@ const discountCodesSlice = createSlice({
     });
 
     builder.addCase(getDiscountCodeById.fulfilled, (state, action) => {
-      state.discountCodes = [action.payload];
+      state.discountCode = [action.payload];
       state.loading = false;
       state.error = null;
     });
@@ -128,20 +137,18 @@ const discountCodesSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(updateDiscountCode.fulfilled, (state, action) => {
-      if (state.discountCodes) {
-        state.discountCodes = state.discountCodes.map((code) =>
-          code === action.payload? action.payload : code
-        );
-      }
+    builder.addCase(updateDiscountCode.fulfilled, (state) => {
+      // if (state.discountCodes) {
+      //   state.discountCodes = state.discountCodes.map((code) =>
+      //     code === action.payload? action.payload : code
+      //   );
+      // }
       state.loading = false;
       state.error = null;
     });
 
     builder.addCase(deleteDiscountCode.fulfilled, (state) => {
-      // if (state.discountCodes) {
-      //   state.discountCodes = state.discountCodes.filter((code) => code._id !== action.meta.arg);
-      // }
+      
       state.loading = false;
       state.error = null;
     });

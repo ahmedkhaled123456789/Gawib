@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData } from "../utils/api";
+import { useGetData, useGetDataToken } from "../utils/api";
 import {useInsertData} from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
@@ -32,7 +32,7 @@ export const getSocialLinks = createAsyncThunk<
   { rejectValue: string }
 >("socialLinks/getAll", async (_, thunkAPI) => {
   try {
-    const res = await useGetData<SocialLink[]>(`admin/social-links`);
+    const res = await useGetDataToken<SocialLink[]>(`admin/social-links`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -113,7 +113,7 @@ const socialLinksSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getSocialLinks.fulfilled, (state, action) => {
-      state.socialLinks = action.payload;
+      state.socialLinks = action.payload?.data;
       state.loading = false;
       state.error = null;
     });

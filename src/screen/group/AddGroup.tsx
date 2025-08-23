@@ -67,6 +67,7 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
     formData.append("image", image);
     formData.append("category_id",category_id);
     formData.append("is_active", "1");
+    formData.append("is_free", "1");
     formData.append("admin_id", "1");
 
     try {

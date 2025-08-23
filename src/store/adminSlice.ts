@@ -1,5 +1,6 @@
+import { useGetDataToken } from './../utils/api';
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData, useGetDataToken } from "../utils/api";
+import { useGetData } from "../utils/api";
 import { AxiosError } from "axios";
 import useDeleteData from "../hooks/useDeleteData";
 import { useInUpdateData } from "../hooks/useUpdateData";
@@ -16,15 +17,29 @@ interface AdminData {
 
 interface AdminState {
   admins: AdminData | [];
+  counts:[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: AdminState = {
   admins: null,
+  counts:null,
   loading: false,
   error: null,
 };
+
+
+// ============ Get All Admins ============
+export const getCounts = createAsyncThunk("admin/counts", async (_, thunkAPI) => {
+  try {
+    const res = await useGetDataToken<AdminData>(`admin/system-counts`);
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(err.response?.data.message || "getAdmins failed");
+  }
+});
 
 // ============ Get All Admins ============
 export const getAdmins = createAsyncThunk<
@@ -111,6 +126,12 @@ const adminSlice = createSlice({
     
   },
   extraReducers: (builder) => {
+     // Get All Admins
+  builder.addCase(getCounts.fulfilled, (state, action) => {
+    state.counts = action.payload?.data;
+    state.loading = false;
+    state.error = null;
+  });
   // Get All Admins
   builder.addCase(getAdmins.fulfilled, (state, action) => {
     state.admins = action.payload;

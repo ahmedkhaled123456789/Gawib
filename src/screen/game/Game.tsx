@@ -6,8 +6,8 @@ import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { getQuestions } from "../../store/questionsSlice";
 import AddQuestion from "../questions/AddQuestion";
+import { getGameFree, getGames } from "../../store/gameSlice";
  
  
 
@@ -15,14 +15,14 @@ import AddQuestion from "../questions/AddQuestion";
 const ProductRow = ({ product, index }) => {
     
   return (
-    <tr key={product._id}>
+    <tr key={product.id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
       <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.game_name}</div></Link>
+        <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.name}</div></Link>
       </td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.question.text}</div></td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.answer.text}</div></td>
-      <td className="px-4 py-2 text-white"><div className={`w-16 px-4 py-1 rounded ${
+      <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.description}</div></td>
+      <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.description}</div></td>
+      {/* <td className="px-4 py-2 text-white"><div className={`w-16 px-4 py-1 rounded ${
     product.points === 200
       ? "bg-[#309222]"
       : product.points === 400
@@ -30,10 +30,11 @@ const ProductRow = ({ product, index }) => {
       : "bg-[#ae1113]"
   }`}>
         
-        {product.points}</div></td>
-        <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.see || "سنوات 2"}</div></td>
-            <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.admin|| "محمد الناصر"}</div></td>
-  
+        {product.points}</div></td> */}
+        <td className="px-4 py-2 text-gray-700"><div className="w-20">{ "سنوات 2"}</div></td>
+            <td className="px-4 py-2 text-gray-700"><div className="w-20">{ "محمد الناصر"}</div></td>
+              <td className="px-4 py-2 text-gray-700"><div className="w-20"></div>{product.admin.name}</td>
+
          <td className="px-4 py-2">
             <div className="flex  items-center justify-center w-24 gap-2">
                
@@ -49,11 +50,13 @@ const Game = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const dispatch = useDispatch<AppDispatch>();
 
-  const { questions} = useSelector((state: RootState) => state.questions);
+  const { games} = useSelector((state: RootState) => state.game);
 
   useEffect(() => {
-    dispatch(getQuestions());
-  }, [dispatch]);  const [searchQuery, setSearchQuery] = useState("");
+    dispatch(getGameFree());
+  }, [dispatch]);  
+  
+  const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
       const [showPriceModal, setShowPriceModal] = useState(false);
       const [showModal, setShowModal] = useState(false);
@@ -126,13 +129,13 @@ const dispatch = useDispatch<AppDispatch>();
             </thead>
 
              <tbody className="divide-y text-center divide-gray-200">
-  {questions?.data?.length > 0 ? (
-    questions.data
-      .filter(question => question?.game.is_free === false) // هنا التعديل
-      .map((question, index) => (
+  {games?.data?.length > 0 ? (
+    games.data
+      .filter(game => game?.is_free === true) 
+      .map((game, index) => (
         <ProductRow
-          key={question._id || question.id}
-          product={question}
+          key={game.id}
+          product={game}
           index={index}
          />
       ))

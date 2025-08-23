@@ -18,6 +18,7 @@ interface GameData {
 interface GameState {
   games: GameData | null;
   game: GameData | null;
+   gameFree: GameData | null;
   loading: boolean;
   error: string | null;
 }
@@ -25,6 +26,7 @@ interface GameState {
 const initialState: GameState = {
   games: null,
   game: null,
+  gameFree:null,
   loading: false,
   error: null,
 };
@@ -43,7 +45,20 @@ export const getGames = createAsyncThunk<
     return thunkAPI.rejectWithValue(err.response?.data.message || "getGames failed");
   }
 });
-
+// ============ Get All Games ============
+export const getGameFree = createAsyncThunk<
+  GameData,
+  void,
+  { rejectValue: string }
+>("game/getGameFree", async (_, thunkAPI) => {
+  try {
+    const res = await useGetDataToken<GameData>(`admin/games?filter[is_free]=1`);
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(err.response?.data.message || "getGames failed");
+  }
+});
 // ============ Get One Game ============
 export const getGameById = createAsyncThunk<
   GameData,
@@ -83,15 +98,17 @@ export const createGame = createAsyncThunk<
 
 // ============ Update Game ============
 export const updateGame = createAsyncThunk<
-  GameData, // النتيجة اللي بترجع
-  { id: string; data: FormData }, // هنا خليت data من النوع FormData
+  GameData,
+  { id: string; data: FormData }, 
   { rejectValue: string }
 >("game/updateGame", async ({ id, data }, thunkAPI) => {
   try {
-    const res = await useInUpdateData<FormData>(`admin/games/${id}`, data);
+    const res = await useInsertDataWithImage<FormData>(`admin/games/${id}`, data);
+          thunkAPI.dispatch(getGames());
     return res as unknown as GameData;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
+    
     return thunkAPI.rejectWithValue(
       err.response?.data.message || "updateGame failed"
     );
@@ -123,7 +140,11 @@ const gameSlice = createSlice({
       state.loading = false;
       state.error = null;
     });
-
+   builder.addCase(getGameFree.fulfilled, (state, action) => {
+      state.games = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
     builder.addCase(getGameById.fulfilled, (state, action) => {
       state.game = action.payload;
       state.loading = false;
@@ -135,9 +156,8 @@ const gameSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(updateGame.fulfilled, (state, action) => {
-      state.games = action.payload;
-      state.loading = false;
+    builder.addCase(updateGame.fulfilled, (state) => {
+       state.loading = false;
       state.error = null;
     });
 

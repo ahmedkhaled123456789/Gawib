@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {  useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
 import {useInsertData} from "../hooks/useInsertData";
-import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
 
   interface QuestionData {

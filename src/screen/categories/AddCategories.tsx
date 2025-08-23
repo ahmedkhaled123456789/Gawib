@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ButtonGroup from "../../components/ButtonGroup";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
-import { getGameById } from "../../store/gameSlice";
+import { getGameById, updateGame } from "../../store/gameSlice";
 
 const AddCategories = ({ selectedId, onClose }: { selectedId?: string; onClose: () => void }) => {
   const [name, setName] = useState("");
@@ -37,14 +37,29 @@ const AddCategories = ({ selectedId, onClose }: { selectedId?: string; onClose: 
   };
 
   const submitData = () => {
-    if (!name || !image) {
-      toast.warn("يرجى استكمال جميع الحقول!");
-      return;
-    }
-    toast.success("تمت إضافة المجموعة بنجاح!");
-    onClose();
-  };
+  if (!name || !image) {
+    toast.warn("يرجى استكمال جميع الحقول!");
+    return;
+  }
 
+  const formData = new FormData();
+  formData.append("name", name);
+    formData.append("_method", "PUT");
+
+  if (image instanceof File) {
+    formData.append("image", image);
+  }
+
+   dispatch(updateGame({ id: selectedId, data: formData }))
+      .unwrap()
+      .then(() => {
+        toast.success("تم تعديل الفئة بنجاح!");
+        onClose();
+      })
+      .catch(() => {
+        toast.error("فشل تعديل الفئة");
+      });
+};
   const resetHandle = () => {
     setName("");
     setImage(null);

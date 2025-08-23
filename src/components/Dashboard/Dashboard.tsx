@@ -1,5 +1,5 @@
  
-const Dashboard = () => {
+const Dashboard = ({counts}) => {
  
 
   return (
@@ -9,11 +9,11 @@ const Dashboard = () => {
       <div className="grid grid-cols-2 mb-2 rounded py-4 bg-[#085E9C] text-white text-center ">
            <div  className="py-3 border-l ">
             <div className="text-sm mb-2 font-medium">الفئات  </div>
-            <div className="text-lg font-bold">500</div>
+            <div className="text-lg font-bold">{counts?.games}</div>
           </div>
            <div  className="py-3  ">
             <div className="text-sm mb-2 font-medium">  المجموعات</div>
-            <div className="text-lg font-bold">500</div>
+            <div className="text-lg font-bold">{counts?.categories}</div>
           </div>
          
        </div>
@@ -23,11 +23,11 @@ const Dashboard = () => {
      
           <div  className="py-3 text-[#085E9C]  border-l border-[#085E9C]  ">
             <div className="mb-2 font-semibold">الأسئلة (600)</div>
-            <div className=" font-bold">1800</div>
+            <div className=" font-bold">{counts?.questions_600}</div>
           </div>
           <div  className="py-3 text-[#085E9C]   ">
             <div className=" mb-2 font-semibold">الأسئلة (400)</div>
-            <div className=" font-bold">1800</div>
+            <div className=" font-bold">{counts?.questions_400}</div>
           </div>
           
        </div>
@@ -42,7 +42,7 @@ const Dashboard = () => {
           </div>
            <div  className="py-3  border-l">
             <div className="text-sm mb-2 font-medium">  التواصل</div>
-            <div className="text-lg font-bold">500</div>
+            <div className="text-lg font-bold">{counts?.contactUs}</div>
           </div>
           <div  className="py-3">
             <div className="text-sm mb-2 font-medium">البلاغات  </div>
@@ -55,15 +55,15 @@ const Dashboard = () => {
      
           <div  className="py-3 text-[#085E9C]  border-l border-[#085E9C]  ">
             <div className="mb-2 font-semibold">الأسئلة (600)</div>
-            <div className=" font-bold">300</div>
+            <div className=" font-bold">{counts?.questions_600}</div>
           </div>
           <div  className="py-3 text-[#085E9C]  border-l border-[#085E9C] ">
             <div className="  mb-2 font-semibold">الأسئلة (400)</div>
-            <div className=" font-bold">300</div>
+            <div className=" font-bold">{counts?.questions_400}</div>
           </div>
           <div  className="py-3 text-[#085E9C]  ">
             <div className=" mb-2 font-semibold">الأسئلة (200)</div>
-            <div className="font-bold">300</div>
+            <div className="font-bold">{counts?.questions_200}</div>
           </div>
        </div>
        
@@ -81,7 +81,7 @@ const Dashboard = () => {
           </div>
           <div  className="py-3">
             <div className="text-sm mb-2 font-medium">المستخدمين  </div>
-            <div className="text-lg font-bold">500</div>
+            <div className="text-lg font-bold">{counts?.users}</div>
           </div>
        </div>
 
@@ -90,15 +90,15 @@ const Dashboard = () => {
      
           <div  className="py-3 text-[#085E9C]  border-l border-[#085E9C]  ">
             <div className="mb-2 font-semibold">الأسئلة (600)</div>
-            <div className=" font-bold">1800</div>
+            <div className=" font-bold">{counts?.questions_600}</div>
           </div>
           <div  className="py-3 text-[#085E9C]  border-l border-[#085E9C] ">
             <div className="mb-2 font-semibold">الأسئلة (400)</div>
-            <div className=" font-bold">1800</div>
+            <div className=" font-bold">{counts?.questions_400}</div>
           </div>
           <div  className="py-3 text-[#085E9C]  ">
             <div className="mb-2 font-semibold">الأسئلة (200)</div>
-            <div className=" font-bold">1800</div>
+            <div className=" font-bold">{counts?.questions_200}</div>
           </div>
        </div>
        

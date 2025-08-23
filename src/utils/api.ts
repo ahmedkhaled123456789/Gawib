@@ -16,7 +16,7 @@ export const useGetData = async <T>(
 };
 
 // Generic function to GET data with token
-export const useGetDataToken = async <T>(url: string): Promise<T> => {
+export const useGetDataToken = async <T>(url: string, id: string): Promise<T> => {
   const token = localStorage.getItem("token");
 
   const config: AxiosRequestConfig = {

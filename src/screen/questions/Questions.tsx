@@ -54,7 +54,7 @@ const ProductRow = ({ product,setSelectedImg,setSelectedId,handleConfirmStatus, 
   src="/images/group/see.png"
   alt={`${product.categoryName} logo`}
   className="w-6 h-6  cursor-pointer"
-  onClick={() => setSelectedImg(product.game.image)}
+  onClick={() => setSelectedImg(product.question.image)}
 />
             </span>
                           

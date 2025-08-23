@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ButtonGroup from "../../components/ButtonGroup";
-import { createDiscountCode } from "../../store/DiscountSlice";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store";
-  
+import { createDiscountCode, getDiscountCodeById, updateDiscountCode } from "../../store/DiscountSlice"; // 👈 استدعاء update
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { getGamePackages } from "../../store/GamePackagesSlice";
 
 interface InputFieldProps {
   label: string;
@@ -15,69 +15,131 @@ interface InputFieldProps {
   type: string;
 }
 
-const InputField = ({ label, placeholder, set, val,type }: InputFieldProps) => {
+const InputField = ({ label, placeholder, set, val, type }: InputFieldProps) => {
   return (
-    <div className="flex flex-col text-[#085E9C]   w-[48%] ">
+    <div className="flex flex-col text-[#085E9C] w-[48%] ">
       <label className="mb-1 text-lg font-bold ">{label}</label>
       <input
         value={val}
         onChange={(e) => set(e.target.value)}
         type={type}
         placeholder={placeholder}
-        className="w-full rounded border border-[#085E9C]  p-2 text-sm shadow-md outline-none text-right"
+        className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right"
       />
     </div>
   );
 };
 
-// AddAdmins.tsx
-const AddDiscount = ({ onClose }: { onClose: () => void }) => {
-      const dispatch = useDispatch<AppDispatch>();
- const [code, setCode] = useState("");
-  const [codeType, setCodeType] = useState("");
+const AddDiscount = ({ selectedId, onClose }: { selectedId?: string; onClose: () => void }) => {
+  const { gamePackages, loading, error } = useSelector((state: RootState) => state.gamePackage);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [code, setCode] = useState("");
   const [price, setPrice] = useState("");
-   const [codePrice, setCodePrice] = useState("");
+  const [codePrice, setCodePrice] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [status, setStatus] = useState("");
   const [email, setEmail] = useState("");
-  const [Package, setPackage] = useState(""); 
-const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عام");
- const submitData = () => {
-  if (!price || !code || !codeType || !codePrice || !startDate || !endDate || !status || !email || !Package) {
-    toast.warn("يرجى استكمال جميع الحقول!");
-    return;
-  }
+  const [Package, setPackage] = useState("");
+  const [selectedPackage, setSelectedPackage] = useState<string>("");
 
-  const newDiscount = {
-    code,
-    discount: Number(code), // assuming discount = percentage
-    is_percentage: 1, // أو 0 لو ثابت
-    isActive: status === "نشط" // حسب حالتك
+  const [discountType, setDiscountType] = useState<0 | 1 >(0);
+const prevId = useRef<string | null>(null);
+
+useEffect(() => {
+  if (selectedId && selectedId !== prevId.current) {
+    prevId.current = selectedId; // خزّن آخر id
+    dispatch(getDiscountCodeById(selectedId))
+      .unwrap()
+      .then((data) => {
+        console.log(data.data.type);
+        setPrice(Number(data.data.game_package.price) || 0);
+        setCode(data.data.discount);
+        setCodePrice(Number(data.data.discounted_price));
+        setStartDate(data.data.starts_at);
+        setEndDate(data.data.ends_at);
+        setEmail(data.data.email);
+        setPackage(data.data.game_package.name);
+        setDiscountType(data.data.type);
+        setSelectedPackage(data.data.game_package.id);
+      })
+      .catch(() => {
+        toast.error("فشل تحميل بيانات السؤال");
+      });
+  }
+}, [selectedId, dispatch]);
+
+
+  useEffect(() => {
+    dispatch(getGamePackages());
+  }, [dispatch]);
+
+  const submitData = () => {
+    if (!price) {
+      toast.warn("يرجى استكمال جميع الحقول!");
+      return;
+    }
+
+    const newDiscount = {
+      game_package_id: selectedPackage,
+      discount: Number(codePrice),
+      type: discountType,
+      email: discountType === 1 ? email : null,
+      starts_at: startDate,
+      ends_at: endDate,
+      code: Package,
+    };
+
+    // 👇 هنا الشرط
+    const action = selectedId
+      ? updateDiscountCode({ id: selectedId, data: newDiscount }) // Update
+      : createDiscountCode(newDiscount); // Create
+
+    dispatch(action)
+      .unwrap()
+      .then(() => {
+        toast.success(selectedId ? "تم تحديث الكود بنجاح!" : "تمت إضافة الكود بنجاح!");
+        onClose();
+      })
+      .catch((err) => {
+        toast.error(err || "حدث خطأ أثناء الحفظ");
+      });
   };
 
-  dispatch(createDiscountCode(newDiscount))
-    .unwrap()
-    .then(() => {
-      toast.success("تمت إضافة الكود بنجاح!");
-      onClose();
-    })
-    .catch((err) => {
-      toast.error(err);
-    });
-};
-   const resetHandle = () => {
+  const handleChangeDrop = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const pkgId = e.target.value;
+    setSelectedPackage(pkgId);
+
+    const selectedPkg = gamePackages?.data?.data?.find(
+      (pkg: { id: string }) => pkg.id.toString() === pkgId
+    );
+
+    if (selectedPkg) {
+      setPrice(selectedPkg.price);
+    } else {
+      setPrice("");
+    }
+  };
+
+  useEffect(() => {
+    if (price && code) {
+      const discounted = Number(price) - (Number(price) * Number(code)) / 100;
+      setCodePrice(discounted.toString());
+    } else {
+      setCodePrice(price);
+    }
+  }, [price, code]);
+
+  const resetHandle = () => {
     setPrice("");
     setCode("");
-    setCodeType("");
     setCodePrice("");
     setStartDate("");
     setEndDate("");
-    setStatus("");
     setEmail("");
     setPackage("");
-
   };
+
 
   return (
     <div className="w-[80%] p-5 ">
@@ -85,62 +147,92 @@ const [discountType, setDiscountType] = useState<"عام" | "خاص" | "">("عا
         <form className="flex flex-wrap items-center justify-center gap-5 pt-5">
 
             {/* Dropdown */}
-           <div className="flex flex-col text-[#085E9C]   w-[48%] ">
-             <label className="mb-1 text-lg font-bold">الباقة</label>
-                 <select className="w-full rounded border border-[#085E9C]  p-2 text-sm shadow-md outline-none text-right">
-            <option value="">باقة 3 العاب</option>
-            <option value="">باقة 3 العاب</option>
-            <option value="">باقة 3 العاب</option>
+          <div className="flex flex-col text-[#085E9C] w-[48%]">
+        <label className="mb-1 text-lg font-bold">الباقة</label>
 
-           </select>
-           </div>
+        {loading ? (
+          <p>جاري التحميل...</p>
+        ) : error ? (
+          <p className="text-red-500">حدث خطأ أثناء جلب البيانات</p>
+        ) : (
+          <select
+            className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right"
+            value={selectedPackage}
+            onChange={handleChangeDrop}
+          >
+            <option value="">اختر الباقة</option>
+            {gamePackages?.data?.data?.map(
+              (pkg: { id: string; name: string; price: number }) => (
+                <option key={pkg.id} value={pkg.id}>
+                  {pkg.name}
+                </option>
+              )
+            )}
+          </select>
+        )}
+      </div>
            
-          <InputField val={price} set={setPrice} type="number" label="السعر الحالي  " placeholder="أدخل السعر الحالي  " />
+           <div className="flex flex-col text-[#085E9C]   w-[48%] ">
+      <label className="mb-1 text-lg font-bold ">السعر الحالي </label>
+      
+      <div className="w-full rounded border border-[#085E9C]  p-2 text-sm shadow-md outline-none text-right">
+        {price||0}</div>
+    </div>
           <InputField val={code} set={setCode} type="number" label="نسبة كود الخصم  " placeholder="أدخل   نسبة كود الخصم" />
-          <InputField val={codePrice} set={setCodePrice} type="number" label="سعر كود الخصم  " placeholder="أدخل سعر كود الخصم" />
+           <div className="flex flex-col text-[#085E9C]   w-[48%] ">
+      <label className="mb-1 text-lg font-bold ">سعر كود الخصم    </label>
+      
+      <div className="w-full rounded border border-[#085E9C]  p-2 text-sm shadow-md outline-none text-right">
+        {codePrice|| "0"}</div>
+    </div>
             <InputField val={startDate} set={setStartDate} type="date" label="تاريخ البداية  " placeholder="أدخل تاريخ البداية" />
           <InputField val={endDate} set={setEndDate} type="date" label="تاريخ النهاية  " placeholder="أدخل تاريخ النهاية" />
           <InputField val={Package} set={setPackage} type="text" label="اسم كود الخصم  " placeholder="أدخل اسم كود الخصم" />
-         <div className="flex flex-col text-[#085E9C] w-[48%]">
-      <label className="mb-1 text-lg font-bold">نوع كود الخصم</label>
-      <div className="flex items-center justify-between p-2 border border-[#085E9C] gap-2">
-        {/* عام */}
-        <div
-          onClick={() => setDiscountType("عام")}
-          className="flex items-center gap-2 cursor-pointer"
-        >
-          <span className="p-1 w-6 h-6 border rounded border-[#085E9C]">
-            {discountType === "عام" && (
-              <img src="/images/group/true.png" alt="selected" className="w-4 h-4" />
-            )}
-          </span>
-          <span>عام</span>
-        </div>
-
-        {/* خاص */}
-        <div
-          onClick={() => setDiscountType("خاص")}
-          className="flex items-center gap-2 cursor-pointer"
-        >
-          <span className="p-1 w-6 h-6 border rounded border-[#085E9C]">
-            {discountType === "خاص" && (
-              <img src="/images/group/true.png" alt="selected" className="w-4 h-4" />
-            )}
-          </span>
-          <span>خاص</span>
-        </div>
-      </div>
+        <div className="flex flex-col text-[#085E9C] w-[48%]">
+  <label className="mb-1 text-lg font-bold">نوع كود الخصم</label>
+  <div className="flex items-center justify-between p-2 border border-[#085E9C] gap-2">
+    {/* عام */}
+    <div
+      onClick={() => setDiscountType(0)}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <span className="p-1 w-6 h-6 border rounded border-[#085E9C]">
+        {discountType === 0 && (
+          <img src="/images/group/true.png" alt="selected" className="w-4 h-4" />
+        )}
+      </span>
+      <span>عام</span>
     </div>
- <div className="flex flex-col text-[#085E9C]   w-full ">
-             <label className="mb-1 text-lg font-bold">البريد الإلكتروني </label>
-                 <input
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        type='email'
-        placeholder='email'
-        className="w-full rounded border border-[#085E9C]  p-2 text-sm shadow-md outline-none text-right"
-      /> 
-           </div>
+
+    {/* خاص */}
+    <div
+      onClick={() => setDiscountType(1)}
+      className="flex items-center gap-2 cursor-pointer"
+    >
+      <span className="p-1 w-6 h-6 border rounded border-[#085E9C]">
+        {discountType === 1 && (
+          <img src="/images/group/true.png" alt="selected" className="w-4 h-4" />
+        )}
+      </span>
+      <span>خاص</span>
+    </div>
+  </div>
+</div>
+
+{/* يظهر فقط لو خاص */}
+{discountType === 1 && (
+  <div className="flex flex-col text-[#085E9C] w-full">
+    <label className="mb-1 text-lg font-bold">البريد الإلكتروني</label>
+    <input
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      type="email"
+      placeholder="email"
+      className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right"
+    />
+  </div>
+)}
+
         </form>
                   <ButtonGroup handleSubmit={submitData} resetHandle={resetHandle} onClose={onClose} />
 
