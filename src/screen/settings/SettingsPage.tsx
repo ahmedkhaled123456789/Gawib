@@ -1,63 +1,55 @@
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../store";
+import { getSettings, updateSetting } from "../../store/settingSlice";
+ 
 const ArabicFormLayout: React.FC = () => {
-  const [emailData, setEmailData] = useState({
-    purchaseEmail: '',
-    generalEmail: '',
-    valueAddedTax: '$15'
-  });
+  const dispatch = useDispatch<AppDispatch>();
+  const { settings } = useSelector((state: RootState) => state.settings);
+   const [formData, setFormData] = useState<Record<string, string>>({});
+   useEffect(() => {
+    dispatch(getSettings());
+  }, [dispatch]);
 
-  const [textareaData, setTextareaData] = useState({
-    aboutJawab: 'لغرض جودة الخدمة وسرعة الانجاز فأننا من الممكن مشاركة معلوماتك الشخصية وبيانات حجزك مع جميع فروعنا وخدمة العملاء ومع شركائنا (المضيفين) للتنسيق والتواصل معك إن دعت الحاجة لذلك. من الممكن أيضاً مشاركة بيانات التواصل الخاصة بك من بريد إلكتروني وجوال مع جهات أخرى جديرة بالثقة مثل الفنادق، ومع ذلك فإننا نضمن لك في مكان عدم مشاركة معلوماتك الشخصية لأي جهات ترويجية لغرض التسويق إلا بعد اخذ الموافقة المسبقة منك. أيضا، يحق لك طلب مشاركة معلوماتك مع طرف ثالث إن',
-    termsOfUse: 'لغرض جودة الخدمة وسرعة الانجاز فأننا من الممكن مشاركة معلوماتك الشخصية وبيانات حجزك مع جميع فروعنا وخدمة العملاء ومع شركائنا (المضيفين) للتنسيق والتواصل معك إن دعت الحاجة لذلك. من الممكن أيضاً مشاركة بيانات التواصل الخاصة بك من بريد إلكتروني وجوال مع جهات أخرى جديرة بالثقة مثل الفنادق، ومع ذلك فإننا نضمن لك في مكان عدم مشاركة معلوماتك الشخصية لأي جهات ترويجية لغرض التسويق إلا بعد اخذ الموافقة المسبقة منك. أيضا، يحق لك طلب مشاركة معلوماتك مع طرف ثالث إن '
-  });
+   useEffect(() => {
+    const mapped: Record<string, string> = {};
+    settings?.data.forEach((item) => {
+      mapped[item.key] = item.value;
+    });
+    setFormData(mapped);
+  }, [settings]);
 
-  const handleInputChange = (field: string, value: string) => {
-    setEmailData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleChange = (key: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleTextareaChange = (field: string, value: string) => {
-    setTextareaData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSaveEmails = () => {
-    alert('تم حفظ إعدادات البريد الإلكتروني');
-  };
-
-  const handleSaveAbout = () => {
-    alert('تم حفظ معلومات عن جواب');
-  };
-
-  const handleSaveTerms = () => {
-    alert('تم حفظ شروط الاستخدام');
-  };
-
-  const handleSaveTax = () => {
-    alert('تم حفظ ضريبة القيمة المضافة');
+  const handleSave = (key: string) => {
+    const setting = settings?.data.find((s) => s.key === key);
+    if (setting) {
+      dispatch(updateSetting({ id: setting.id.toString(), data: { ...setting, value: formData[key] } }));
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4" dir="rtl">
-      <div className=" px-6 mb-4 border-b border-[#085E9C] py-3 text-right text-[#085E9C]  text-lg font-bold">
-الإعدادات      </div>
-      <div className="max-w-4xl mx-auto">
-       
+    <div dir="rtl" className="p-4">
+      <h1 className="text-lg font-bold mb-4 text-[#085E9C]">الإعدادات</h1>
 
-        {/* Messages and Electronic Mail Section */}
+
+     
+
+    
+ {/* Messages and Electronic Mail Section */}
         <div className="bg-white  shadow-sm border border-[#085E9C] mb-6">
           <div className=" text-[#085E9C]   border-b border-[#085E9C] flex items-center justify-between">
                         <h2 className="text-lg font-medium ">     </h2>
 
             <h2 className="text-lg font-medium ">الرسائل والبريد الإلكتروني</h2>
             <button 
-              onClick={handleSaveEmails}
-              className="bg-[#085E9C] text-white px-6 py-4   text-sm font-bold "
+ onClick={() =>{
+   handleSave("buy_message");
+handleSave("gift_message");
+ }}        
+       className="bg-[#085E9C] text-white px-6 py-4   text-sm font-bold "
             >
               حفظ
             </button>
@@ -73,8 +65,8 @@ const ArabicFormLayout: React.FC = () => {
                 <input
                   type="email"
                   placeholder="شكرا لشراء 3 أعضاء بمبلغ 150 ريال، استخدم بريدك"
-                  value={emailData.purchaseEmail}
-                  onChange={(e) => handleInputChange('purchaseEmail', e.target.value)}
+                 value={formData["buy_message"] || ""}
+          onChange={(e) => handleChange("buy_message", e.target.value)}
                   className="flex-1 px-4 py-3 border border-[#085E9C] rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 />
               </div>
@@ -87,16 +79,16 @@ const ArabicFormLayout: React.FC = () => {
                 <input
                   type="email"
                   placeholder="مبروك العضوية، حصلت على رصيد واحد، استخدم بريدك"
-                  value={emailData.generalEmail}
-                  onChange={(e) => handleInputChange('generalEmail', e.target.value)}
+                 value={formData["gift_message"] || ""}
+          onChange={(e) => handleChange("gift_message", e.target.value)}
                   className="flex-1 px-4 py-3  border border-[#085E9C] rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 />
               </div>
             </div>
           </div>
         </div>
-
-        {/* About Jawab Section */}
+      
+ {/* About Jawab Section */}
         <div className="bg-white rounded shadow-sm border border-[#085E9C] mb-6">
            
             <div className=" text-[#085E9C]   border-b border-[#085E9C] flex items-center justify-between">
@@ -104,8 +96,7 @@ const ArabicFormLayout: React.FC = () => {
 
             <h2 className="text-lg font-medium ">عن جواب</h2>
             <button 
-              onClick={handleSaveAbout}
-              className="bg-[#085E9C] text-white px-6 py-4   text-sm font-bold "
+ onClick={() => handleSave("about_us")}              className="bg-[#085E9C] text-white px-6 py-4   text-sm font-bold "
             >
               حفظ
             </button>
@@ -114,8 +105,8 @@ const ArabicFormLayout: React.FC = () => {
             <textarea
               className="w-full h-32 px-4 py-3 border border-[#085E9C] rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm leading-relaxed resize-none"
               placeholder="اكتب وصف حول المنصة..."
-              value={textareaData.aboutJawab}
-              onChange={(e) => handleTextareaChange('aboutJawab', e.target.value)}
+               value={formData["about_us"] || ""}
+          onChange={(e) => handleChange("about_us", e.target.value)}
             />
           </div>
         </div>
@@ -128,7 +119,7 @@ const ArabicFormLayout: React.FC = () => {
 
             <h2 className="text-lg font-medium ">شروط الاستخدام</h2>
             <button 
-              onClick={handleSaveTerms}
+          onClick={() => handleSave("terms_and_conditions")}
               className="bg-[#085E9C] text-white px-6 py-4   text-sm font-bold "
             >
               حفظ
@@ -138,13 +129,13 @@ const ArabicFormLayout: React.FC = () => {
             <textarea
               className="w-full h-32 px-4 py-3 border border-[#085E9C] rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm leading-relaxed resize-none"
               placeholder="اكتب شروط الاستخدام..."
-              value={textareaData.termsOfUse}
-              onChange={(e) => handleTextareaChange('termsOfUse', e.target.value)}
+                value={formData["terms_and_conditions"] || ""}
+          onChange={(e) => handleChange("terms_and_conditions", e.target.value)}
             />
           </div>
         </div>
 
-        {/* Value Added Tax Section */}
+{/* Value Added Tax Section */}
         <div className="bg-white rounded shadow-sm border border-[#085E9C] mb-6">
            
            <div className=" text-[#085E9C]   border-b border-[#085E9C] flex items-center justify-between">
@@ -152,7 +143,7 @@ const ArabicFormLayout: React.FC = () => {
 
             <h2 className="text-lg font-medium ">ضريبة القيمة المضافة</h2>
             <button 
-              onClick={handleSaveTax}
+              onClick={() => handleSave("app_stamp_tax")}
               className="bg-[#085E9C] text-white px-6 py-4   text-sm font-bold "
             >
               حفظ
@@ -160,20 +151,22 @@ const ArabicFormLayout: React.FC = () => {
           </div> 
           <div className="p-6">
             <div className="flex items-center gap-4">
-              <button className="bg-yellow-500 border w-[28%] border-yellow-500 hover:bg-yellow-600 text-[#085E9C] px-6 py-3 rounded text-sm font-medium transition-colors">
+              <button className="bg-yellow-500 border w-[28%] border-yellow-500 hover:bg-yellow-600 text-[#085E9C] px-6 py-3 rounded text-sm font-medium transition-colors"
+              
+              >
                 ضريبة القيمة المضافة
               </button>
               <input
                 type="text"
                 placeholder="% 15"
-                value={emailData.valueAddedTax}
-                onChange={(e) => handleInputChange('valueAddedTax', e.target.value)}
+              value={formData["app_stamp_tax"] || ""}
+          onChange={(e) => handleChange("app_stamp_tax", e.target.value)}
                   className="flex-1 px-4 py-3 border border-[#085E9C] rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
           </div>
         </div>
-      </div>
+    
     </div>
   );
 };

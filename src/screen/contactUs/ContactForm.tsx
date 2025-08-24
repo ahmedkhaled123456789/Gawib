@@ -2,12 +2,15 @@ import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ButtonGroup from "../../components/ButtonGroup";
- 
+ import { useDispatch } from "react-redux";
+ import { AppDispatch } from "../../store";
+import { updateContact } from "../../store/contactSlice";
 
 
 // AddAdmins.tsx
 const ContactForm =  ({ selectedId, onClose }: { selectedId?: string; onClose: () => void }) => {
  const [message, setMessage] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
 
 
  const submitData = () => {
@@ -20,20 +23,16 @@ const ContactForm =  ({ selectedId, onClose }: { selectedId?: string; onClose: (
        answer: message,
      };
  
-     // 👇 هنا الشرط
-     const action = selectedId
-       ? updateDiscountCode({ id: selectedId, data: newDiscount }) // Update
-       : createDiscountCode(newDiscount); // Create
- 
-     dispatch(action)
-       .unwrap()
-       .then(() => {
-         toast.success(selectedId ? "تم تحديث الكود بنجاح!" : "تمت إضافة الكود بنجاح!");
-         onClose();
-       })
-       .catch((err) => {
-         toast.error(err || "حدث خطأ أثناء الحفظ");
-       });
+   dispatch(updateContact({ id: selectedId, data: newDiscount }))
+  .unwrap()
+  .then(() => {
+    toast.success(selectedId ? "تم التحديث بنجاح!" : "تمت الإضافة بنجاح!");
+    onClose(); // closes modal
+  })
+  .catch((err) => {
+    toast.error(err || "حدث خطأ أثناء الحفظ");
+  });
+
    };
    const resetHandle = () => {
     setMessage("");
@@ -45,8 +44,8 @@ const ContactForm =  ({ selectedId, onClose }: { selectedId?: string; onClose: (
       <div className="bg-white rounded-md p-10 mb-5">
         <form className="flex flex-wrap  gap-5 pt-5">
           <label className="mb-1 text-lg font-bold text-right text-[#085E9C] " >الرد على الرسالة</label>
-         <textarea name="" id=""  cols={25} rows={10} className="w-full rounded resize-none border border-[#085E9C]  p-3 text-sm shadow-md outline-none text-right" >
-          سنرى ماذا يمكننا ان نفعل وسنضع ذلك في عين الاعتبار 
+         <textarea value={message} name="" id=""  cols={25} rows={10} className="w-full rounded resize-none border border-[#085E9C]  p-3 text-sm shadow-md outline-none text-right"onChange={(e) => setMessage(e.target.value)}  >
+         
          </textarea>
   
         </form>

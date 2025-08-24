@@ -307,7 +307,7 @@ const resetSosial=() =>{
                  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-blue-300">
         <form className="">
-         <label className="mb-4 text-[#085E9C] font-bold text-lg"> أسم المجموعة </label>
+         <label className="mb-4 text-[#085E9C] font-bold text-lg"> الاسم   </label>
       <input
         type="text"
         value={name}
@@ -316,7 +316,7 @@ const resetSosial=() =>{
       />
 
 <div className="flex flex-col  w-full  ">
-          <label className="mb-1 text-lg font-bold text-[#085E9C]">  وصف المجموعة  </label>
+          <label className="mb-1 text-lg font-bold text-[#085E9C]">  اللينك    </label>
           
     <input
       value={url}
@@ -326,7 +326,7 @@ const resetSosial=() =>{
     />
          </div>
         <div className="w-full  flex flex-col ">
-              <label className="mb-3 text-lg font-bold text-[#085E9C]">صورة المجموعة  </label>
+              <label className="mb-3 text-lg font-bold text-[#085E9C]">الصوره</label>
               <div
                 className="w-full h-[200px]   border border-[#085E9C] flex items-center justify-center cursor-pointer rounded-md hover:shadow-lg transition"
                 onClick={handleImageClick}

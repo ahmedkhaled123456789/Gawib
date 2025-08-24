@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData } from "../utils/api";
+import { useGetData, useGetDataToken } from "../utils/api";
 import {useInsertData} from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
@@ -30,7 +30,7 @@ export const getSettings = createAsyncThunk<
   { rejectValue: string }
 >("settings/getAll", async (_, thunkAPI) => {
   try {
-    const res = await useGetData<Setting[]>(`admin/settings`);
+    const res = await useGetDataToken<Setting[]>(`admin/settings`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -45,7 +45,7 @@ export const getSettingById = createAsyncThunk<
   { rejectValue: string }
 >("settings/getOne", async (id, thunkAPI) => {
   try {
-    const res = await useGetData<Setting>(`admin/settings/${id}`);
+    const res = await useGetDataToken<Setting>(`admin/settings/${id}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;

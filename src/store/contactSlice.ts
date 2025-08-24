@@ -9,7 +9,7 @@ interface ContactData {
   firstName: string;
   lastName: string;
   email: string;
-  message: string;
+  answer: string;
 }
 
 interface ContactState {
@@ -68,17 +68,31 @@ export const addContact = createAsyncThunk<ContactData, Omit<ContactData, "id">,
 );
 
 // UPDATE
-export const updateContact = createAsyncThunk<ContactData, { id: string; data: Partial<ContactData> }, { rejectValue: string }>(
+export const updateContact = createAsyncThunk<
+  ContactData,
+  { id: string; data: Partial<ContactData> },
+  { rejectValue: string }
+>(
   "contact/updateContact",
   async ({ id, data }, thunkAPI) => {
     try {
-      return await useInUpdateData<Partial<ContactData>, ContactData>("admin/contact-us", id, data);
+      const res = await useInUpdateData<Partial<ContactData>, ContactData>(
+        `admin/contact-us/${id}`,
+        data
+      );
+      
+       thunkAPI.dispatch(getContacts());
+
+      return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "updateContact failed");
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "updateContact failed"
+      );
     }
   }
 );
+
 
 // DELETE
 export const deleteContact = createAsyncThunk<string, string, { rejectValue: string }>(
@@ -104,7 +118,7 @@ const contactSlice = createSlice({
       // GET ALL
       .addCase(getContacts.pending, (state) => { state.loading = true; })
       .addCase(getContacts.fulfilled, (state, action: PayloadAction<ContactData[]>) => {
-        state.contacts = action.payload.data;
+        state.contacts = action.payload;
         state.loading = false;
       })
       .addCase(getContacts.rejected, (state, action) => {

@@ -98,7 +98,7 @@ const dispatch = useDispatch<AppDispatch>();
             </thead>
 
             <tbody className="divide-y text-center divide-gray-200">
-            {loading ? (
+          {loading ? (
   <tr>
     <td colSpan={6} className="px-4 py-2 text-gray-700">
       جاري التحميل...
@@ -110,24 +110,24 @@ const dispatch = useDispatch<AppDispatch>();
       {error}
     </td>
   </tr>
-) : contacts.length > 0 ? (
-  contacts.map((product, index) => (
+) : Array.isArray(contacts?.data) && contacts.data.length > 0 ? (
+  contacts.data.map((product, index) => (
     <ProductRow
       key={product.id}
       product={product}
       index={index}
       setShowModal={setShowModal}
       setSelectedId={setSelectedId}
-
     />
   ))
 ) : (
   <tr>
     <td colSpan={6} className="px-4 py-2 text-gray-700">
-      لم يتم العثور على رسائل.
+      لا يوجد بيانات.
     </td>
   </tr>
 )}
+
 
             </tbody>
           </table>

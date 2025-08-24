@@ -11,6 +11,7 @@ import settingsReducer from "./settingSlice";
 import questionsReducer from "./questionsSlice";
 import userReducer from "./userSlice";
 import adminReducer from "./adminSlice";
+import paymentReducer from "./payment";
 
 const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ const store = configureStore({
     questions: questionsReducer,
     user:userReducer,
     admin:adminReducer,
+    payment:paymentReducer,
   },
 });
 
