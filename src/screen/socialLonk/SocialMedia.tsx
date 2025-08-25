@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { AppDispatch, RootState } from '../../store';
-import { createSocialLink, getSocialLinks } from '../../store/SocialLinksSlice';
-
+import { createSocialLink, getSocialLinks, updateSocialLink } from '../../store/SocialLinksSlice';
+ 
 interface SocialPlatform {
   id: string;
   name: string;
@@ -199,7 +199,22 @@ const resetSosial=() =>{
       )
     );
   };
-
+const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
+   dispatch(
+     updateSocialLink({
+       id: data.id,
+       data: {
+         is_active: data.is_active,
+         _method:"PUT",
+        
+       },
+     }) 
+   );
+   console.log({
+     id: data.id,
+     formData: { is_active: data.is_active },
+   });
+  };
   const updateUrl = (id: string, url: string) => {
     setPlatforms(prev => 
       prev.map(platform => 
@@ -278,8 +293,11 @@ const resetSosial=() =>{
     {/* Checkbox */}
     <div>
       <button
-        onClick={() => toggleCheckbox(data.id)}
-        className="w-12 h-12 mr-2 border border-[#085E9C] flex items-center justify-center transition-all"
+        onClick={() =>{
+           toggleCheckbox(data.id)
+             handleConfirmStatus({ id:data.id, is_active: data.is_active ? 0 : 1 })
+          }}
+         className="w-12 h-12 mr-2 border border-[#085E9C] flex items-center justify-center transition-all"
       >
         {data.is_active && (
           <img src="/images/group/true.png" alt="selected" className="w-6 h-6" />

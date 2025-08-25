@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useGetData, useGetDataToken } from "../utils/api";
 import {useInsertData} from "../hooks/useInsertData";
-import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
 import { AxiosError } from "axios";
 
@@ -9,7 +8,8 @@ interface SocialLink {
   name?: string;
   icon: File;
   url: string;
-  is_active: string;
+  is_active: number;
+  _method:string;
 
 }
 
@@ -84,7 +84,8 @@ export const updateSocialLink = createAsyncThunk<
   { rejectValue: string }
 >("socialLinks/update", async ({ id, data }, thunkAPI) => {
   try {
-    const res = await useInUpdateData<SocialLink>(`admin/social-links/${id}`, data);
+    const res = await useInsertData<SocialLink>(`admin/social-links/${id}`, data);
+           thunkAPI.dispatch(getSocialLinks());
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
