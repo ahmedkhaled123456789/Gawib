@@ -98,7 +98,7 @@ const CategoriesRow = ({ product,setSelectedImg,setSelectedId, index,setShowCatM
         <div className="w-24"> {product.name}</div>
        </td>
       <td className="px-4 py-2  text-gray-700">
-                <div className="w-24"> {product.category.name}</div>
+                <div className="w-24"> {product?.category?.name || "_"}</div>
 
        </td>
 
@@ -113,7 +113,7 @@ const CategoriesRow = ({ product,setSelectedImg,setSelectedId, index,setShowCatM
         <div className=" flex items-center justify-center">
 <img
   src={product.image}
-  alt={`${product.category.name} logo`}
+  alt={`${product?.category?.name} logo`}
   className="w-6 h-6 rounded-full cursor-pointer"
   onClick={() => setSelectedImg(product.img)}
 />
