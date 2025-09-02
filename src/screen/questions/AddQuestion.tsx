@@ -33,8 +33,8 @@ const AddQuestion = ({ selectedId, onClose }: { selectedId?: string; onClose: ()
           setAnswer(data.data.answer.text || "");
           setSee(data.data.hint || "");
            setCat(data.data.question.text || "");
-          setImage(data.data.question.image);
-          setImage2(data.data.answer.image);
+        setImage(data.data.question?.image || null);
+        setImage2(data.data.answer?.image || null);
         })
         .catch(() => {
           toast.error("فشل تحميل بيانات السؤال");
@@ -42,33 +42,36 @@ const AddQuestion = ({ selectedId, onClose }: { selectedId?: string; onClose: ()
     }
   }, [selectedId, dispatch]);
 
-  const handleSubmit = () => {
-    const formData = new FormData();
-    formData.append("points", activePoints?.toString() || "0");
-    formData.append("game_id", "1");
-    formData.append("question.text", question);
-    if (image) formData.append("question.image", image);
-    formData.append("answer.text", answer);
-    if (image2) formData.append("answer.image", image2);
-    formData.append("hint", see);
-    formData.append("activeCategory", age);
-    formData.append("is_active", "0");
-if(selectedId){ formData.append("_method", "PUT");}
-    const action = selectedId
-      ? updateQuestion({ id: selectedId,formData })
-      : createQuestion(formData);
+const handleSubmit = () => {
+  const formData = new FormData();
+  formData.append("points", activePoints?.toString() || "0");
+  formData.append("game_id", "1");
+  formData.append("question.text", question);
+  if (image) formData.append("question.image", image);
+  formData.append("answer.text", answer);
+  if (image2) formData.append("answer.image", image2);
+  formData.append("hint", see);
+  formData.append("activeCategory", age);
+  formData.append("is_active", "0");
+  if (selectedId) formData.append("_method", "PUT");
 
-    dispatch(action)
-      .unwrap() 
-      .then(() => {
-        toast.success(selectedId ? "تم التحديث بنجاح!" : "تم الحفظ بنجاح!");
-        resetHandle();
-        onClose();
-      })
-      .catch((err) => {
-        toast.error(err || (selectedId ? "فشل التحديث!" : "فشل الحفظ!"));
-      });
-  };
+  const action = selectedId
+    ? updateQuestion({ id: selectedId, formData }) 
+    : createQuestion(formData); 
+
+  dispatch(action)
+    .unwrap()
+    .then(() => {
+      toast.success(selectedId ? "تم التحديث بنجاح!" : "تم الحفظ بنجاح!");
+      resetHandle();
+      onClose();
+    })
+    .catch((err) => {
+      toast.error(err || (selectedId ? "فشل التحديث!" : "فشل الحفظ!"));
+    });
+};
+
+
 
   const resetHandle = () => {
      setQuestion("");

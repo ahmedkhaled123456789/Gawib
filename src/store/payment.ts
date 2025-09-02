@@ -1,9 +1,8 @@
 // features/payment/paymentSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-  import { PaginatedPayments, Payment } from "../types/payment";
+import { PaginatedPayments, Payment } from "../types/payment";
 import { useGetDataToken } from "../utils/api";
-import { useInsertData } from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
  
@@ -25,22 +24,23 @@ const initialState: PaymentState = {
 
 // ============ Get All Payments ============
 export const getPayments = createAsyncThunk<
-  PaginatedPayments,
-  number | void, // page number
+  PaginatedPayments, 
+  void,
   { rejectValue: string }
->("payments/getPayments", async (page = 1, thunkAPI) => {
-  try {
-    const res = await useGetDataToken<PaginatedPayments>(
-      `admin/payments?page=${page}`
-    );
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(
-      err.response?.data.message || "getPayments failed"
-    );
+>(
+  "payments/getPayments",
+  async (_, thunkAPI) => {
+    try {
+      const res = await useGetDataToken<PaginatedPayments>(`admin/payments`);
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(err.response?.data.message || "getPayments failed");
+    }
   }
-});
+);
+
+
 
 // ============ Get One Payment ============
 export const getPaymentById = createAsyncThunk<
@@ -60,22 +60,22 @@ export const getPaymentById = createAsyncThunk<
 });
 
 // ============ Create Payment ============
-export const createPayment = createAsyncThunk<
-  Payment,
-  Partial<Payment>,
-  { rejectValue: string }
->("payments/createPayment", async (data, thunkAPI) => {
-  try {
-    const res = await useInsertData<Payment>(`admin/payments`, data);
-    thunkAPI.dispatch(getPayments()); // refresh list
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(
-      err.response?.data.message || "createPayment failed"
-    );
-  }
-});
+// export const createPayment = createAsyncThunk<
+//   Payment,
+//   Partial<Payment>,
+//   { rejectValue: string }
+// >("payments/createPayment", async (data, thunkAPI) => {
+//   try {
+//     const res = await useInsertData<Payment>(`admin/payments`, data);
+//     thunkAPI.dispatch(getPayments()); // refresh list
+//     return res;
+//   } catch (error) {
+//     const err = error as AxiosError<{ message: string }>;
+//     return thunkAPI.rejectWithValue(
+//       err.response?.data.message || "createPayment failed"
+//     ); 
+//   }
+// });
 
 // ============ Update Payment ============
 export const updatePayment = createAsyncThunk<
@@ -122,12 +122,13 @@ const paymentSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Get All
-      .addCase(getPayments.fulfilled, (state, action) => {
-        state.pagination = action.payload;
-        state.payments = action.payload.data;
-        state.loading = false;
-        state.error = null;
-      })
+     .addCase(getPayments.fulfilled, (state, action) => {
+  state.pagination = action.payload;       
+  state.payments = action.payload.data;    
+  state.loading = false;
+  state.error = null;
+})
+
       // Get By ID
       .addCase(getPaymentById.fulfilled, (state, action) => {
         state.selectedPayment = action.payload;
@@ -135,11 +136,11 @@ const paymentSlice = createSlice({
         state.error = null;
       })
       // Create
-      .addCase(createPayment.fulfilled, (state, action) => {
-        state.payments.unshift(action.payload);
-        state.loading = false;
-        state.error = null;
-      })
+      // .addCase(createPayment.fulfilled, (state, action) => {
+      //   state.payments.unshift(action.payload);
+      //   state.loading = false;
+      //   state.error = null;
+      // })
       // Update
       .addCase(updatePayment.fulfilled, (state, action) => {
         const idx = state.payments.findIndex((p) => p.id === action.payload.id);

@@ -43,9 +43,9 @@ const AddPrice = ({ selectedId, onClose }: { selectedId?: string; onClose: () =>
       dispatch(getGamePackageById(selectedId))
         .unwrap()
         .then((data) => {
-      setName(data.data.name);
-    setCount(data.data.games_count);
-    setPrice(data.data.price);
+      setName(data?.name);
+    setCount(data?.games_count);
+    setPrice(data?.price);
  
         }
       )
@@ -63,9 +63,9 @@ const AddPrice = ({ selectedId, onClose }: { selectedId?: string; onClose: () =>
 
     const payload = {
       name,
-      games_count: Number(count),
-      price: Number(price),
-      is_active: 1,
+      games_count: count,
+      price: price,
+      is_active: "1",
       is_free: 0,
     };
 

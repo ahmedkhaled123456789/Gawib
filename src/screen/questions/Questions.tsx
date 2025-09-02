@@ -82,17 +82,13 @@ const [selectedImg, setSelectedImg] = useState(null);
 const [selectedId, setSelectedId] = useState(null);
 
  
-const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
+const handleConfirmStatus = (data: { id: string; is_active: "0" | "1" }) => {
     dispatch(
      updateQuestion({
        id: data.id,
-       formData: { is_active: !data.is_active },
+       formData: { is_active: !data.is_active,_method:"PUT", },
      }) 
    ); 
-  console.log({
-     id: data.id,
-     formData: { is_active: !data.is_active },
-   });
   };
  
 
@@ -172,7 +168,7 @@ const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
           <tbody className="divide-y text-center divide-gray-200">
   {questions?.data?.length > 0 ? (
     questions.data
-      .filter(question => question?.is_active) // هنا التعديل
+      .filter(question => question?.is_active) 
       .map((question, index) => (
         <ProductRow
           key={question._id || question.id}

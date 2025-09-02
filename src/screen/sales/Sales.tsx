@@ -251,7 +251,7 @@ const ProductRow = ({ product, index , setShowModal}) => {
 
 const Sales = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { payments, loading, error, pagination } = useSelector(
+  const { payments, loading, error } = useSelector(
     (state: RootState) => state.payment
   );
    const [searchQuery, setSearchQuery] = useState("");
@@ -330,8 +330,8 @@ const Sales = () => {
                     {error}
                   </td>
                 </tr>
-              ) : payments?.data.length > 0 ? (
-                payments?.data.map((product, index) => (
+              ) : payments.length > 0 ? (
+                payments.map((product, index) => (
                   <ProductRow
                     key={product.id}
                     product={product}
@@ -352,10 +352,8 @@ const Sales = () => {
       </div>
 
       {/* Pagination */}
-      <Pagination
-        pageCount={pagination?.totalPages || 1}
-        onPress={(page) => dispatch(getPayments(page))}
-      />
+                    <Pagination pageCount={6} onPress={1} />
+
 
       {/* Modal */}
       <CustomModal isOpen={showModal}>

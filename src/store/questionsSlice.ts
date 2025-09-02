@@ -5,14 +5,15 @@ import {useInsertData} from "../hooks/useInsertData";
 import useDeleteData from "../hooks/useDeleteData";
 
   interface QuestionData {
-  data: any;
-  game_id: string;
-  title: string;
-  options: string[];
-  image: File;
-  sound: File;
-  points: string;
-  is_active?: number;
+  data?: any;
+  game_id?: string;
+  title?: string;
+  options?: string[];
+  image?: File;
+  sound?: File;
+  points?: string;
+  is_active?: string | boolean;
+  _method?: string;
 }
 
 interface QuestionsState {

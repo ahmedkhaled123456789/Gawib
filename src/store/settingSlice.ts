@@ -1,18 +1,19 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useGetDataToken } from "../utils/api";
-import {useInsertData} from "../hooks/useInsertData";
-import { useInUpdateData } from "../hooks/useUpdateData";
-import useDeleteData from "../hooks/useDeleteData";
-import { AxiosError } from "axios";
+ import { useInUpdateData } from "../hooks/useUpdateData";
+ import { AxiosError } from "axios";
 
 interface Setting {
+  [x: string]: any;
   _id?: string;
   key: string;
   value: string;
 }
-
+ interface SettingResponse {
+  data: Setting[];
+}
 interface SettingsState {
-  settings: Setting[] | null;
+  settings: SettingResponse | null;
   loading: boolean;
   error: string | null;
 }
@@ -25,12 +26,12 @@ const initialState: SettingsState = {
 
 // ========== Get All ==========
 export const getSettings = createAsyncThunk<
-  Setting[],
+  SettingResponse,
   void,
   { rejectValue: string }
 >("settings/getAll", async (_, thunkAPI) => {
   try {
-    const res = await useGetDataToken<Setting[]>(`admin/settings`);
+    const res = await useGetDataToken<SettingResponse>(`admin/settings`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -38,41 +39,9 @@ export const getSettings = createAsyncThunk<
   }
 });
 
-// ========== Get One ==========
-export const getSettingById = createAsyncThunk<
-  Setting,
-  string,
-  { rejectValue: string }
->("settings/getOne", async (id, thunkAPI) => {
-  try {
-    const res = await useGetDataToken<Setting>(`admin/settings/${id}`);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to fetch setting");
-  }
-});
 
-// ========== Create ==========
-export const createSetting = createAsyncThunk<
-  Setting,
-  Setting,
-  { rejectValue: string }
->(
-  "settings/create",
-  async (data, thunkAPI) => {
-    try {
-      const res = await useInsertData<Setting>(`admin/settings`, data);
-       thunkAPI.dispatch(getSettings());
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(
-        err.response?.data.message || "Failed to create setting"
-      );
-    }
-  }
-);
+
+
 
 
 // ========== Update ==========
@@ -88,6 +57,8 @@ export const updateSetting = createAsyncThunk<
         `admin/settings/${id}`,
         data
       );
+           thunkAPI.dispatch(getSettings());
+      
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -99,20 +70,7 @@ export const updateSetting = createAsyncThunk<
 );
 
 
-// ========== Delete ==========
-export const deleteSetting = createAsyncThunk<
-  { message: string },
-  string,
-  { rejectValue: string }
->("settings/delete", async (id, thunkAPI) => {
-  try {
-    const res = await useDeleteData(`admin/settings/${id}`);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to delete setting");
-  }
-});
+
 
 const settingsSlice = createSlice({
   name: "settings",
@@ -125,34 +83,19 @@ const settingsSlice = createSlice({
       state.error = null;
     });
 
-    builder.addCase(getSettingById.fulfilled, (state, action) => {
-      state.settings = [action.payload];
-      state.loading = false;
-      state.error = null;
-    });
+  
 
-    builder.addCase(createSetting.fulfilled, (state) => {
-       state.loading = false;
-      state.error = null;
-    });
+  
 
     builder.addCase(updateSetting.fulfilled, (state, action) => {
-      if (state.settings) {
-        state.settings = state.settings.map((setting) =>
-          setting._id === action.payload._id ? action.payload : setting
-        );
-      }
-      state.loading = false;
-      state.error = null;
-    });
-
-    builder.addCase(deleteSetting.fulfilled, (state, action) => {
-      if (state.settings) {
-        state.settings = state.settings.filter((setting) => setting._id !== action.meta.arg);
-      }
-      state.loading = false;
-      state.error = null;
-    });
+  if (state.settings) {
+    state.settings.data = state.settings.data.map((setting) =>
+      setting._id === action.payload._id ? action.payload : setting
+    );
+  }
+  state.loading = false;
+  state.error = null;
+});
 
     builder
       .addMatcher((action) => action.type.endsWith("/pending"), (state) => {
