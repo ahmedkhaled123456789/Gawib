@@ -162,8 +162,8 @@ const handleDelete = () => {
             </thead>
 
             <tbody className="divide-y text-center divide-gray-200">
-              {discountCodes?.data.length > 0 ? (
-  discountCodes?.data.map((product, index) => (
+              {discountCodes?.length > 0 ? (
+  discountCodes?.map((product, index) => (
     <ProductRow
       key={index}
       product={product}

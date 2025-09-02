@@ -2,25 +2,44 @@ import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/tool
 import { AxiosError } from "axios";
 import { insertData, useGetDataToken } from "../utils/api";
 import { useInUpdateData } from "../hooks/useUpdateData";
-import useDeleteData from "../hooks/useDeleteData";
- 
+
+// ====== Types ======
 interface ContactData {
-  id: string;       // لازم يكون في Id عشان update/delete
-  firstName: string;
-  lastName: string;
+  id: number;
+  first_name: string;
+  last_name: string;
   email: string;
+  message: string;
   answer: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Pagination<T> {
+  current_page: number;
+  data: T[];
+  total: number;
+  per_page: number;
+  last_page: number;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  status: number;
+  locale: string;
+  message: string;
+  data: T;
 }
 
 interface ContactState {
-  contacts: ContactData[];
+  contacts: ApiResponse<Pagination<ContactData>> | null;
   contact: ContactData | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ContactState = {
-  contacts: [],
+  contacts: null,
   contact: null,
   loading: false,
   error: null,
@@ -29,24 +48,25 @@ const initialState: ContactState = {
 // ================ CRUD Thunks ===============
 
 // GET ALL
-export const getContacts = createAsyncThunk<ContactData[], void, { rejectValue: string }>(
-  "contact/getContacts",
-  async (_, thunkAPI) => {
-    try {
-      return await useGetDataToken<ContactData[]>("admin/contact-us");
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "getContacts failed");
-    }
+export const getContacts = createAsyncThunk<
+  ApiResponse<Pagination<ContactData>>,
+  void,
+  { rejectValue: string }
+>("contact/getContacts", async (_, thunkAPI) => {
+  try {
+    return await useGetDataToken<ApiResponse<Pagination<ContactData>>>("admin/contact-us");
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(err.response?.data.message || "getContacts failed");
   }
-);
+});
 
 // GET ONE
 export const getContactById = createAsyncThunk<ContactData, string, { rejectValue: string }>(
   "contact/getContactById",
   async (id, thunkAPI) => {
     try {
-      return await useGetDataToken<ContactData>("admin/contact-us", id);
+      return await useGetDataToken<ContactData>(`admin/contact-us/${id}`);
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       return thunkAPI.rejectWithValue(err.response?.data.message || "getContactById failed");
@@ -72,41 +92,21 @@ export const updateContact = createAsyncThunk<
   ContactData,
   { id: string; data: Partial<ContactData> },
   { rejectValue: string }
->(
-  "contact/updateContact",
-  async ({ id, data }, thunkAPI) => {
-    try {
-      const res = await useInUpdateData<Partial<ContactData>, ContactData>(
-        `admin/contact-us/${id}`,
-        data
-      );
-      
-       thunkAPI.dispatch(getContacts());
+>("contact/updateContact", async ({ id, data }, thunkAPI) => {
+  try {
+    const res = await useInUpdateData<Partial<ContactData>, ContactData>(
+      `admin/contact-us/${id}`,
+      data
+    );
 
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(
-        err.response?.data.message || "updateContact failed"
-      );
-    }
+    thunkAPI.dispatch(getContacts());
+
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(err.response?.data.message || "updateContact failed");
   }
-);
-
-
-// DELETE
-export const deleteContact = createAsyncThunk<string, string, { rejectValue: string }>(
-  "contact/deleteContact",
-  async (id, thunkAPI) => {
-    try {
-      await useDeleteData("admin/contact-us", id);
-      return id; // هنرجّع الـ id عشان نمسحه من الـ state
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "deleteContact failed");
-    }
-  }
-);
+});
 
 // ================ Slice ===============
 const contactSlice = createSlice({
@@ -116,8 +116,10 @@ const contactSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // GET ALL
-      .addCase(getContacts.pending, (state) => { state.loading = true; })
-      .addCase(getContacts.fulfilled, (state, action: PayloadAction<ContactData[]>) => {
+      .addCase(getContacts.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getContacts.fulfilled, (state, action: PayloadAction<ApiResponse<Pagination<ContactData>>>) => {
         state.contacts = action.payload;
         state.loading = false;
       })
@@ -133,17 +135,19 @@ const contactSlice = createSlice({
 
       // ADD
       .addCase(addContact.fulfilled, (state, action: PayloadAction<ContactData>) => {
-        state.contacts.push(action.payload);
+        // أضف العنصر الجديد في الـ data array لو موجودة
+        if (state.contacts) {
+          state.contacts.data.data.push(action.payload);
+        }
       })
 
       // UPDATE
       .addCase(updateContact.fulfilled, (state, action: PayloadAction<ContactData>) => {
-        state.contacts = state.contacts.map((c) => (c.id === action.payload.id ? action.payload : c));
-      })
-
-      // DELETE
-      .addCase(deleteContact.fulfilled, (state, action: PayloadAction<string>) => {
-        state.contacts = state.contacts.filter((c) => c.id !== action.payload);
+        if (state.contacts) {
+          state.contacts.data.data = state.contacts.data.data.map((c) =>
+            c.id === action.payload.id ? action.payload : c
+          );
+        }
       });
   },
 });

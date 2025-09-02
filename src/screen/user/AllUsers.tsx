@@ -24,7 +24,7 @@ const ProductRow = ({ product, index ,onStatusClick}) => {
       <td className="px-4 py-2 text-gray-700">{product.nationality&& "_"}</td>
             <td className="px-4 py-2 text-gray-700">{product.created_at}</td>
 
-            <td className="px-4 py-2 text-gray-700"><div className="w-24">{product.played_games&& _}</div></td>
+            <td className="px-4 py-2 text-gray-700"><div className="w-24">{product.played_games&& "_"}</div></td>
             <td className="px-4 py-2    text-gray-700"> <div className="w-14"> <div  className={` w-2 h-2 p-2  rounded-md ${
             product.status === 1 ? 'bg-[#588a17]' : 'bg-transparent'
           }`}
@@ -147,8 +147,8 @@ const AllUsers = () => {
             </thead>
 
             <tbody className="divide-y text-center divide-gray-200">
-             {user?.data.length > 0 ? (
-  user?.data.map((product, index) => (
+             {user?.data.data.length > 0 ? (
+  user?.data.data.map((product, index) => (
     <ProductRow
       key={product._id}
       product={product}

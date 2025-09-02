@@ -10,8 +10,7 @@ const AddQuestion = ({ selectedId, onClose }: { selectedId?: string; onClose: ()
   const dispatch = useDispatch<AppDispatch>();
 
   const [activePoints, setActivePoints] = useState<number | null>(400);
-  const [category, setCategory] = useState("");
-  const [question, setQuestion] = useState("");
+   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [cat, setCat] = useState("");
   const [age, setAge] = useState("");
@@ -60,7 +59,7 @@ if(selectedId){ formData.append("_method", "PUT");}
       : createQuestion(formData);
 
     dispatch(action)
-      .unwrap()
+      .unwrap() 
       .then(() => {
         toast.success(selectedId ? "تم التحديث بنجاح!" : "تم الحفظ بنجاح!");
         resetHandle();
@@ -72,8 +71,7 @@ if(selectedId){ formData.append("_method", "PUT");}
   };
 
   const resetHandle = () => {
-    setCategory("");
-    setQuestion("");
+     setQuestion("");
     setAnswer("");
     setAge("");
     setSee("");

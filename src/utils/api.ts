@@ -16,7 +16,7 @@ export const useGetData = async <T>(
 };
 
 // Generic function to GET data with token
-export const useGetDataToken = async <T>(url: string, id: string): Promise<T> => {
+export const useGetDataToken = async <T>(url: string, id?: string | number): Promise<T> => {
   const token = localStorage.getItem("token");
 
   const config: AxiosRequestConfig = {
@@ -26,13 +26,16 @@ export const useGetDataToken = async <T>(url: string, id: string): Promise<T> =>
   };
 
   try {
-    const res = await baseUrl.get<T>(url, config);
+    const fullUrl = id ? `${url}/${id}` : url; // لو في id ضيفه على الرابط
+    const res = await baseUrl.get<T>(fullUrl, config);
     return res.data;
   } catch (error) {
     console.error(`Error fetching data with token from ${url}:`, error);
     throw new Error("Failed to fetch data with token");
   }
 };
+
+
 
 // Generic function to POST data with optional token and custom config
 export const insertData = async <TRequest, TResponse>(

@@ -73,7 +73,7 @@ const dispatch = useDispatch<AppDispatch>();
   if (loading) return <div>جاري التحميل...</div>;
   if (error) return <div>حدث خطأ: {error}</div>;
 
-  const handleConfirmStatus = (data: { id: string; is_active: boolean }) => {
+  const handleConfirmStatus = (data: { id: string; is_active: "0" | "1" }) => {
      dispatch(
        updateGamePackage({
          id: data.id,
@@ -146,8 +146,8 @@ const dispatch = useDispatch<AppDispatch>();
             </thead>
 
              <tbody className="divide-y text-center divide-gray-200">
-        {gamePackages?.data?.data?.length > 0 ? (
-          gamePackages?.data?.data?.map((product, index) => (
+        {gamePackages.length > 0 ? (
+          gamePackages.map((product, index) => (
             <ProductRow  handleConfirmStatus={handleConfirmStatus} setSelectedId={setSelectedId} setShowPriceModal={setShowPriceModal} key={product.id} product={product} index={index} />
           ))
         ) : (

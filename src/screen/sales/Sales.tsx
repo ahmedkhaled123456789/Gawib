@@ -254,8 +254,7 @@ const Sales = () => {
   const { payments, loading, error, pagination } = useSelector(
     (state: RootState) => state.payment
   );
-console.log(payments.data)
-  const [searchQuery, setSearchQuery] = useState("");
+   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [showModal, setShowModal] = useState(false);
 

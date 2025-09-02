@@ -110,8 +110,8 @@ const dispatch = useDispatch<AppDispatch>();
       {error}
     </td>
   </tr>
-) : Array.isArray(contacts?.data) && contacts.data.length > 0 ? (
-  contacts.data.map((product, index) => (
+) : Array.isArray(contacts?.data.data) && contacts.data.data.length > 0 ? (
+  contacts.data.data.map((product, index) => (
     <ProductRow
       key={product.id}
       product={product}

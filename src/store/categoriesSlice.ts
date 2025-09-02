@@ -91,18 +91,21 @@ export const updateCategory = createAsyncThunk<
   "category/updateCategory",
   async ({ id, formData }, thunkAPI) => {
     try {
-      const res = await useInUpdateData<CategoryData, Partial<CategoryData>>(
+      const res = await useInUpdateData<Partial<CategoryData>, CategoryData>(
         `admin/categories/${id}`,
         formData
       );
+
       thunkAPI.dispatch(getCategories());
-      return res;
+
+      return res; // ده نوعه CategoryData
     } catch (error) {
       console.error("Error updating Category:", error);
       return thunkAPI.rejectWithValue("Failed to update Category");
     }
   }
 );
+
 
 
 // ========================== Delete Category ==========================

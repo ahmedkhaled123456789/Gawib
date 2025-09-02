@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import { AppDispatch, RootState } from '../../store';
-import { createSocialLink, getSocialLinks, updateSocialLink } from '../../store/SocialLinksSlice';
+import { getSocialLinks, updateSocialLink } from '../../store/SocialLinksSlice';
  
 interface SocialPlatform {
   id: string;
@@ -138,58 +138,58 @@ const SocialMedia = () => {
       bgColor: 'bg-red-500'
     }
   ]);
-const [modalFormOpen, setModalFormOpen] = useState(false);
- const [url,setUrl]= useState("");
- const [name,setName]= useState("");
-  const [status,setStatus]= useState(0);
+// const [modalFormOpen, setModalFormOpen] = useState(false);
+//  const [url,setUrl]= useState("");
+//  const [name,setName]= useState("");
+//   const [status,setStatus]= useState("0");
 
-  const [image, setImage] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+//   const [image, setImage] = useState<File | null>(null);
+//   const fileInputRef = useRef<HTMLInputElement | null>(null);
 useEffect(() => {
   dispatch(getSocialLinks());
 }, [dispatch]);
 
-  const handleConfirmForm = async(e) => {
-    e.preventDefault();
-   if (!name) {
-        toast.warn("يرجى استكمال جميع الحقول!");
-        return;
-      }
+  // const handleConfirmForm = async(e) => {
+  //   e.preventDefault();
+  //  if (!name) {
+  //       toast.warn("يرجى استكمال جميع الحقول!");
+  //       return;
+  //     }
   
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("icon", image);
-      formData.append("url", url);
-      formData.append("is_active", status);
+  //     const formData = new FormData();
+  //     formData.append("name", name);
+  //     formData.append("icon", image);
+  //     formData.append("url", url);
+  //     formData.append("is_active", status);
 
   
-       try {
-             const resultAction = await dispatch(createSocialLink(formData));
+  //      try {
+  //            const resultAction = await dispatch(createSocialLink(formData));
       
-            if (createSocialLink.fulfilled.match(resultAction)) {
-              toast.success("تمت إضافة المجموعة بنجاح!");
-                 setModalFormOpen(false);
-                   resetSosial();
-            } else {
-              toast.error("حدث خطأ أثناء الإضافة");
-            }
-          } catch {
-            toast.error("فشل الاتصال بالسيرفر");
-          }
-   };
-const resetSosial=() =>{
-  setName("");
-  setUrl("");
-  setImage(null);
-}
-  const handleImageClick = () => {
-    fileInputRef.current?.click();
-  };
+  //           if (createSocialLink.fulfilled.match(resultAction)) {
+  //             toast.success("تمت إضافة المجموعة بنجاح!");
+  //                setModalFormOpen(false);
+  //                  resetSosial();
+  //           } else {
+  //             toast.error("حدث خطأ أثناء الإضافة");
+  //           }
+  //         } catch {
+  //           toast.error("فشل الاتصال بالسيرفر");
+  //         }
+  //  };
+// const resetSosial=() =>{
+//   setName("");
+//   setUrl("");
+//   setImage(null);
+// }
+  // const handleImageClick = () => {
+  //   fileInputRef.current?.click();
+  // };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setImage(file);
-  };
+  // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) setImage(file);
+  // };
   const toggleCheckbox = (id: string) => {
     setPlatforms(prev => 
       prev.map(platform => 
@@ -199,22 +199,17 @@ const resetSosial=() =>{
       )
     );
   };
-const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
-   dispatch(
-     updateSocialLink({
-       id: data.id,
-       data: {
-         is_active: data.is_active,
-         _method:"PUT",
-        
-       },
-     }) 
-   );
-   console.log({
-     id: data.id,
-     formData: { is_active: data.is_active },
-   });
-  };
+const handleConfirmStatus = (data: { id: string; is_active: "0" | "1" }) => {
+  dispatch(
+    updateSocialLink({
+      id: data.id,
+      data: {
+        is_active: data.is_active,
+        _method: "PUT", 
+      },
+    })
+  );
+};
   const updateUrl = (id: string, url: string) => {
     setPlatforms(prev => 
       prev.map(platform => 
@@ -241,12 +236,12 @@ const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
          
 <p className="text-md  ml-16 font-bold "> التواصل الاجتماعي</p>
 
-          <div className="flex items-center  space-x-4 space-x-reverse">
+          {/* <div className="flex items-center  space-x-4 space-x-reverse">
               <button  onClick={() => setModalFormOpen(true)} className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-4 py-2 rounded text-sm font-medium transition-colors"
               
               >
 إضافة             </button>
-            </div>
+            </div> */}
 
       </div>
 <div className='m-6 rounded border border-[#085E9C] overflow-hidden'>
@@ -268,60 +263,52 @@ const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
       {/* Form Content */}
       <div className="p-6">
         <div className="space-y-1">
-          {socialLinks?.data && socialLinks?.data.map((data) => (
-  <div 
-    key={data.id}
-    className="flex items-center py-3 px-2 border-b border-gray-100 hover:bg-gray-50 transition-colors rounded"
-  >
-    {/* Social Icon */}
+         {socialLinks && socialLinks.map((data) => (
+  <div key={data.id} className="flex items-center py-3 px-2 border-b border-gray-100 hover:bg-gray-50 transition-colors rounded">
     <div className="flex items-center justify-center p-2 border border-[#085E9C] border-l-0 ">
-      <div className="flex items-center justify-center">
-        <img src={data.icon} alt="img" className="w-8 h-8" />
-      </div>
+      <img src={data.icon} alt="img" className="w-8 h-8" />
     </div>
 
-    {/* URL Input */}
     <input
       type="text"
       value={data.url}
-      onChange={(e) => updateUrl(data.id, e.target.value)}
-      onFocus={() => !data.checked && toggleCheckbox(data.id)}
+      onChange={(e) => updateUrl(data.id.toString(), e.target.value)}
+      onFocus={() => !data.is_active && toggleCheckbox(data.id.toString())}
       className="flex-1 px-4 py-3 border border-[#085E9C] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
       dir="ltr"
     />
 
-    {/* Checkbox */}
-    <div>
-      <button
-        onClick={() =>{
-           toggleCheckbox(data.id)
-             handleConfirmStatus({ id:data.id, is_active: data.is_active ? 0 : 1 })
-          }}
-         className="w-12 h-12 mr-2 border border-[#085E9C] flex items-center justify-center transition-all"
-      >
-        {data.is_active && (
-          <img src="/images/group/true.png" alt="selected" className="w-6 h-6" />
-        )}
-      </button>
-    </div>
+    <button
+      onClick={() => {
+        toggleCheckbox(data.id.toString());
+        handleConfirmStatus({ id: data.id.toString(), is_active: data.is_active ? "0" : "1" });
+      }}
+      className="w-12 h-12 mr-2 border border-[#085E9C] flex items-center justify-center transition-all"
+    >
+      {data.is_active && (
+        <img src="/images/group/true.png" alt="selected" className="w-6 h-6" />
+      )}
+    </button>
   </div>
 ))}
+
 
          
         </div>
 
         {/* Summary */}
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-          <div className="text-sm text-gray-600 text-center">
-            تم تحديد {socialLinks?.data.filter(p => p.is_active).length} من أصل {socialLinks?.data.length} منصة
-          </div>
-        </div>
+       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+  <div className="text-sm text-gray-600 text-center">
+    تم تحديد {socialLinks.filter(p => p.is_active).length} من أصل {socialLinks.length} منصة
+  </div>
+</div>
+
       </div>
 </div>
       
 
        {/* add social */}
-            {modalFormOpen   && ( 
+            {/* {modalFormOpen   && ( 
                  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-blue-300">
         <form className="">
@@ -371,8 +358,8 @@ const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
   <input
     type="checkbox"
     id="status"
-    checked={status === 1}   // اذا كان 1 يبقى checked
-    onChange={(e) => setStatus(e.target.checked ? 1 : 0)}
+    checked={status === "1"}   // اذا كان 1 يبقى checked
+    onChange={(e) => setStatus(e.target.checked ? "1" : "0")}
     className="w-4 h-4 border border-[#085E9C] rounded"
   />
   <label htmlFor="status" className="text-[#085E9C] font-medium">
@@ -399,7 +386,7 @@ const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
       </div>
       
     </div>
-            )}
+            )} */}
     </div>
   );
 };

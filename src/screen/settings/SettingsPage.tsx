@@ -16,7 +16,7 @@ const ArabicFormLayout: React.FC = () => {
     settings?.data.forEach((item) => {
       mapped[item.key] = item.value;
     });
-    setFormData(mapped);
+    setFormData(mapped); 
   }, [settings]);
 
   const handleChange = (key: string, value: string) => {

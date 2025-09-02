@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData, useGetDataToken } from "../utils/api";
+import { useGetDataToken } from "../utils/api";
 import {useInsertData} from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
@@ -78,17 +78,26 @@ export const createSetting = createAsyncThunk<
 // ========== Update ==========
 export const updateSetting = createAsyncThunk<
   Setting,
-  { id: string; data: Setting },
+  { id: string; data: Partial<Setting> },
   { rejectValue: string }
->("settings/update", async ({ id, data }, thunkAPI) => {
-  try {
-    const res = await useInUpdateData<Setting>(`admin/settings/${id}`, data);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to update setting");
+>(
+  "settings/update",
+  async ({ id, data }, thunkAPI) => {
+    try {
+      const res = await useInUpdateData<Partial<Setting>, Setting>(
+        `admin/settings/${id}`,
+        data
+      );
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "Failed to update setting"
+      );
+    }
   }
-});
+);
+
 
 // ========== Delete ==========
 export const deleteSetting = createAsyncThunk<

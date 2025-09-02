@@ -34,17 +34,18 @@ const AddDiscount = ({ selectedId, onClose }: { selectedId?: string; onClose: ()
   const { gamePackages, loading, error } = useSelector((state: RootState) => state.gamePackage);
   const dispatch = useDispatch<AppDispatch>();
 
-  const [code, setCode] = useState("");
-  const [price, setPrice] = useState("");
-  const [codePrice, setCodePrice] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [email, setEmail] = useState("");
-  const [Package, setPackage] = useState("");
-  const [selectedPackage, setSelectedPackage] = useState<string>("");
+ const [code, setCode] = useState<string | number>("");
+const [price, setPrice] = useState<string | number>("");
+const [codePrice, setCodePrice] = useState<string | number>("");
+const [startDate, setStartDate] = useState<string>("");
+const [endDate, setEndDate] = useState<string>("");
+const [email, setEmail] = useState<string>("");
+const [Package, setPackage] = useState<string>("");
+const [selectedPackage, setSelectedPackage] = useState<string | number>("");
 
-  const [discountType, setDiscountType] = useState<0 | 1 >(0);
+const [discountType, setDiscountType] = useState<0 | 1>(0);
 const prevId = useRef<string | null>(null);
+
 
 useEffect(() => {
   if (selectedId && selectedId !== prevId.current) {
@@ -52,16 +53,15 @@ useEffect(() => {
     dispatch(getDiscountCodeById(selectedId))
       .unwrap()
       .then((data) => {
-        console.log(data.data.type);
-        setPrice(Number(data.data.game_package.price) || 0);
-        setCode(data.data.discount);
-        setCodePrice(Number(data.data.discounted_price));
-        setStartDate(data.data.starts_at);
-        setEndDate(data.data.ends_at);
-        setEmail(data.data.email);
-        setPackage(data.data.game_package.name);
-        setDiscountType(data.data.type);
-        setSelectedPackage(data.data.game_package.id);
+         setPrice(Number(data.game_package.price) || 0);
+        setCode(data.discount);
+        setCodePrice(Number(data.discounted_price));
+        setStartDate(data.starts_at);
+        setEndDate(data.ends_at);
+        setEmail(data.email);
+        setPackage(data.game_package.name);
+        setDiscountType(data.type);
+        setSelectedPackage(data.game_package.id);
       })
       .catch(() => {
         toast.error("فشل تحميل بيانات السؤال");
@@ -110,12 +110,12 @@ useEffect(() => {
     const pkgId = e.target.value;
     setSelectedPackage(pkgId);
 
-    const selectedPkg = gamePackages?.data?.data?.find(
+    const selectedPkg = gamePackages.find(
       (pkg: { id: string }) => pkg.id.toString() === pkgId
     );
 
     if (selectedPkg) {
-      setPrice(selectedPkg.price);
+      setPrice(selectedPkg.price.toString());
     } else {
       setPrice("");
     }
@@ -161,7 +161,7 @@ useEffect(() => {
             onChange={handleChangeDrop}
           >
             <option value="">اختر الباقة</option>
-            {gamePackages?.data?.data?.map(
+            {gamePackages?.map(
               (pkg: { id: string; name: string; price: number }) => (
                 <option key={pkg.id} value={pkg.id}>
                   {pkg.name}

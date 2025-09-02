@@ -1,99 +1,103 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData, useGetDataToken } from "../utils/api";
-import {useInsertData} from "../hooks/useInsertData";
+import { useGetDataToken } from "../utils/api";
+import { useInsertData2} from "../hooks/useInsertData";
 import useDeleteData from "../hooks/useDeleteData";
 import { AxiosError } from "axios";
 
+// Social Link Object
 interface SocialLink {
-  name?: string;
-  icon: File;
+  id: number;
+  name: string;
   url: string;
-  is_active: number;
-  _method:string;
-
+  icon: string | null;
+  is_active: string;
+ _method?: string; 
+  created_at: string | null;
+  updated_at: string | null;
 }
 
+// Response Wrapper (اللي بيرجع من الـ API)
+interface ApiResponse<T> {
+  success: boolean;
+  status: number;
+  locale: string;
+  message: string;
+  data: {
+    data: T;
+  };
+}
+
+// Slice State
 interface SocialLinksState {
-  socialLinks: SocialLink[] | null;
+  socialLinks: SocialLink[];  // نخزن هنا الـ Array
   loading: boolean;
   error: string | null;
 }
 
 const initialState: SocialLinksState = {
-  socialLinks: null,
+  socialLinks: [],
   loading: false,
   error: null,
 };
 
-// ========== Get All ==========
+
+
+// Get All
 export const getSocialLinks = createAsyncThunk<
-  SocialLink[],
+  ApiResponse<SocialLink[]>, // return type
   void,
   { rejectValue: string }
 >("socialLinks/getAll", async (_, thunkAPI) => {
   try {
-    const res = await useGetDataToken<SocialLink[]>(`admin/social-links`);
-    return res;
+    return await useGetDataToken<ApiResponse<SocialLink[]>>(`admin/social-links`);
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to fetch social links");
   }
 });
 
-// ========== Get One ==========
-export const getSocialLinkById = createAsyncThunk<
-  SocialLink,
-  string,
-  { rejectValue: string }
->("socialLinks/getOne", async (id, thunkAPI) => {
-  try {
-    const res = await useGetData<SocialLink>(`admin/social-links/${id}`);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to fetch social link");
-  }
-});
+// Create
+// export const createSocialLink = createAsyncThunk<
+//   ApiResponse<SocialLink>,
+//   FormData,
+//   { rejectValue: string }
+// >("socialLinks/create", async (data, thunkAPI) => {
+//   try {
+//     const res = await useInsertData<ApiResponse<SocialLink>>(`admin/social-links`, data);
+//     thunkAPI.dispatch(getSocialLinks());
+//     return res;
+//   } catch (error) {
+//     const err = error as AxiosError<{ message: string }>;
+//     return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to create social link");
+//   }
+// });
 
-// ========== Create ==========
-export const createSocialLink = createAsyncThunk<
-  SocialLink,
-  SocialLink,
-  { rejectValue: string }
->(
-  "socialLinks/create",
-  async (data, thunkAPI) => {
-    try {
-      const res = await useInsertData<SocialLink>(`admin/social-links`, data);
-       thunkAPI.dispatch(getSocialLinks());
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(
-        err.response?.data.message || "Failed to create social link"
-      );
-    }
-  }
-);
-
-
-// ========== Update ==========
+// Update
 export const updateSocialLink = createAsyncThunk<
-  SocialLink,
-  { id: string; data: SocialLink },
+  ApiResponse<SocialLink>, // Response Type
+  { id: string; data: Partial<SocialLink> }, // Request Params
   { rejectValue: string }
 >("socialLinks/update", async ({ id, data }, thunkAPI) => {
   try {
-    const res = await useInsertData<SocialLink>(`admin/social-links/${id}`, data);
-           thunkAPI.dispatch(getSocialLinks());
+    const res = await useInsertData2<ApiResponse<SocialLink>, Partial<SocialLink>>(
+      `admin/social-links/${id}`,
+      data
+    );
+
+    thunkAPI.dispatch(getSocialLinks());
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to update social link");
+    return thunkAPI.rejectWithValue(err.response?.data.message || "update failed");
   }
 });
 
-// ========== Delete ==========
+
+
+
+
+
+// Delete
 export const deleteSocialLink = createAsyncThunk<
   { message: string },
   string,
@@ -101,6 +105,7 @@ export const deleteSocialLink = createAsyncThunk<
 >("socialLinks/delete", async (id, thunkAPI) => {
   try {
     const res = await useDeleteData(`admin/social-links/${id}`);
+    thunkAPI.dispatch(getSocialLinks());
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -114,36 +119,28 @@ const socialLinksSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getSocialLinks.fulfilled, (state, action) => {
-      state.socialLinks = action.payload?.data;
+      state.socialLinks = action.payload.data.data; 
       state.loading = false;
       state.error = null;
     });
 
-    builder.addCase(getSocialLinkById.fulfilled, (state, action) => {
-      state.socialLinks = [action.payload];
-      state.loading = false;
-      state.error = null;
-    });
+    // builder.addCase(getSocialLinkById.fulfilled, (state, action) => {
+    //   state.socialLinks = [action.payload.data]; // عنصر واحد
+    //   state.loading = false;
+    //   state.error = null;
+    // });
 
-    builder.addCase(createSocialLink.fulfilled, (state) => {
-       state.loading = false;
-      state.error = null;
-    });
+    // builder.addCase(createSocialLink.fulfilled, (state) => {
+    //   state.loading = false;
+    //   state.error = null;
+    // });
 
-    builder.addCase(updateSocialLink.fulfilled, (state, action) => {
-      if (state.socialLinks) {
-        state.socialLinks = state.socialLinks.map((link) =>
-          link === action.payload ? action.payload : link
-        );
-      }
+    builder.addCase(updateSocialLink.fulfilled, (state) => {
       state.loading = false;
       state.error = null;
     });
 
     builder.addCase(deleteSocialLink.fulfilled, (state) => {
-      // if (state.socialLinks) {
-      //   state.socialLinks = state.socialLinks.filter((link) => link !== action.meta.arg);
-      // }
       state.loading = false;
       state.error = null;
     });
@@ -160,4 +157,5 @@ const socialLinksSlice = createSlice({
   },
 });
 
+ 
 export default socialLinksSlice.reducer;

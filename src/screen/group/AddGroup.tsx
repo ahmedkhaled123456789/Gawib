@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ButtonGroup from "../../components/ButtonGroup";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { addCategory, getCategories } from "../../store/categoriesSlice";
+import { getCategories } from "../../store/categoriesSlice";
 import { getAdmins } from "../../store/adminSlice";
 import { createGame } from "../../store/gameSlice";
 

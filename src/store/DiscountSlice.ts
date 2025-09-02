@@ -1,59 +1,79 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData, useGetDataToken } from "../utils/api";
+import { useGetDataToken } from "../utils/api";
 import {useInsertData} from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
 import { AxiosError } from "axios";
 
 interface DiscountCode {
+  id: number;
   code: string;
-  discount:number;
-  game_package_id: number;
-  type: boolean;
+  discount: string;
   starts_at: string;
-    email: string;
   ends_at: string;
+  type: number;
+  status: string;
+  discounted_price: number;
+  emails: string | null;
+  game_package: {
+    id: number;
+    name: string;
+    games_count: string;
+    price: string;
+    number_of_buys: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+  };
+}
+
+interface DiscountResponse {
+  success: boolean;
+  status: number;
+  message: string;
+  data: DiscountCode[];
+}
 
 
- }
 
 interface DiscountCodesState {
   discountCodes: DiscountCode[] | null;
-  discountCode: DiscountCode[] | null;
+  discountCode: DiscountCode | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: DiscountCodesState = {
   discountCodes: null,
-   discountCode: null,
+  discountCode: null,
   loading: false,
   error: null,
 };
 
 // ========== Get All ==========
-export const getDiscountCodes = createAsyncThunk<
-  DiscountCode[],
+ export const getDiscountCodes = createAsyncThunk<
+  DiscountCode[], // 👈 النوع النهائي الذي نريده في state
   void,
   { rejectValue: string }
 >("discountCodes/getAll", async (_, thunkAPI) => {
   try {
-    const res = await useGetDataToken<DiscountCode[]>(`admin/discount-codes`);
-    return res;
+    const res = await useGetDataToken<DiscountResponse>(`admin/discount-codes`);
+    return res.data; // 👈 نأخذ الـ data فقط
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to fetch discount codes");
   }
 });
 
+
 // ========== Get One ==========
 export const getDiscountCodeById = createAsyncThunk<
-  DiscountCode,
+  DiscountResponse,
   string,
   { rejectValue: string }
 >("discountCodes/getOne", async (id, thunkAPI) => {
   try {
-    const res = await useGetDataToken<DiscountCode>(`admin/discount-codes/${id}`);
+    const res = await useGetDataToken<DiscountResponse>(`admin/discount-codes/${id}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -86,17 +106,26 @@ export const createDiscountCode = createAsyncThunk<
 // ========== Update ==========
 export const updateDiscountCode = createAsyncThunk<
   DiscountCode,
-  { id: string; data: DiscountCode },
+  { id: string; data: Partial<DiscountCode> },
   { rejectValue: string }
->("discountCodes/update", async ({ id, data }, thunkAPI) => {
-  try {
-    const res = await useInUpdateData<DiscountCode>(`admin/discount-codes/${id}`, data);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to update discount code");
+>(
+  "discountCodes/update",
+  async ({ id, data }, thunkAPI) => {
+    try {
+      const res = await useInUpdateData<Partial<DiscountCode>, DiscountCode>(
+        `admin/discount-codes/${id}`,
+        data
+      );
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "Failed to update discount code"
+      );
+    }
   }
-});
+);
+
 
 // ========== Delete ==========
 export const deleteDiscountCode = createAsyncThunk<
@@ -120,17 +149,18 @@ const discountCodesSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getDiscountCodes.fulfilled, (state, action) => {
-      state.discountCodes = action.payload;
-      state.loading = false;
-      state.error = null;
-    });
+   builder.addCase(getDiscountCodes.fulfilled, (state, action) => {
+  state.discountCodes = action.payload; // action.payload: DiscountResponse
+  state.loading = false;
+  state.error = null;
+});
 
-    builder.addCase(getDiscountCodeById.fulfilled, (state, action) => {
-      state.discountCode = [action.payload];
-      state.loading = false;
-      state.error = null;
-    });
+builder.addCase(getDiscountCodeById.fulfilled, (state, action) => {
+  state.discountCode = action.payload.data[0];
+  state.loading = false;
+  state.error = null;
+});
+
 
     builder.addCase(createDiscountCode.fulfilled, (state) => {
        state.loading = false;

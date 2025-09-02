@@ -12,12 +12,15 @@ interface AdminData {
   phone_number: string;
   password: string;
   is_super_admin: number;
-  is_active: number;
+  is_active: string;
 }
 
+interface CountsResponse {
+  data: AdminData;
+}
 interface AdminState {
-  admins: AdminData | [];
-  counts:[];
+ admins: CountsResponse | null;
+  counts: AdminData | null;
   loading: boolean;
   error: string | null;
 }
@@ -33,7 +36,7 @@ const initialState: AdminState = {
 // ============ Get All Admins ============
 export const getCounts = createAsyncThunk("admin/counts", async (_, thunkAPI) => {
   try {
-    const res = await useGetDataToken<AdminData>(`admin/system-counts`);
+    const res = await useGetDataToken<CountsResponse>(`admin/system-counts`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -43,12 +46,12 @@ export const getCounts = createAsyncThunk("admin/counts", async (_, thunkAPI) =>
 
 // ============ Get All Admins ============
 export const getAdmins = createAsyncThunk<
-  AdminData,
+  CountsResponse,
   void,
   { rejectValue: string }
 >("admin/getAdmins", async (_, thunkAPI) => {
   try {
-    const res = await useGetDataToken<AdminData>(`admin/admins`);
+    const res = await useGetDataToken<CountsResponse>(`admin/admins`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -58,12 +61,12 @@ export const getAdmins = createAsyncThunk<
 
 // ============ Get One Admin ============
 export const getAdminById = createAsyncThunk<
-  AdminData,
+  CountsResponse,
   string, // adminId
   { rejectValue: string }
 >("admin/getAdminById", async (id, thunkAPI) => {
   try {
-    const res = await useGetData<AdminData>(`admin/admins/${id}`);
+    const res = await useGetData<CountsResponse>(`admin/admins/${id}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -90,18 +93,22 @@ export const createAdmin = createAsyncThunk<
 
 // ============ Update Admin ============
 export const updateAdmin = createAsyncThunk<
-  AdminData,
-  { id: string; data: AdminData },
+  CountsResponse,
+  { id: string; data: Partial<CountsResponse> },
   { rejectValue: string }
 >("admin/updateAdmin", async ({ id, data }, thunkAPI) => {
   try {
-    const res = await useInUpdateData<AdminData>(`admin/admins/${id}`, data);
-    return res;
+    const res = await useInUpdateData<Partial<CountsResponse>, CountsResponse>(
+      `admin/admins/${id}`,
+      data
+    );
+    return res; // ده هيبقى CountsResponse
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(err.response?.data.message || "updateAdmin failed");
   }
 });
+
 
 // ============ Delete Admin ============
 export const deleteAdmin = createAsyncThunk<

@@ -4,37 +4,45 @@ import { AxiosError } from "axios";
 import {useInsertData} from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
-
+// ========= Types =========
 interface GamePackage {
-  is_active: number;
+  id: string;
+  is_active: string;
   name: string;
   is_free: number;
   price: number;
   games_count: number;
 }
 
+interface GamePackagesResponse {
+  data: GamePackage[];
+}
+
 interface GamePackagesState {
-  gamePackages: GamePackage | null;
-  gamePackage: GamePackage | null;
+  gamePackages: GamePackage[];   // هنا نحفظ الـ array نفسها
+  gamePackage: GamePackage | null; // package واحد أو null
   loading: boolean;
   error: string | null;
 }
 
+// ========= Initial State =========
 const initialState: GamePackagesState = {
-  gamePackages: null,
-    gamePackage: null,
+  gamePackages: [],
+  gamePackage: null,
   loading: false,
   error: null,
 };
 
+
 // ========== Get All ==========
+// GET ALL
 export const getGamePackages = createAsyncThunk<
-  GamePackage,
+  GamePackagesResponse, // ✅ يرجع Response واحد مش Array
   void,
   { rejectValue: string }
 >("gamePackages/getGamePackages", async (_, thunkAPI) => {
   try {
-    const res = await useGetDataToken<GamePackage>("admin/game-packages");
+    const res = await useGetDataToken<GamePackagesResponse>("admin/game-packages");
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -42,9 +50,9 @@ export const getGamePackages = createAsyncThunk<
   }
 });
 
-// ========== Get One ==========
+// ========= Get One =========
 export const getGamePackageById = createAsyncThunk<
-  GamePackage,
+  GamePackage, // ✅ package واحد
   string,
   { rejectValue: string }
 >("gamePackages/getGamePackageById", async (id, thunkAPI) => {
@@ -82,19 +90,29 @@ export const createGamePackage = createAsyncThunk<
 // ========== Update ==========
 export const updateGamePackage = createAsyncThunk<
   GamePackage,
-  { id: string; data: GamePackage },
+  { id: string; data: Partial<GamePackage> },
   { rejectValue: string }
->("gamePackages/updateGamePackage", async ({ id, data }, thunkAPI) => {
-  try {
-    const res = await useInUpdateData<GamePackage>(`admin/game-packages/${id}`, data);
-           thunkAPI.dispatch(getGamePackages());
+>(
+  "gamePackages/updateGamePackage",
+  async ({ id, data }, thunkAPI) => {
+    try {
+      const res = await useInUpdateData<Partial<GamePackage>, GamePackage>(
+        `admin/game-packages/${id}`,
+        data
+      );
 
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "updateGamePackage failed");
+      thunkAPI.dispatch(getGamePackages());
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "updateGamePackage failed"
+      );
+    }
   }
-});
+);
+
 
 // ========== Delete ==========
 export const deleteGamePackage = createAsyncThunk<
@@ -117,7 +135,7 @@ const gamePackagesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getGamePackages.fulfilled, (state, action) => {
-      state.gamePackages = action.payload;
+      state.gamePackages = action.payload.data;
       state.loading = false;
       state.error = null;
     });

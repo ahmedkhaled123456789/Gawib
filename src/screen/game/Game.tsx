@@ -7,7 +7,7 @@ import CustomModal from "../../components/Modals/CustomModal";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import AddQuestion from "../questions/AddQuestion";
-import { getGameFree, getGames } from "../../store/gameSlice";
+import { getGameFree } from "../../store/gameSlice";
  
  
 

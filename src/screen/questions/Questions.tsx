@@ -88,7 +88,7 @@ const handleConfirmStatus = (data: { id: string; is_active: 0 | 1 }) => {
        id: data.id,
        formData: { is_active: !data.is_active },
      }) 
-   );
+   ); 
   console.log({
      id: data.id,
      formData: { is_active: !data.is_active },

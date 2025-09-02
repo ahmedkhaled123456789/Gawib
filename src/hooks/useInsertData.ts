@@ -22,6 +22,30 @@ const useInsertData = async <T>(
   }
 };
 
+
+const useInsertData2 = async <TResponse, TParams>(
+ url: string,
+  params: TParams,
+  config?: AxiosRequestConfig
+): Promise<TResponse> => {
+  try {
+    const defaultConfig: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        ...config?.headers,
+      },
+    };
+
+    const res = await baseUrl.post<TResponse>(url, params, defaultConfig);
+    return res.data;
+  } catch (error) {
+    console.error(`Error inserting data to ${url}:`, error);
+    throw new Error("Failed to insert data");
+  }
+};
+
+
+
 const useInsertDataWithImage = async <T>(
   url: string,
   formData: FormData,
@@ -44,4 +68,4 @@ const useInsertDataWithImage = async <T>(
   }
 };
 
- export { useInsertData, useInsertDataWithImage };
+ export { useInsertData, useInsertDataWithImage ,useInsertData2};

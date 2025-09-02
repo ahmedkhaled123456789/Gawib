@@ -15,7 +15,7 @@ export const useInUpdateDataWithImage = async (
 };
 
 // Generic update with typed response/request
-export const useInUpdateData = async <TResponse = unknown, TRequest = unknown>(
+export const useInUpdateData = async <TRequest = unknown, TResponse = unknown>(
   url: string,
   data: TRequest,
   config?: AxiosRequestConfig
@@ -39,3 +39,4 @@ export const useInUpdateData = async <TResponse = unknown, TRequest = unknown>(
     throw error;
   }
 };
+

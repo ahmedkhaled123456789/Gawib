@@ -56,9 +56,9 @@ const AddAdmins = ({ onClose }: { onClose: () => void }) => {
       name,
       email,
       password,
-      phone_number, // هيكون +20xxxx
+      phone_number, 
       is_super_admin: 1,
-      is_active: 1,
+      is_active: "1",
     };
 
     try {

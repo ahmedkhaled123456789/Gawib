@@ -65,15 +65,23 @@ export const updateUser = createAsyncThunk<
   "user/updateUser",
   async ({ id, formData }, thunkAPI) => {
     try {
-      const res = await useInUpdateData<UserData>(`admin/users/${id}`, formData);
-       thunkAPI.dispatch(getUser());
+      const res = await useInUpdateData<Partial<UserData>, UserData>(
+        `admin/users/${id}`,
+        formData
+      );
+
+      thunkAPI.dispatch(getUser());
+
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "updateUser failed");
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "updateUser failed"
+      );
     }
   }
 );
+
 
 
 // ==================== deleteUser ====================
