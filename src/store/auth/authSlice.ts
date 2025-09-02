@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/tool
 import { AxiosError } from "axios";
 import { insertData } from "../../utils/api"; // ✅ renamed and moved out of hooks
 import { useGetData } from "../../hooks/useGetData";
-import { useInUpdateData } from "../../hooks/useUpdateData";
  
 interface UserData {
   data: any;
@@ -25,10 +24,6 @@ const initialState: AuthState = {
   loading: false,
   error: null,
 };
-interface UpdateUserArgs {
-  id: string;
-  data: Partial<UserData>; // or any DTO type you use for update
-}
 // ================ Login ===============
 export const loginUser = createAsyncThunk<
   UserData,                     // Return type
@@ -69,23 +64,7 @@ export const getUser = createAsyncThunk<
 
 
 
-// ================ update User ===============
-export const updateUser = createAsyncThunk<
-  UserData,
-  UpdateUserArgs,
-  { rejectValue: string }
->(
-  "auth/updateUser",
-  async ({ id, data }, thunkAPI) => {
-    try {
-      const response = await useInUpdateData<UserData>(`manage/users/${id}`, data);
-      return response;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "فشل في تحديث المستخدم");
-    }
-  }
-);
+
 // ================ log out ===============
 export const logOut = createAsyncThunk<
   UserData,
@@ -139,12 +118,7 @@ const authSlice = createSlice({
         state.error = null;
       })
 
-      //  update user
-      .addCase(updateUser.fulfilled, (state, action: PayloadAction<UserData>) => {
-        state.user = action.payload;
-        state.loading = false;
-        state.error = null;
-      })
+     
             // Log Out Cases
       
       .addCase(logOut.fulfilled, (state) => {
