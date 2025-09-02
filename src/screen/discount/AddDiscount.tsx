@@ -11,7 +11,7 @@ interface InputFieldProps {
   label: string;
   placeholder: string;
   set: React.Dispatch<React.SetStateAction<string>>;
-  val: string;
+  val: string | number;
   type: string;
 }
 
@@ -49,7 +49,7 @@ const prevId = useRef<string | null>(null);
 
 useEffect(() => {
   if (selectedId && selectedId !== prevId.current) {
-    prevId.current = selectedId; // خزّن آخر id
+    prevId.current = selectedId; 
     dispatch(getDiscountCodeById(selectedId))
       .unwrap()
       .then((data) => {
@@ -80,22 +80,17 @@ useEffect(() => {
       return;
     }
 
-    const newDiscount = {
-      game_package_id: selectedPackage,
-      discount: Number(codePrice),
-      type: discountType,
-      email: discountType === 1 ? email : null,
-      starts_at: startDate,
-      ends_at: endDate,
-      code: Package,
-    };
+   const newDiscount = {
+  game_package_id: selectedPackage,
+  discount: codePrice.toString(), 
+  type: discountType,
+  email: discountType === 1 ? email : null,
+  starts_at: startDate,
+  ends_at: endDate,
+  code: Package,
+};
 
-    // 👇 هنا الشرط
-    const action = selectedId
-      ? updateDiscountCode({ id: selectedId, data: newDiscount }) // Update
-      : createDiscountCode(newDiscount); // Create
-
-    dispatch(action)
+if(selectedId){  dispatch( updateDiscountCode({ id: selectedId, data: newDiscount }))
       .unwrap()
       .then(() => {
         toast.success(selectedId ? "تم تحديث الكود بنجاح!" : "تمت إضافة الكود بنجاح!");
@@ -103,7 +98,17 @@ useEffect(() => {
       })
       .catch((err) => {
         toast.error(err || "حدث خطأ أثناء الحفظ");
-      });
+      });}else{  dispatch( createDiscountCode(newDiscount))
+      .unwrap()
+      .then(() => {
+        toast.success(selectedId ? "تم تحديث الكود بنجاح!" : "تمت إضافة الكود بنجاح!");
+        onClose();
+      })
+      .catch((err) => {
+        toast.error(err || "حدث خطأ أثناء الحفظ");
+      });}
+  
+  
   };
 
   const handleChangeDrop = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -161,13 +166,14 @@ useEffect(() => {
             onChange={handleChangeDrop}
           >
             <option value="">اختر الباقة</option>
-            {gamePackages?.map(
-              (pkg: { id: string; name: string; price: number }) => (
-                <option key={pkg.id} value={pkg.id}>
-                  {pkg.name}
-                </option>
-              )
-            )}
+           {gamePackages?.map(
+  (pkg: { id: string; name: string; price: string }) => (
+    <option key={pkg.id} value={pkg.id}>
+      {pkg.name}
+    </option>
+  )
+)}
+
           </select>
         )}
       </div>

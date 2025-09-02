@@ -3,7 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Dropdown from "../../components/DropDown";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store";
+import type { AppDispatch } from "../../store";
 import { createQuestion, updateQuestion, getQuestionById } from "../../store/questionsSlice"; // نفترض عندك API تجيب سؤال واحد
 
 const AddQuestion = ({ selectedId, onClose }: { selectedId?: string; onClose: () => void }) => {
@@ -54,21 +54,32 @@ const handleSubmit = () => {
   formData.append("activeCategory", age);
   formData.append("is_active", "0");
   if (selectedId) formData.append("_method", "PUT");
+  if (selectedId){
+    dispatch(updateQuestion({ id: selectedId, formData }))
+  .unwrap()
+  .then(() => {
+    toast.success(selectedId ? "تم التحديث بنجاح!" : "تم الحفظ بنجاح!");
+    resetHandle();
+    onClose();
+  })
+  .catch((err) => {
+    toast.error(err || (selectedId ? "فشل التحديث!" : "فشل الحفظ!"));
+  });
+  }else{
+    dispatch(createQuestion(formData))
+  .unwrap()
+  .then(() => {
+    toast.success(selectedId ? "تم التحديث بنجاح!" : "تم الحفظ بنجاح!");
+    resetHandle();
+    onClose();
+  })
+  .catch((err) => {
+    toast.error(err || (selectedId ? "فشل التحديث!" : "فشل الحفظ!"));
+  });
+  }
+ 
 
-  const action = selectedId
-    ? updateQuestion({ id: selectedId, formData }) 
-    : createQuestion(formData); 
 
-  dispatch(action)
-    .unwrap()
-    .then(() => {
-      toast.success(selectedId ? "تم التحديث بنجاح!" : "تم الحفظ بنجاح!");
-      resetHandle();
-      onClose();
-    })
-    .catch((err) => {
-      toast.error(err || (selectedId ? "فشل التحديث!" : "فشل الحفظ!"));
-    });
 };
 
 

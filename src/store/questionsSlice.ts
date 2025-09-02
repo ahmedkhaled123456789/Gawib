@@ -63,13 +63,12 @@ export const getQuestionById = createAsyncThunk<
 // ========== Create Question ==========
 export const createQuestion = createAsyncThunk<
   QuestionData,
-  QuestionData,
-  { rejectValue: string }
+  FormData
 >(
   "questions/createQuestion",
-  async (data, thunkAPI) => {
+  async (formData, thunkAPI) => {
     try {
-      const res = await useInsertData<QuestionData>(`admin/questions`, data);
+      const res = await useInsertData<QuestionData>(`admin/questions`, formData as any);
        thunkAPI.dispatch(getQuestions());
       return res;
     } catch (error) {
@@ -85,13 +84,12 @@ export const createQuestion = createAsyncThunk<
 // ========== Update Question ==========
 export const updateQuestion = createAsyncThunk<
   QuestionData,
-  { id: string; formData: Partial<QuestionData> },
-  { rejectValue: string }
+ { id: string; formData: Partial<QuestionData> | FormData },  { rejectValue: string }
 >(
   "questions/updateQuestion",
   async ({ id, formData }, thunkAPI) => {
     try {
-      const res = await useInsertData<QuestionData>(`admin/questions/${id}`, formData);
+      const res = await useInsertData<QuestionData>(`admin/questions/${id}`, formData as any);
        thunkAPI.dispatch(getQuestions());
       return res;
     } catch (error) {

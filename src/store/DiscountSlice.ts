@@ -6,16 +6,16 @@ import useDeleteData from "../hooks/useDeleteData";
 import { AxiosError } from "axios";
 
 interface DiscountCode {
-  id: number;
-  code: string;
-  discount: string;
-  starts_at: string;
-  ends_at: string;
-  type: number;
-  status: string;
-  discounted_price: number;
-  emails: string | null;
-  game_package: {
+  id?: number;
+  code?: string;
+  discount?: string;
+  starts_at?: string;
+  ends_at?: string;
+  type?: number;
+  status?: string;
+  discounted_price?: number;
+  emails?: string | null;
+  game_package?: {
     id: number;
     name: string;
     games_count: string;
@@ -28,6 +28,7 @@ interface DiscountCode {
 }
 
 interface DiscountResponse {
+  [x: string]: any;
   success: boolean;
   status: number;
   message: string;
