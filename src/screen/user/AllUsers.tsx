@@ -11,7 +11,6 @@ import { AppDispatch, RootState } from "../../store";
 import { getUser, updateUser } from "../../store/userSlice";
 import { getCounts } from "../../store/adminSlice";
 
-
 const ProductRow = ({ product, index ,onStatusClick}) => {
   return (
     <tr key={product._id}>
@@ -51,7 +50,7 @@ const ProductRow = ({ product, index ,onStatusClick}) => {
 const AllUsers = () => {
  const dispatch = useDispatch<AppDispatch>();
 
-  const { user, loading } = useSelector((state: RootState) => state.user);
+  const { users, loading } = useSelector((state: RootState) => state.user);
     const { counts } = useSelector((state: RootState) => state.admin);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -147,10 +146,10 @@ const AllUsers = () => {
             </thead>
 
             <tbody className="divide-y text-center divide-gray-200">
-             {user?.data.data.length > 0 ? (
-  user?.data.data.map((product, index) => (
+             {users?.data.data.length > 0 ? (
+  users?.data.data.map((product, index) => (
     <ProductRow
-      key={product._id}
+      key={product.id}
       product={product}
       index={index}
       onStatusClick={() => handleStatusClick(product)}

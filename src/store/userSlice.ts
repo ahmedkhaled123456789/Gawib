@@ -3,37 +3,49 @@ import { useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
 import { useInsertData } from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
-import useDeleteData from "../hooks/useDeleteData";
 
-interface UserData {
-  data?: any;
-  firstName: string;
-  lastName: string;
+interface UserItem {
+  id: number;
+  first_name: string;
+  last_name: string;
   email: string;
-  status:number;
-  phone: string;
-  password?: string;
-  confirmPassword?: string;
+  phone_number: string;
+  status: number;
+}
+
+interface UsersResponse {
+  success: boolean;
+  status: number;
+  message: string;
+  data: {
+    current_page: number;
+    data: UserItem[];
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
 }
 
 interface UserState {
-  user: UserData | null;
+  users: UsersResponse | null;
+  user: UsersResponse | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: UserState = {
+  users: null,
   user: null,
   loading: false,
   error: null,
 };
 
 // ==================== getUser ====================
-export const getUser = createAsyncThunk<UserData, void, { rejectValue: string }>(
+export const getUser = createAsyncThunk<UsersResponse, void, { rejectValue: string }>(
   "user/getUser",
   async (_, thunkAPI) => {
     try {
-      const res = await useGetDataToken<UserData>(`admin/users`);
+      const res = await useGetDataToken<UsersResponse>(`admin/users`);
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -43,11 +55,11 @@ export const getUser = createAsyncThunk<UserData, void, { rejectValue: string }>
 );
 
 // ==================== createUser ====================
-export const createUser = createAsyncThunk<UserData, UserData, { rejectValue: string }>(
+export const createUser = createAsyncThunk<UsersResponse, UsersResponse, { rejectValue: string }>(
   "user/createUser",
   async (userData, thunkAPI) => {
     try {
-      const res = await useInsertData<UserData>(`admin/users`, userData);
+      const res = await useInsertData<UsersResponse>(`admin/users`, userData);
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -58,14 +70,14 @@ export const createUser = createAsyncThunk<UserData, UserData, { rejectValue: st
 
 // ==================== updateUser ====================
 export const updateUser = createAsyncThunk<
-  UserData,
-  { id: string; formData: Partial<UserData> },
+  UsersResponse,
+  { id: string; formData: Partial<UsersResponse> },
   { rejectValue: string }
 >(
   "user/updateUser",
   async ({ id, formData }, thunkAPI) => {
     try {
-      const res = await useInUpdateData<Partial<UserData>, UserData>(
+      const res = await useInUpdateData<Partial<UsersResponse>, UsersResponse>(
         `admin/users/${id}`,
         formData
       );
@@ -84,19 +96,7 @@ export const updateUser = createAsyncThunk<
 
 
 
-// ==================== deleteUser ====================
-export const deleteUser = createAsyncThunk<string, string, { rejectValue: string }>(
-  "user/deleteUser",
-  async (id, thunkAPI) => {
-    try {
-      await useDeleteData(`admin/users/${id}`);
-      return id; // Return deleted ID so we can remove from state
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "deleteUser failed");
-    }
-  }
-);
+
 
 
 const userSlice = createSlice({
@@ -110,8 +110,8 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(getUser.fulfilled, (state, action: PayloadAction<UserData>) => {
-        state.user = action.payload;
+      .addCase(getUser.fulfilled, (state, action: PayloadAction<UsersResponse>) => {
+        state.users = action.payload;
         state.loading = false;
       })
       .addCase(getUser.rejected, (state, action) => {
@@ -125,7 +125,7 @@ const userSlice = createSlice({
         state.loading = true;
       })
       .addCase(createUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.users = action.payload;
         state.loading = false;
       })
       .addCase(createUser.rejected, (state, action) => {
@@ -140,14 +140,7 @@ const userSlice = createSlice({
         state.loading = false;
       });
 
-    // ===== DELETE =====
-    builder
-      .addCase(deleteUser.fulfilled, (state, action) => {
-        if (state.user && state.user.data?._id === action.payload) {
-          state.user = null; // Remove deleted user from state
-        }
-        state.loading = false;
-      });
+    
   },
 });
 
