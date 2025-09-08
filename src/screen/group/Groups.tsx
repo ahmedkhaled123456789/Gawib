@@ -37,7 +37,6 @@ const resetGroup=() =>{
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setImage(file);

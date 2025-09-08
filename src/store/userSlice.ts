@@ -41,11 +41,11 @@ const initialState: UserState = {
 };
 
 // ==================== getUser ====================
-export const getUser = createAsyncThunk<UsersResponse, void, { rejectValue: string }>(
+export const getUser = createAsyncThunk<UsersResponse, number, { rejectValue: string }>(
   "user/getUser",
-  async (_, thunkAPI) => {
+  async (page, thunkAPI) => {
     try {
-      const res = await useGetDataToken<UsersResponse>(`admin/users`);
+      const res = await useGetDataToken<UsersResponse>(`admin/users?page=${page}`);
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -53,6 +53,7 @@ export const getUser = createAsyncThunk<UsersResponse, void, { rejectValue: stri
     }
   }
 );
+
 
 // ==================== createUser ====================
 export const createUser = createAsyncThunk<UsersResponse, UsersResponse, { rejectValue: string }>(
@@ -82,7 +83,7 @@ export const updateUser = createAsyncThunk<
         formData
       );
 
-      thunkAPI.dispatch(getUser());
+      thunkAPI.dispatch(getUser(1));
 
       return res;
     } catch (error) {

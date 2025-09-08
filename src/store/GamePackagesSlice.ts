@@ -16,11 +16,20 @@ interface GamePackage {
 }
 
 interface GamePackagesResponse {
+  success: boolean;
+  status: number;
+  message: string;
   data: GamePackage[];
+  meta?: {
+    current_page: number;
+    last_page: number;
+    total: number;
+  };
+  
 }
 
 interface GamePackagesState {
-  gamePackages: GamePackage[];  
+  gamePackages: GamePackagesResponse;  
   gamePackage: GamePackage[] | null; 
   loading: boolean;
   error: string | null;
@@ -28,7 +37,7 @@ interface GamePackagesState {
 
 // ========= Initial State =========
 const initialState: GamePackagesState = {
-  gamePackages: [],
+  gamePackages: null,
   gamePackage: null,
   loading: false,
   error: null,
@@ -39,11 +48,11 @@ const initialState: GamePackagesState = {
 // GET ALL
 export const getGamePackages = createAsyncThunk<
   GamePackagesResponse,
-  void,
+  number,
   { rejectValue: string }
->("gamePackages/getGamePackages", async (_, thunkAPI) => {
+>("gamePackages/getGamePackages", async (page, thunkAPI) => {
   try {
-    const res = await useGetDataToken<GamePackagesResponse>("admin/game-packages");
+    const res = await useGetDataToken<GamePackagesResponse>(`admin/game-packages?page=${page}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -76,7 +85,7 @@ export const createGamePackage = createAsyncThunk<
   async (data, thunkAPI) => {
     try {
       const res = await useInsertData<Partial<GamePackage>>(`admin/game-packages`, data); // ← هنا
-      thunkAPI.dispatch(getGamePackages());
+      thunkAPI.dispatch(getGamePackages(1));
       return res as GamePackage;  
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -103,7 +112,7 @@ export const updateGamePackage = createAsyncThunk<
         data
       );
 
-      thunkAPI.dispatch(getGamePackages());
+      thunkAPI.dispatch(getGamePackages(1));
 
       return res;
     } catch (error) {
@@ -137,7 +146,7 @@ const gamePackagesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getGamePackages.fulfilled, (state, action) => {
-      state.gamePackages = action.payload.data;
+      state.gamePackages = action.payload;
       state.loading = false;
       state.error = null;
     });

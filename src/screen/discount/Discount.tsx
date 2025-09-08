@@ -74,7 +74,7 @@ const dispatch = useDispatch<AppDispatch>();
   const { discountCodes } = useSelector((state: RootState) => state.discountCodes);
  
 useEffect(() => {
-  dispatch(getDiscountCodes());
+  dispatch(getDiscountCodes(1));
 }, [dispatch]);
   // const [products] = useState(dummyProducts);
   const [searchQuery, setSearchQuery] = useState("");
@@ -85,13 +85,17 @@ const [selectedId, setSelectedId] = useState(null);
 
 
 const handleDelete = () => {
-  console.log(selectedId)
-  if (selectedId) {
+   if (selectedId) {
 
     dispatch(deleteDiscountCode(selectedId));
   }
   setShowModal(false);
 };
+
+const onPress = async (page) => { 
+  
+  await dispatch(getDiscountCodes(page))
+}
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
@@ -162,8 +166,8 @@ const handleDelete = () => {
             </thead>
 
             <tbody className="divide-y text-center divide-gray-200">
-              {discountCodes?.length > 0 ? (
-  discountCodes?.map((product, index) => (
+              {discountCodes?.data.length > 0 ? (
+  discountCodes?.data.map((product, index) => (
     <ProductRow
       key={index}
       product={product}
@@ -185,8 +189,12 @@ const handleDelete = () => {
           </table>
         </div>
       </div>
-              <Pagination pageCount={6} onPress={1} />
-<CustomModal isOpen={showPriceModal}>
+{
+discountCodes?.meta.last_page && (
+          <Pagination pageCount={discountCodes?.meta.last_page} onPress={onPress} />
+        )
+      }
+      <CustomModal isOpen={showPriceModal}>
         <AddDiscount  selectedId={selectedId} onClose={() => setShowPriceModal(false)} />
       </CustomModal>
 

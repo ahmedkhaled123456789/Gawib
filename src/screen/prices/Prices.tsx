@@ -67,7 +67,7 @@ const dispatch = useDispatch<AppDispatch>();
 
       
   useEffect(() => {
-    dispatch(getGamePackages());
+    dispatch(getGamePackages(1));
   }, [dispatch]);
 
   if (loading) return <div>جاري التحميل...</div>;
@@ -80,11 +80,11 @@ const dispatch = useDispatch<AppDispatch>();
          data: { is_active: data.is_active },
        }) 
      );
-     console.log({
-       id: data.id,
-       formData: { is_active: data.is_active },
-     });
     };
+    const onPress = async (page) => { 
+      
+      await dispatch(getGamePackages(page))
+    }
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
@@ -146,8 +146,8 @@ const dispatch = useDispatch<AppDispatch>();
             </thead>
 
              <tbody className="divide-y text-center divide-gray-200">
-        {gamePackages.length > 0 ? (
-          gamePackages.map((product, index) => (
+        {gamePackages?.data.length > 0 ? (
+          gamePackages?.data.map((product, index) => (
             <ProductRow  handleConfirmStatus={handleConfirmStatus} setSelectedId={setSelectedId} setShowPriceModal={setShowPriceModal} key={product.id} product={product} index={index} />
           ))
         ) : (
@@ -161,8 +161,11 @@ const dispatch = useDispatch<AppDispatch>();
           </table>
         </div>
       </div>
-              <Pagination pageCount={6} onPress={1} />
-<CustomModal isOpen={showPriceModal}>
+{
+        gamePackages?.meta?.last_page && (
+          <Pagination pageCount={gamePackages?.meta?.last_page} onPress={onPress} />
+        )
+      }<CustomModal isOpen={showPriceModal}>
         <AddPrice selectedId={selectedId} onClose={() => setShowPriceModal(false)} />
       </CustomModal>
     </div>

@@ -59,7 +59,7 @@ const AllUsers = () => {
     setSearchQuery(e.target.value);
   };
   useEffect(() => {
-    dispatch(getUser());
+    dispatch(getUser(1));
         dispatch(getCounts());
 
   }, [dispatch]);
@@ -79,14 +79,13 @@ const AllUsers = () => {
        formData: { status: data.status },
      }) 
    );
-   console.log({
-     id: data.id,
-     formData: { status: data.status },
-   });
    setModalOpen(false);
  };
 
-
+const onPress = async (page) => { 
+  
+  await dispatch(getUser(page))
+}
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
@@ -165,7 +164,11 @@ const AllUsers = () => {
           </table>
         </div>
       </div>
-              <Pagination pageCount={6} onPress={1} />
+      {
+        users?.data?.last_page && (
+          <Pagination pageCount={users?.data?.last_page} onPress={onPress} />
+        )
+      }
 {selectedProduct && (
   <CustomModal
     isOpen={modalOpen}

@@ -50,11 +50,11 @@ const initialState: ContactState = {
 // GET ALL
 export const getContacts = createAsyncThunk<
   ApiResponse<Pagination<ContactData>>,
-  void,
+  number,
   { rejectValue: string }
->("contact/getContacts", async (_, thunkAPI) => {
+>("contact/getContacts", async (page, thunkAPI) => {
   try {
-    return await useGetDataToken<ApiResponse<Pagination<ContactData>>>("admin/contact-us");
+    return await useGetDataToken<ApiResponse<Pagination<ContactData>>>(`admin/contact-us?page=${page}`);
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(err.response?.data.message || "getContacts failed");
@@ -99,7 +99,7 @@ export const updateContact = createAsyncThunk<
       data
     );
 
-    thunkAPI.dispatch(getContacts());
+    thunkAPI.dispatch(getContacts(1));
 
     return res;
   } catch (error) {

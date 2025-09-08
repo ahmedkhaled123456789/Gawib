@@ -99,7 +99,7 @@ const Posted_questions = () => {
     const { questions} = useSelector((state: RootState) => state.questions);
   
     useEffect(() => {
-      dispatch(getQuestions());
+      dispatch(getQuestions(1));
     }, [dispatch]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -118,6 +118,10 @@ const [selectedId, setSelectedId] = useState(null);
                  }) 
                );
               };
+              const onPress = async (page) => { 
+                
+                await dispatch(getQuestions(page))
+              }
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
@@ -231,8 +235,11 @@ const [selectedId, setSelectedId] = useState(null);
   </div>
 )}
       </div>
-              <Pagination pageCount={6} onPress={1} />
-<CustomModal isOpen={showPriceModal}>
+{
+        questions?.meta?.last_page && (
+          <Pagination pageCount={questions?.meta?.last_page} onPress={onPress} />
+        )
+      }<CustomModal isOpen={showPriceModal}>
         <AddQuestion selectedId={selectedId} onClose={() => setShowPriceModal(false)} />
       </CustomModal>
 <CustomModal isOpen={showSalesModal}>

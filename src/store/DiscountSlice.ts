@@ -28,17 +28,21 @@ interface DiscountCode {
 }
 
 interface DiscountResponse {
-  [x: string]: any;
   success: boolean;
   status: number;
   message: string;
   data: DiscountCode[];
+  meta?: {
+    current_page: number;
+    last_page: number;
+    total: number;
+  };
 }
 
 
 
 interface DiscountCodesState {
-  discountCodes: DiscountCode[] | null;
+  discountCodes: DiscountResponse | null;
   discountCode: DiscountCode | null;
   loading: boolean;
   error: string | null;
@@ -53,13 +57,13 @@ const initialState: DiscountCodesState = {
 
 // ========== Get All ==========
  export const getDiscountCodes = createAsyncThunk<
-  DiscountCode[], // 👈 النوع النهائي الذي نريده في state
-  void,
+  DiscountResponse, 
+  number,
   { rejectValue: string }
->("discountCodes/getAll", async (_, thunkAPI) => {
+>("discountCodes/getAll", async (page, thunkAPI) => {
   try {
-    const res = await useGetDataToken<DiscountResponse>(`admin/discount-codes`);
-    return res.data; // 👈 نأخذ الـ data فقط
+    const res = await useGetDataToken<DiscountResponse>(`admin/discount-codes?page=${page}`);
+    return res; 
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to fetch discount codes");
@@ -92,7 +96,7 @@ export const createDiscountCode = createAsyncThunk<
   async (data, thunkAPI) => {
     try {
       const res = await useInsertData<DiscountCode>(`admin/discount-codes`, data);
-       thunkAPI.dispatch(getDiscountCodes());
+       thunkAPI.dispatch(getDiscountCodes(1));
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -136,7 +140,7 @@ export const deleteDiscountCode = createAsyncThunk<
 >("discountCodes/delete", async (id, thunkAPI) => {
   try {
     const res = await useDeleteData(`admin/discount-codes/${id}`);
-           thunkAPI.dispatch(getDiscountCodes());
+           thunkAPI.dispatch(getDiscountCodes(1));
 
     return res;
   } catch (error) {
@@ -151,7 +155,7 @@ const discountCodesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
    builder.addCase(getDiscountCodes.fulfilled, (state, action) => {
-  state.discountCodes = action.payload; // action.payload: DiscountResponse
+  state.discountCodes = action.payload; 
   state.loading = false;
   state.error = null;
 });

@@ -33,25 +33,26 @@ const initialState: GameState = {
 // ============ Get All Games ============
 export const getGames = createAsyncThunk<
   GameData,
-  void,
+  number, 
   { rejectValue: string }
->("game/getGames", async (_, thunkAPI) => {
+>("game/getGames", async (page, thunkAPI) => {
   try {
-    const res = await useGetDataToken<GameData>(`admin/games`);
+    const res = await useGetDataToken<GameData>(`admin/games?page=${page}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(err.response?.data.message || "getGames failed");
   }
 });
+
 // ============ Get All Games ============
 export const getGameFree = createAsyncThunk<
   GameData,
-  void,
+  number,
   { rejectValue: string }
->("game/getGameFree", async (_, thunkAPI) => {
+>("game/getGameFree", async (page, thunkAPI) => {
   try {
-    const res = await useGetDataToken<GameData>(`admin/games?filter[is_free]=1`);
+    const res = await useGetDataToken<GameData>(`admin/games?filter[is_free]=1&page=${page}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -83,7 +84,7 @@ export const createGame = createAsyncThunk<
   async (formData, thunkAPI) => {
     try {
       const res = await useInsertDataWithImage<FormData>(`admin/games`, formData);
-      thunkAPI.dispatch(getGames());
+      thunkAPI.dispatch(getGames(1));
       return res as unknown as GameData;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -103,7 +104,7 @@ export const updateGame = createAsyncThunk<
 >("game/updateGame", async ({ id, data }, thunkAPI) => {
   try {
     const res = await useInsertDataWithImage<FormData>(`admin/games/${id}`, data);
-          thunkAPI.dispatch(getGames());
+          thunkAPI.dispatch(getGames(1));
     return res as unknown as GameData;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;

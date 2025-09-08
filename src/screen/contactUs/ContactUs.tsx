@@ -49,10 +49,13 @@ const dispatch = useDispatch<AppDispatch>();
   const [selectedId, setSelectedId] = useState(null);
 
    useEffect(() => {
-    dispatch(getContacts());
+    dispatch(getContacts(1));
   }, [dispatch]);
 
- 
+ const onPress = async (page) => { 
+   
+   await dispatch(getContacts(page))
+ }
 
   return (
     <div className="overflow-x-hidden">
@@ -134,8 +137,12 @@ const dispatch = useDispatch<AppDispatch>();
         </div>
       </div>
 
-      <Pagination pageCount={6} onPress={1} />
-      <CustomModal isOpen={showModal}>
+{
+         contacts?.data?.last_page && (
+          <Pagination pageCount={ contacts?.data?.last_page} onPress={onPress} />
+        )
+      }  
+          <CustomModal isOpen={showModal}>
         <ContactForm selectedId={selectedId} onClose={() => setShowModal(false)} />
       </CustomModal>
     </div>

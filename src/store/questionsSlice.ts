@@ -14,6 +14,11 @@ import useDeleteData from "../hooks/useDeleteData";
   points?: string;
   is_active?: string | boolean;
   _method?: string;
+  meta?: {
+    current_page: number;
+    last_page: number;
+    total: number;
+  };
 }
 
 interface QuestionsState {
@@ -33,11 +38,11 @@ const initialState: QuestionsState = {
 // ========== Get All Questions ==========
 export const getQuestions = createAsyncThunk<
   QuestionData,
-  void,
+  number,
   { rejectValue: string }
->("questions/getQuestions", async (_, thunkAPI) => {
+>("questions/getQuestions", async (page, thunkAPI) => {
   try {
-    const res = await useGetDataToken<QuestionData>(`admin/questions`);
+    const res = await useGetDataToken<QuestionData>(`admin/questions?page=${page}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -69,7 +74,7 @@ export const createQuestion = createAsyncThunk<
   async (formData, thunkAPI) => {
     try {
       const res = await useInsertData<QuestionData>(`admin/questions`, formData as any);
-       thunkAPI.dispatch(getQuestions());
+       thunkAPI.dispatch(getQuestions(1));
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -90,7 +95,7 @@ export const updateQuestion = createAsyncThunk<
   async ({ id, formData }, thunkAPI) => {
     try {
       const res = await useInsertData<QuestionData>(`admin/questions/${id}`, formData as any);
-       thunkAPI.dispatch(getQuestions());
+       thunkAPI.dispatch(getQuestions(1));
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;

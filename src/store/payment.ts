@@ -1,23 +1,23 @@
 // features/payment/paymentSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { PaginatedPayments, Payment } from "../types/payment";
+import { ApiResponse, Paginated, Payment } from "../types/payment";
 import { useGetDataToken } from "../utils/api";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
  
+export type PaginatedPayments = ApiResponse<Paginated<Payment>>;
+
 interface PaymentState {
-  payments: Payment[]; // list
-  selectedPayment: Payment | null; // single
-  pagination: PaginatedPayments | null;
+  payments: PaginatedPayments | null; 
+  selectedPayment: Payment | null; 
   loading: boolean;
   error: string | null;
 }
 
 const initialState: PaymentState = {
-  payments: [],
+  payments: null,
   selectedPayment: null,
-  pagination: null,
   loading: false,
   error: null,
 };
@@ -25,13 +25,13 @@ const initialState: PaymentState = {
 // ============ Get All Payments ============
 export const getPayments = createAsyncThunk<
   PaginatedPayments, 
-  void,
+  number,
   { rejectValue: string }
 >(
   "payments/getPayments",
-  async (_, thunkAPI) => {
+  async (page, thunkAPI) => {
     try {
-      const res = await useGetDataToken<PaginatedPayments>(`admin/payments`);
+      const res = await useGetDataToken<PaginatedPayments>(`admin/payments?page=${page}`);
       return res;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -105,7 +105,7 @@ export const deletePayment = createAsyncThunk<
 >("payments/deletePayment", async (id, thunkAPI) => {
   try {
     const res = await useDeleteData(`admin/payments/${id}`);
-    thunkAPI.dispatch(getPayments()); // refresh list
+    thunkAPI.dispatch(getPayments(1)); 
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -123,8 +123,7 @@ const paymentSlice = createSlice({
     builder
       // Get All
      .addCase(getPayments.fulfilled, (state, action) => {
-  state.pagination = action.payload;       
-  state.payments = action.payload.data;    
+  state.payments = action.payload;    
   state.loading = false;
   state.error = null;
 })
@@ -135,30 +134,8 @@ const paymentSlice = createSlice({
         state.loading = false;
         state.error = null;
       })
-      // Create
-      // .addCase(createPayment.fulfilled, (state, action) => {
-      //   state.payments.unshift(action.payload);
-      //   state.loading = false;
-      //   state.error = null;
-      // })
-      // Update
-      .addCase(updatePayment.fulfilled, (state, action) => {
-        const idx = state.payments.findIndex((p) => p.id === action.payload.id);
-        if (idx !== -1) state.payments[idx] = action.payload;
-        if (state.selectedPayment?.id === action.payload.id) {
-          state.selectedPayment = action.payload;
-        }
-        state.loading = false;
-        state.error = null;
-      })
-      // Delete
-      .addCase(deletePayment.fulfilled, (state, action) => {
-        state.payments = state.payments.filter(
-          (p) => p.id !== Number(action.meta.arg)
-        );
-        state.loading = false;
-        state.error = null;
-      })
+     
+     
       // Common Pending
       .addMatcher(
         (action) => action.type.endsWith("/pending"),

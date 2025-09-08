@@ -53,7 +53,7 @@ const dispatch = useDispatch<AppDispatch>();
   const { games} = useSelector((state: RootState) => state.game);
 
   useEffect(() => {
-    dispatch(getGameFree());
+    dispatch(getGameFree(1));
   }, [dispatch]);  
   
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,7 +63,10 @@ const dispatch = useDispatch<AppDispatch>();
 
  
 
- 
+ const onPress = async (page) => { 
+   
+   await dispatch(getGameFree(page))
+ }
 
 
   return (
@@ -150,8 +153,11 @@ const dispatch = useDispatch<AppDispatch>();
           </table>
         </div>
       </div>
-              <Pagination pageCount={6} onPress={1} />
-<CustomModal isOpen={showPriceModal}>
+{
+        games?.meta?.last_page && (
+          <Pagination pageCount={games?.meta?.last_page} onPress={onPress} />
+        )
+      }<CustomModal isOpen={showPriceModal}>
         <AddQuestion onClose={() => setShowPriceModal(false)} />
       </CustomModal>
 

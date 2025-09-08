@@ -157,7 +157,7 @@ const Categories = () => {
   const dispatch = useDispatch<AppDispatch>();
     const {games } = useSelector((state: RootState) => state.game);
     useEffect(() =>{
-dispatch(getGames())
+dispatch(getGames(1))
     },[])
     console.log(games)
    const [searchQuery, setSearchQuery] = useState("");
@@ -165,7 +165,10 @@ dispatch(getGames())
     const [showCatModal, setShowCatModal] = useState(false);
 const [selectedImg, setSelectedImg] = useState(null);
  const [selectedId, setSelectedId] = useState(null);
- 
+ const onPress = async (page) => { 
+   
+   await dispatch(getGames(page))
+ }
   return (
     <div className="p-4">
  
@@ -274,7 +277,11 @@ const [selectedImg, setSelectedImg] = useState(null);
 )}
 
         </div>
-               <Pagination pageCount={6} onPress={1} />
+               {
+       games?.meta?.last_page && (
+          <Pagination pageCount={games?.meta?.last_page} onPress={onPress} />
+        )
+      }
 
     </div>
   );
