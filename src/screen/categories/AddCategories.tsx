@@ -33,7 +33,7 @@ const AddCategories = ({ selectedId, onClose }: { selectedId?: string; onClose: 
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setImage(file); // 👈 هنا بيكون File
+    if (file) setImage(file);
   };
 
   const submitData = () => {

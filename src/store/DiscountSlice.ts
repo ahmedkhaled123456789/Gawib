@@ -11,7 +11,7 @@ interface DiscountCode {
   discount?: string;
   starts_at?: string;
   ends_at?: string;
-  type?: number;
+  type?: number| boolean;
   status?: string;
   discounted_price?: number;
   emails?: string | null;
@@ -38,12 +38,18 @@ interface DiscountResponse {
     total: number;
   };
 }
-
+interface DiscountIdResponse {
+  success: boolean;
+  status: number;
+  message: string;
+  data: DiscountCode;
+ 
+}
 
 
 interface DiscountCodesState {
   discountCodes: DiscountResponse | null;
-  discountCode: DiscountCode | null;
+  discountCode: DiscountIdResponse | null;
   loading: boolean;
   error: string | null;
 }
@@ -73,12 +79,12 @@ const initialState: DiscountCodesState = {
 
 // ========== Get One ==========
 export const getDiscountCodeById = createAsyncThunk<
-  DiscountResponse,
+  DiscountIdResponse,
   string,
   { rejectValue: string }
 >("discountCodes/getOne", async (id, thunkAPI) => {
   try {
-    const res = await useGetDataToken<DiscountResponse>(`admin/discount-codes/${id}`);
+    const res = await useGetDataToken<DiscountIdResponse>(`admin/discount-codes/${id}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -161,8 +167,8 @@ const discountCodesSlice = createSlice({
 });
 
 builder.addCase(getDiscountCodeById.fulfilled, (state, action) => {
-  state.discountCode = action.payload.data[0];
-  state.loading = false;
+  state.discountCode = action.payload;
+   state.loading = false;
   state.error = null;
 });
 

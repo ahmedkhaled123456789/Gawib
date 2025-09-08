@@ -43,7 +43,7 @@ const [email, setEmail] = useState<string>("");
 const [Package, setPackage] = useState<string>("");
 const [selectedPackage, setSelectedPackage] = useState<string | number>("");
 
-const [discountType, setDiscountType] = useState<0 | 1>(0);
+const [discountType, setDiscountType] = useState<number | boolean>(0);
 const prevId = useRef<string | null>(null);
 
 
@@ -53,15 +53,15 @@ useEffect(() => {
     dispatch(getDiscountCodeById(selectedId))
       .unwrap()
       .then((data) => {
-         setPrice(Number(data.game_package.price) || 0);
-        setCode(data.discount);
-        setCodePrice(Number(data.discounted_price));
-        setStartDate(data.starts_at);
-        setEndDate(data.ends_at);
-        setEmail(data.email);
-        setPackage(data.game_package.name);
-        setDiscountType(data.type);
-        setSelectedPackage(data.game_package.id);
+         setPrice(Number(data?.data?.game_package.price) || 0);
+        setCode(data?.data?.discount);
+        setCodePrice(Number(data?.data?.discounted_price));
+        setStartDate(data?.data?.starts_at);
+        setEndDate(data?.data?.ends_at);
+        setEmail(data?.data?.emails);
+        setPackage(data?.data?.game_package.name);
+        setDiscountType(data?.data?.type);
+        setSelectedPackage(data?.data?.game_package.id);
       })
       .catch(() => {
         toast.error("فشل تحميل بيانات السؤال");
@@ -71,7 +71,7 @@ useEffect(() => {
 
 
   useEffect(() => {
-    dispatch(getGamePackages());
+    dispatch(getGamePackages(1));
   }, [dispatch]);
 
   const submitData = () => {
@@ -115,7 +115,7 @@ if(selectedId){  dispatch( updateDiscountCode({ id: selectedId, data: newDiscoun
     const pkgId = e.target.value;
     setSelectedPackage(pkgId);
 
-    const selectedPkg = gamePackages.find(
+    const selectedPkg = gamePackages.data.find(
       (pkg: { id: string }) => pkg.id.toString() === pkgId
     );
 
@@ -166,7 +166,7 @@ if(selectedId){  dispatch( updateDiscountCode({ id: selectedId, data: newDiscoun
             onChange={handleChangeDrop}
           >
             <option value="">اختر الباقة</option>
-           {gamePackages?.map(
+           {gamePackages?.data.map(
   (pkg: { id: string; name: string; price: string }) => (
     <option key={pkg.id} value={pkg.id}>
       {pkg.name}
