@@ -8,9 +8,9 @@ import { useNavigate } from "react-router-dom";
 const Auth: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.auth);
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState<"phone" | "email">("phone");
- const user =localStorage.getItem("userinfo");
+  const token = localStorage.getItem("token");
 
   const [form, setForm] = useState({
     first_name: "",
@@ -33,11 +33,11 @@ const navigate = useNavigate();
 
     dispatch(loginUser(payload));
   };
-useEffect(() => {
-  if (user) {
-    navigate("/");
-  }
-}, [user]);
+  useEffect(() => {
+    if (token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
   return (
     <div className="flex items-center justify-center h-screen bg-gray-50 px-4">
       <div className="w-full max-w-md p-6 bg-white shadow-md rounded-md">

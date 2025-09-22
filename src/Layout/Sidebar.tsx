@@ -39,8 +39,7 @@ const Sidebar: React.FC = () => {
   }, []);
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
+    localStorage.removeItem("userinfo");
     navigate("/login");
   };
   const menuItems = [

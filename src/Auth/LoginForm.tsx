@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import 'react-phone-input-2/lib/style.css';
-import PhoneInput from 'react-phone-input-2';
+import "react-phone-input-2/lib/style.css";
+import PhoneInput from "react-phone-input-2";
 
 interface LoginFormProps {
   loginMethod: "email" | "phone";
@@ -57,8 +57,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
       <div className="space-y-4 w-full max-w-md mx-auto">
         {loginMethod === "phone" && (
           <PhoneInput
-            country={'eg'}
-            value={form.phone_number?.replace('+', '') || ''}
+            country={"eg"}
+            value={form.phone_number?.replace("+", "") || ""}
             onChange={(value: string) =>
               setForm((prev: any) => ({
                 ...prev,
@@ -66,22 +66,22 @@ const LoginForm: React.FC<LoginFormProps> = ({
               }))
             }
             inputProps={{
-              name: 'phone_number',
-              dir: 'rtl',
+              name: "phone_number",
+              dir: "rtl",
             }}
-            containerStyle={{ direction: 'rtl' }}
+            containerStyle={{ direction: "rtl" }}
             inputStyle={{
-              width: '100%',
-              textAlign: 'right',
-              borderRadius: '6px',
-              paddingRight: '50px',
-              padding: '20px 10px',
+              width: "100%",
+              textAlign: "right",
+              borderRadius: "6px",
+              paddingRight: "50px",
+              padding: "20px 10px",
             }}
             buttonStyle={{
-              backgroundColor: 'transparent',
-              border: 'none',
-              position: 'absolute',
-              left: '0',
+              backgroundColor: "transparent",
+              border: "none",
+              position: "absolute",
+              left: "0",
             }}
           />
         )}
