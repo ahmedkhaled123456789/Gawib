@@ -1,15 +1,26 @@
+// CustomModal.tsx
+import { Loader2 } from "lucide-react";
+
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (data: { id: string; status: 0 | 1 }) => void;
-  status: 0 | 1;
+  onConfirm: (data: { id: string; status: boolean }) => void;
+  status: boolean;
   id: string;
+  loading: boolean; // ✅ جديد: لو هنظهر loader هنا كمان
 };
 
-const CustomModal = ({ isOpen, onClose, onConfirm, status, id }: Props) => {
+const CustomModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  status,
+  id,
+  loading,
+}: Props) => {
   if (!isOpen) return null;
 
-  const isActive = status === 1;
+  const isActive = status === true;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -20,12 +31,19 @@ const CustomModal = ({ isOpen, onClose, onConfirm, status, id }: Props) => {
 
         <div className="flex justify-center gap-4">
           <button
-            onClick={() => onConfirm({ id, status: isActive ? 0 : 1 })}
-            className={`px-4 py-2 text-white rounded ${
+            onClick={() => onConfirm({ id, status: isActive ? false : true })}
+            className={`px-4 py-2 text-white rounded flex items-center justify-center gap-2 ${
               isActive ? "bg-[#ff426e]" : "bg-[#588a17]"
             }`}
+            disabled={loading}
           >
-            {isActive ? "إيقاف" : "تفعيل"}
+            {loading ? (
+              <Loader2 className="animate-spin h-5 w-5" />
+            ) : isActive ? (
+              "إيقاف"
+            ) : (
+              "تفعيل"
+            )}
           </button>
 
           <button

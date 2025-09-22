@@ -10,7 +10,7 @@ const Auth: React.FC = () => {
   const { loading, error } = useSelector((state: RootState) => state.auth);
 const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState<"phone" | "email">("phone");
- const user =localStorage.getItem("user");
+ const user =localStorage.getItem("userinfo");
 
   const [form, setForm] = useState({
     first_name: "",

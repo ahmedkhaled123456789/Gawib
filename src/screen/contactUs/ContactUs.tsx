@@ -5,16 +5,18 @@ import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
 import ContactForm from "./ContactForm";
- import { getContacts } from "../../store/contactSlice"; 
+import { getContacts } from "../../store/contactSlice";
 import { AppDispatch, RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
-const ProductRow = ({ product, index,setSelectedId, setShowModal }) => {
-  
+
+const ProductRow = ({ product, index, setSelectedId, setShowModal }) => {
   return (
     <tr key={product.id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
       <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product.id}`}>{product.first_name} {product.last_name}</Link>
+        <Link to={`/productDetails/${product.id}`}>
+          {product.first_name} {product.last_name}
+        </Link>
       </td>
       <td className="px-4 py-2 text-gray-700">{product.email}</td>
       <td className="px-4 py-2 text-gray-700">{product.message}</td>
@@ -22,17 +24,17 @@ const ProductRow = ({ product, index,setSelectedId, setShowModal }) => {
       <td className="px-4 py-2 text-white">
         <button
           onClick={() => {
-            setSelectedId(product._id || product.id); 
-            setShowModal(true);}}
+            setSelectedId(product.id);
+            setShowModal(true);
+          }}
           disabled={product.answer}
           className={`px-4 py-2 w-full rounded font-semibold cursor-pointer ${
-            product.answer 
-              ?  "text-[#085E9C] border border-[#085E9C]"
-              : "bg-[#085E9C]" 
+            product.answer
+              ? "text-[#085E9C] border border-[#085E9C]"
+              : "bg-[#085E9C]"
           }`}
-        
         >
-          {product.answer ? "منتهي" :  "جديد"}
+          {product.answer ? "منتهي" : "جديد"}
         </button>
       </td>
     </tr>
@@ -40,30 +42,33 @@ const ProductRow = ({ product, index,setSelectedId, setShowModal }) => {
 };
 
 const ContactUs = () => {
-const dispatch = useDispatch<AppDispatch>();
-  const { contacts,loading ,error} = useSelector((state: RootState) => state.contact);
+  const dispatch = useDispatch<AppDispatch>();
+  const { contacts, loading, error } = useSelector(
+    (state: RootState) => state.contact
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-   useEffect(() => {
+  useEffect(() => {
     dispatch(getContacts(1));
   }, [dispatch]);
 
- const onPress = async (page) => { 
-   
-   await dispatch(getContacts(page))
- }
+  const onPress = async (page: number) => {
+    await dispatch(getContacts(page));
+  };
 
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
         {/* Header Controls */}
-        <div className="flex flex-col p-4  bg-white md:flex-row items-center justify-between gap-4 ">
+        <div className="flex flex-col p-4 bg-white md:flex-row items-center justify-between gap-4 ">
           <div className="flex gap-4 items-center w-full md:w-auto">
-            <div className="text-xl ml-16 font-bold text-[#085E9C]">اتصل بنا</div>
+            <div className="text-xl ml-16 font-bold text-[#085E9C]">
+              اتصل بنا
+            </div>
 
             {/* Search */}
             <div className="relative w-full md:w-64 border rounded-md border-[#085E9C]">
@@ -101,49 +106,48 @@ const dispatch = useDispatch<AppDispatch>();
             </thead>
 
             <tbody className="divide-y text-center divide-gray-200">
-          {loading ? (
-  <tr>
-    <td colSpan={6} className="px-4 py-2 text-gray-700">
-      جاري التحميل...
-    </td>
-  </tr>
-) : error ? (
-  <tr>
-    <td colSpan={6} className="px-4 py-2 text-red-500">
-      {error}
-    </td>
-  </tr>
-) : Array.isArray(contacts?.data.data) && contacts.data.data.length > 0 ? (
-  contacts.data.data.map((product, index) => (
-    <ProductRow
-      key={product.id}
-      product={product}
-      index={index}
-      setShowModal={setShowModal}
-      setSelectedId={setSelectedId}
-    />
-  ))
-) : (
-  <tr>
-    <td colSpan={6} className="px-4 py-2 text-gray-700">
-      لا يوجد بيانات.
-    </td>
-  </tr>
-)}
-
-
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-2 text-gray-700">
+                    جاري التحميل...
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-2 text-red-500">
+                    {error}
+                  </td>
+                </tr>
+              ) : Array.isArray(contacts?.data) && contacts.data.length > 0 ? (
+                contacts.data.map((product, index) => (
+                  <ProductRow
+                    key={product.id}
+                    product={product}
+                    index={index}
+                    setShowModal={setShowModal}
+                    setSelectedId={setSelectedId}
+                  />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-4 py-2 text-gray-700">
+                    لا يوجد بيانات.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-{
-         contacts?.data?.last_page && (
-          <Pagination pageCount={ contacts?.data?.last_page} onPress={onPress} />
-        )
-      }  
-          <CustomModal isOpen={showModal}>
-        <ContactForm selectedId={selectedId} onClose={() => setShowModal(false)} />
+      {contacts?.meta?.last_page && (
+        <Pagination pageCount={contacts.meta.last_page} onPress={onPress} />
+      )}
+      <CustomModal isOpen={showModal}>
+        <ContactForm
+          selectedId={selectedId}
+          onClose={() => setShowModal(false)}
+        />
       </CustomModal>
     </div>
   );

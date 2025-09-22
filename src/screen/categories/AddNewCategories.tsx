@@ -1,0 +1,181 @@
+import { useRef, useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../store";
+import { getAllGamesForDropdown, createGame } from "../../store/gameSlice";
+import { toast } from "sonner";
+
+interface AddNewCategoriesProps {
+  onClose: () => void;
+  adminId: number;
+}
+
+const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { games } = useSelector((state: RootState) => state.game);
+
+  const [selectedGame, setSelectedGame] = useState<string>("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [isActive, setIsActive] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    dispatch(getAllGamesForDropdown());
+  }, [dispatch]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedGame) {
+      toast.error("يرجى اختيار اللعبة");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("category_id", selectedGame);
+    formData.append("name", name);
+    formData.append("description", description);
+    if (image) formData.append("image", image);
+    formData.append("is_active", isActive ? "1" : "0");
+    formData.append("admin_id", adminId.toString());
+
+    try {
+      setLoading(true); // بدأ التحميل
+      await dispatch(createGame(formData)).unwrap();
+      toast.success("تم حفظ التصنيف بنجاح!");
+      onClose();
+    } catch (err) {
+      toast.error("حدث خطأ أثناء حفظ التصنيف");
+    } finally {
+      setLoading(false); // انتهاء التحميل
+    }
+  };
+
+  const handleImageClick = () => fileInputRef.current?.click();
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setImage(file);
+  };
+
+  return (
+    <div className="w-full p-5">
+      <div className="bg-white rounded-md p-4 border shadow">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <label className="text-[#085E9C] font-bold">اختر اللعبة</label>
+          <select
+            value={selectedGame}
+            onChange={(e) => setSelectedGame(e.target.value)}
+            className="border border-[#085E9C] rounded px-3 py-2 text-sm outline-none"
+            required
+          >
+            <option value="">-- اختر لعبة --</option>
+            {games?.data?.map((game: any) => (
+              <option key={game.id} value={game.id}>
+                {game.name}
+              </option>
+            ))}
+          </select>
+
+          <label className="text-[#085E9C] font-bold">اسم التصنيف</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="border border-[#085E9C] rounded px-3 py-2 text-sm outline-none"
+            placeholder="ادخل اسم التصنيف"
+            required
+          />
+
+          <label className="text-[#085E9C] font-bold">الوصف</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="border border-[#085E9C] rounded px-3 py-2 text-sm outline-none"
+            rows={3}
+            placeholder="ادخل الوصف"
+          />
+
+          <label className="text-[#085E9C] font-bold">الصورة</label>
+          <div
+            className="border border-[#085E9C] flex justify-center items-center h-40 cursor-pointer rounded"
+            onClick={handleImageClick}
+          >
+            {image ? (
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Preview"
+                className="w-[120px] h-[120px] object-cover"
+              />
+            ) : (
+              <img
+                src="/images/group/img.png"
+                alt="Placeholder"
+                className="w-[60px] h-[60px]"
+              />
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              className="hidden"
+            />
+          </div>
+
+          <label className="text-[#085E9C] font-semibold text-lg flex items-center gap-x-2">
+            نشط
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+              className="w-4 h-4"
+            />
+          </label>
+
+          <div className="flex justify-between gap-2 pt-2">
+            <button
+              type="submit"
+              className="flex-1 bg-[#085E9C] text-white rounded p-2 flex justify-center items-center gap-x-2"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
+                  <span>جارٍ الحفظ...</span>
+                </>
+              ) : (
+                "حفظ"
+              )}
+            </button>
+
+            <button
+              type="reset"
+              onClick={() => {
+                setName("");
+                setDescription("");
+                setImage(null);
+                setSelectedGame("");
+              }}
+              className="flex-1 bg-[#ff426e] text-white rounded p-2"
+            >
+              إلغاء
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 border border-[#085E9C] text-[#085E9C] rounded p-2"
+            >
+              إغلاق
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AddNewCategories;

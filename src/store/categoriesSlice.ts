@@ -1,156 +1,216 @@
-import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+// src/store/categoriesSlice.ts
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import { useGetData } from "../hooks/useGetData";
 import { useInUpdateData } from "../hooks/useUpdateData";
-import {  useGetDataToken } from "../utils/api";
+import { useGetDataToken } from "../utils/api";
 import useDeleteData from "../hooks/useDeleteData";
-import  {useInsertDataWithImage}  from "../hooks/useInsertData";
+import { useInsertDataWithImage } from "../hooks/useInsertData";
 
-interface CategoryData {
-  data: any;
- name: string;
- description: string;
-  image: string;
+// ==================== Types ====================
+export interface Category {
+  id: number;
+  name: string;
+  description: string | null;
+  image: string | null;
   is_active: boolean;
+  games_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CategoriesResponse {
+  data: Category[];
+  links: {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: Array<{ url: string | null; label: string; active: boolean }>;
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 interface CategoryState {
-  category: CategoryData | null;
-  categories :  CategoryData | null;
+  category: Category | null;
+  categories: CategoriesResponse | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: CategoryState = {
   category: null,
-  categories:null,
+  categories: null,
   loading: false,
   error: null,
 };
 
-// ================ getCategory ===============
+// ==================== Thunks ====================
+
+// ===== Get single category =====
 export const getCategory = createAsyncThunk<
-  CategoryData,
-  { id: string }, // argument type
+  Category,
+  { id: string },
   { rejectValue: string }
->(
-  "category/getCategory",
-  async ({ id }, thunkAPI) => {
-    try {
-      const res = await useGetData<CategoryData>(`admin/categories/${id}`);
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "getCategory failed");
-    }
+>("category/getCategory", async ({ id }, thunkAPI) => {
+  try {
+    const res = await useGetData<Category>(`admin/categories/${id}`);
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getCategory failed"
+    );
   }
-);
+});
 
-
-// ================ getCategory ===============
+// ===== Get all categories with pagination =====
 export const getCategories = createAsyncThunk<
-  CategoryData,
- void,
+  CategoriesResponse,
+  number | void,
   { rejectValue: string }
->(
-  "category/getCategories",
-  async (_, thunkAPI) => {
-    try {
-      const res = await useGetDataToken<CategoryData>(`admin/categories`);
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "getCategories failed");
-    }
+>("category/getCategories", async (page = 1, thunkAPI) => {
+  try {
+    const res = await useGetDataToken<CategoriesResponse>(
+      `admin/categories?page=${page}`
+    );
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getCategories failed"
+    );
   }
-);
+});
 
-
-// ========================== Create Category ==========================
-export const addCategory = createAsyncThunk<CategoryData, FormData>(
-  "category/addCategory",
-  async (formData, thunkAPI) => {
-    try {
-      const data = await useInsertDataWithImage<CategoryData>("admin/categories", formData);
-       thunkAPI.dispatch(getCategories());
-      return data;
-    } catch (error) {
-      console.error(" Error adding Category:", error);
-      return thunkAPI.rejectWithValue("فشل في إضافة التصنيف");
-    }
+// ===== Add category =====
+export const addCategory = createAsyncThunk<
+  Category,
+  FormData,
+  { rejectValue: string }
+>("category/addCategory", async (formData, thunkAPI) => {
+  try {
+    const res = await useInsertDataWithImage<Category>(
+      "admin/categories",
+      formData
+    );
+    thunkAPI.dispatch(getCategories()); // refresh list
+    return res;
+  } catch (error) {
+    console.error("Error adding category:", error);
+    return thunkAPI.rejectWithValue("فشل في إضافة التصنيف");
   }
-);
+});
 
-
-// ========================== Update Category ==========================
+// ===== Update category =====
 export const updateCategory = createAsyncThunk<
-  CategoryData,
-  { id: string; formData: Partial<CategoryData> },
+  Category,
+  { id: string; formData: Partial<Category> },
   { rejectValue: string }
->(
-  "category/updateCategory",
-  async ({ id, formData }, thunkAPI) => {
-    try {
-      const res = await useInUpdateData<Partial<CategoryData>, CategoryData>(
-        `admin/categories/${id}`,
-        formData
-      );
-
-      thunkAPI.dispatch(getCategories());
-
-      return res; // ده نوعه CategoryData
-    } catch (error) {
-      console.error("Error updating Category:", error);
-      return thunkAPI.rejectWithValue("Failed to update Category");
-    }
+>("category/updateCategory", async ({ id, formData }, thunkAPI) => {
+  try {
+    const res = await useInUpdateData<Partial<Category>, Category>(
+      `admin/categories/${id}`,
+      formData
+    );
+    thunkAPI.dispatch(getCategories()); // refresh list
+    return res;
+  } catch (error) {
+    console.error("Error updating category:", error);
+    return thunkAPI.rejectWithValue("فشل في تعديل التصنيف");
   }
-);
+});
 
-
-
-// ========================== Delete Category ==========================
-export const deleteCategory = createAsyncThunk<string, string>(
-  "category/deleteCategory",
-  async (id, { rejectWithValue }) => {
-    try {
-      await useDeleteData(`admin/categories/${id}`);
-      return id;
-    } catch (error) {
-      console.error("Error deleting Category:", error);
-      return rejectWithValue("Failed to delete Category");
-    }
+// ===== Delete category =====
+export const deleteCategory = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>("category/deleteCategory", async (id, { rejectWithValue }) => {
+  try {
+    await useDeleteData(`admin/categories/${id}`);
+    return id;
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    return rejectWithValue("فشل في حذف التصنيف");
   }
-);
-// ================ Slice ===============
+});
+
+// ==================== Slice ====================
 const categoriesSlice = createSlice({
-  name: "category",
+  name: "categories",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // get category 
-     .addCase(getCategory.fulfilled, (state, action: PayloadAction<CategoryData>) => {
-        state.category = action.payload;
+      // Get single category
+      .addCase(
+        getCategory.fulfilled,
+        (state, action: PayloadAction<Category>) => {
+          state.category = action.payload;
+          state.loading = false;
+          state.error = null;
+        }
+      )
+      // Get all categories
+      .addCase(getCategories.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(
+        getCategories.fulfilled,
+        (state, action: PayloadAction<CategoriesResponse>) => {
+          state.categories = action.payload;
+          state.loading = false;
+          state.error = null;
+        }
+      )
+      .addCase(getCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "فشل في تحميل المجموعات";
+      })
+      // Add category
+      .addCase(addCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addCategory.fulfilled, (state) => {
         state.loading = false;
         state.error = null;
       })
-      // getCategories
-.addCase(getCategories.fulfilled, (state, action: PayloadAction<CategoryData>) => {
-        state.categories = action.payload;
+      .addCase(addCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "فشل في إضافة التصنيف";
+      })
+      // Update category
+      .addCase(updateCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateCategory.fulfilled, (state) => {
         state.loading = false;
         state.error = null;
       })
-  .addCase(addCategory.fulfilled, (state) => {
-         state.loading = false;
-        state.error = null;
-      })
-       .addCase(updateCategory.fulfilled, (state, action: PayloadAction<CategoryData>) => {
-        state.categories = action.payload;
+      .addCase(updateCategory.rejected, (state, action) => {
         state.loading = false;
-        state.error = null;
+        state.error = action.payload || "فشل في تعديل التصنيف";
       })
-         
-           
+      // Delete category
+      .addCase(
+        deleteCategory.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          if (state.categories) {
+            state.categories.data = state.categories.data.filter(
+              (cat) => cat.id.toString() !== action.payload
+            );
+          }
+        }
+      );
   },
 });
 

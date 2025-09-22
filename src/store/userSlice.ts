@@ -1,149 +1,197 @@
+// src/store/userSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
-import { useInsertData } from "../hooks/useInsertData";
+import { useGetDataToken } from "../utils/api";
 import { useInUpdateData } from "../hooks/useUpdateData";
+import useDeleteData from "../hooks/useDeleteData";
 
-interface UserItem {
+export interface UserItem {
   id: number;
   first_name: string;
   last_name: string;
   email: string;
   phone_number: string;
-  status: number;
+  status: boolean;
+  nationality?: string;
+  created_at?: string;
+  played_games?: number;
+  total_purchases_amount?: number;
 }
 
-interface UsersResponse {
+export interface UsersResponse {
   success: boolean;
-  status: number;
+  status: boolean;
   message: string;
-  data: {
+  data: UserItem[];
+  links: {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
     current_page: number;
-    data: UserItem[];
+    from: number;
     last_page: number;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    path: string;
     per_page: number;
+    to: number;
     total: number;
   };
 }
 
 interface UserState {
   users: UsersResponse | null;
-  user: UsersResponse | null;
   loading: boolean;
   error: string | null;
+  currentPage: number;
+  searchQuery: string;
 }
 
 const initialState: UserState = {
   users: null,
-  user: null,
   loading: false,
   error: null,
+  currentPage: 1,
+  searchQuery: "",
 };
 
 // ==================== getUser ====================
-export const getUser = createAsyncThunk<UsersResponse, number, { rejectValue: string }>(
-  "user/getUser",
-  async (page, thunkAPI) => {
-    try {
-      const res = await useGetDataToken<UsersResponse>(`admin/users?page=${page}`);
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "getUser failed");
-    }
+export const getUser = createAsyncThunk<
+  UsersResponse,
+  { page?: number; search?: string },
+  { rejectValue: string }
+>("user/getUser", async ({ page = 1, search = "" }, thunkAPI) => {
+  try {
+    const query = search ? `&filter[search]=${search}` : "";
+    const res = await useGetDataToken<UsersResponse>(
+      `admin/users?page=${page}${query}`
+    );
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getUser failed"
+    );
   }
-);
-
-
-// ==================== createUser ====================
-export const createUser = createAsyncThunk<UsersResponse, UsersResponse, { rejectValue: string }>(
-  "user/createUser",
-  async (userData, thunkAPI) => {
-    try {
-      const res = await useInsertData<UsersResponse>(`admin/users`, userData);
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "createUser failed");
-    }
-  }
-);
+});
 
 // ==================== updateUser ====================
 export const updateUser = createAsyncThunk<
-  UsersResponse,
-  { id: string; formData: Partial<UsersResponse> },
+  UserItem,
+  { id: string; status: boolean },
   { rejectValue: string }
->(
-  "user/updateUser",
-  async ({ id, formData }, thunkAPI) => {
-    try {
-      const res = await useInUpdateData<Partial<UsersResponse>, UsersResponse>(
-        `admin/users/${id}`,
-        formData
-      );
-
-      thunkAPI.dispatch(getUser(1));
-
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(
-        err.response?.data.message || "updateUser failed"
-      );
-    }
+>("user/updateUser", async ({ id, status }, thunkAPI) => {
+  try {
+    // useInUpdateData بيرجع الشكل: { success, status, message, data }
+    const res = await useInUpdateData<{ status: boolean }, { data: UserItem }>(
+      `admin/users/${id}`,
+      { status }
+    );
+    return res.data; // ✅ فقط الـ user updated
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "updateUser failed"
+    );
   }
-);
+});
 
-
-
-
-
+// ==================== deleteUser ====================
+export const deleteUser = createAsyncThunk<
+  number, // بنرجع الـ id المحذوف
+  string, // id المستخدم للحذف
+  { rejectValue: string }
+>("user/deleteUser", async (id, thunkAPI) => {
+  try {
+    // useDeleteData بيرجع الشكل: { success, status, message }
+    await useDeleteData(`admin/users/${id}`);
+    return Number(id); // نرجع id عشان نحذفه من ال state
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "deleteUser failed"
+    );
+  }
+});
 
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    setSearchQuery: (state, action: PayloadAction<string>) => {
+      state.searchQuery = action.payload;
+    },
+  },
   extraReducers: (builder) => {
-    // ===== GET =====
     builder
+      // ===== GET =====
       .addCase(getUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getUser.fulfilled, (state, action: PayloadAction<UsersResponse>) => {
-        state.users = action.payload;
-        state.loading = false;
-      })
+      .addCase(
+        getUser.fulfilled,
+        (state, action: PayloadAction<UsersResponse>) => {
+          state.users = action.payload;
+          state.loading = false;
+          state.currentPage = action.payload.meta.current_page;
+        }
+      )
       .addCase(getUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Error fetching user";
-      });
+        state.error = action.payload || "Error fetching users";
+      })
 
-    // ===== CREATE =====
-    builder
-      .addCase(createUser.pending, (state) => {
+      // ===== UPDATE =====
+      .addCase(updateUser.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(createUser.fulfilled, (state, action) => {
-        state.users = action.payload;
+      .addCase(
+        updateUser.fulfilled,
+        (state, action: PayloadAction<UserItem>) => {
+          if (state.users) {
+            state.users = {
+              ...state.users,
+              data: state.users.data.map((u) =>
+                u.id === action.payload.id ? { ...u, ...action.payload } : u
+              ),
+            };
+          }
+          state.loading = false;
+        }
+      )
+      .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
-      })
-      .addCase(createUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || "Error creating user";
+        state.error = action.payload || "Error updating user";
       });
 
-    // ===== UPDATE =====
+    // ===== DELETE =====
     builder
-      .addCase(updateUser.fulfilled, (state, action) => {
-        state.user = { ...state.user, ...action.payload };
+      .addCase(deleteUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteUser.fulfilled, (state, action: PayloadAction<number>) => {
+        if (state.users) {
+          state.users.data = state.users.data.filter(
+            (u) => u.id !== action.payload
+          );
+        }
         state.loading = false;
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Error deleting user";
       });
-
-    
   },
 });
 
+export const { setSearchQuery } = userSlice.actions;
 export default userSlice.reducer;
-

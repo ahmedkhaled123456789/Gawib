@@ -2,21 +2,15 @@ import "./index.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
- import { Provider } from "react-redux";
+import { Provider } from "react-redux";
 import store from "./store/index.ts";
-import { ToastContainer } from "react-toastify";
+import { Toaster } from "sonner";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <Provider store={store}>
-      <ToastContainer
-        theme="light"
-        position="top-right"
-        autoClose={3000}
-        closeOnClick
-        pauseOnHover={false}
-      />
-         <App />
-     </Provider>
+      <Toaster position="top-center" />
+      <App />
+    </Provider>
   </React.StrictMode>
 );

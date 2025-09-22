@@ -1,10 +1,11 @@
- 
- export interface ApiResponse<T> {
+export interface ApiResponse<T> {
   success: boolean;
   status: number;
   locale: string;
   message: string;
   data: T;
+  links?: any; 
+  meta?: any; 
 }
 
 export interface Paginated<T> {
@@ -77,7 +78,6 @@ export interface Payment {
   package: PaymentPackage;
 }
 
-
 export interface PaymentPackage {
   id: number;
   name: string;
@@ -109,5 +109,3 @@ export interface Payment {
   receiver: PaymentUser | null;
   package: PaymentPackage;
 }
-
-

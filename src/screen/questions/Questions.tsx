@@ -8,506 +8,263 @@ import AddQuestion from "./AddQuestion";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { getQuestions, updateQuestion } from "../../store/questionsSlice";
- 
 
-
-const ProductRow = ({ product,setSelectedImg,setSelectedId,handleConfirmStatus, index ,setShowPriceModal}) => {
-    
+const ProductRow = ({
+  product,
+  setSelectedImg,
+  setSelectedId,
+  handleConfirmStatus,
+  index,
+  setShowPriceModal,
+}) => {
   return (
     <tr key={product._id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
       <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.game_name}</div></Link>
+        <Link to={`/productDetails/${product._id}`}>
+          <div className="w-20 truncate">{product.game_name}</div>
+        </Link>
       </td>
-<td className="px-4 py-2 text-gray-700">
-  <div className="w-72">{product?.question?.text}</div>
-</td>
-
-<td className="px-4 py-2 text-gray-700">
-  <div className="w-72">{product?.answer?.text}</div>
-</td>
-      <td className="px-4 py-2 text-white"><div className={`w-16 px-4 py-1 rounded ${
-    product.points === 200
-      ? "bg-[#309222]"
-      : product.points === 400
-      ? "bg-[#9647c4]"
-      : "bg-[#ae1113]"
-  }`}>
-        
-        {product.points}</div></td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.see || "سنوات 2"}</div></td>
-            <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.admin|| "محمد الناصر"}</div></td>
-  
-         <td className="px-4 py-2">
-            <div className="flex  items-center justify-center w-40 gap-2">
-                <span
-  className="p-1 border cursor-pointer rounded bg-[#085E9C]"
-  onClick={() => {
-    setSelectedId(product._id || product.id); // حفظ الـ id
-    setShowPriceModal(true); // فتح المودال
-  }}
->
-  <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
-</span>
-            <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
-                 <img
-  src="/images/group/see.png"
-  alt={`${product.categoryName} logo`}
-  className="w-6 h-6  cursor-pointer"
-  onClick={() => setSelectedImg(product.question.image)}
-/>
-            </span>
-                          
-                    <button onClick={handleConfirmStatus} className=" text-[#085E9C] border border-[#085E9C] rounded px-3 py-1 hover:bg-[#085E9C] hover:text-white ">اعتماد</button>
-
-            </div>
+      <td className="px-4 py-2 text-gray-700 w-72 truncate">
+        {product?.question?.text}
+      </td>
+      <td className="px-4 py-2 text-gray-700 w-72 truncate">
+        {product?.answer?.text}
+      </td>
+      <td className="px-4 py-2 text-white">
+        <div
+          className={`w-16 px-4 py-1 rounded ${
+            product.points === 200
+              ? "bg-[#309222]"
+              : product.points === 400
+              ? "bg-[#9647c4]"
+              : "bg-[#ae1113]"
+          }`}
+        >
+          {product.points}
+        </div>
+      </td>
+      <td className="px-4 py-2 text-gray-700 w-20">
+        {product.see || "سنوات 2"}
+      </td>
+      <td className="px-4 py-2 text-gray-700 w-20">
+        {product.admin || "محمد الناصر"}
+      </td>
+      <td className="px-4 py-2">
+        <div className="flex items-center justify-center w-40 gap-2 flex-wrap">
+          <span
+            className="p-1 border cursor-pointer rounded bg-[#085E9C]"
+            onClick={() => {
+              setSelectedId(product._id || product.id);
+              setShowPriceModal(true);
+            }}
+          >
+            <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
+          </span>
+          <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
+            <img
+              src="/images/group/see.png"
+              alt={`${product.categoryName} logo`}
+              className="w-6 h-6 cursor-pointer"
+              onClick={() => setSelectedImg(product.question.image)}
+            />
+          </span>
+          <button
+            onClick={handleConfirmStatus}
+            className="text-[#085E9C] border border-[#085E9C] rounded px-3 py-1 hover:bg-[#085E9C] hover:text-white"
+          >
+            اعتماد
+          </button>
+        </div>
       </td>
     </tr>
   );
 };
 
 const Questions = () => {
-    const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
+  const { questions } = useSelector((state: RootState) => state.questions);
 
-  const { questions} = useSelector((state: RootState) => state.questions);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [showPriceModal, setShowPriceModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedImg, setSelectedImg] = useState<any>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
-    dispatch(getQuestions(1));
-  }, [dispatch]);
-   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-      const [showPriceModal, setShowPriceModal] = useState(false);
-      const [showModal, setShowModal] = useState(false);
-const [selectedImg, setSelectedImg] = useState(null);
-const [selectedId, setSelectedId] = useState(null);
+    const delayDebounceFn = setTimeout(() => {
+      dispatch(getQuestions({ page: 1, search: searchQuery }));
+    }, 500); // debounce 500ms
 
- 
-const handleConfirmStatus = (data: { id: string; is_active: "0" | "1" }) => {
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, dispatch]);
+
+  const handleConfirmStatus = (data: { id: string; is_active: "0" | "1" }) => {
     dispatch(
-     updateQuestion({
-       id: data.id,
-       formData: { is_active: !data.is_active,_method:"PUT", },
-     }) 
-   ); 
+      updateQuestion({
+        id: data.id,
+        formData: { is_active: !data.is_active, _method: "PUT" },
+      })
+    );
   };
- 
-const onPress = async (page) => { 
-  
-  await dispatch(getQuestions(page))
-}
+
+  const onPress = async (page: number) => {
+    await dispatch(getQuestions({ page, search: searchQuery }));
+  };
 
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
-       
-
- 
- {/* Header Controls */}
-    {/* Header */}
-     
-<div className="flex  p-4  bg-white md:flex-row items-center justify-between gap-2 ">
-    <div className="flex gap-2 items-center w-full md:w-auto">
-          <div className="text-md w-32 font-bold text-[#085E9C]">الأسئلة المعتمدة    </div>
- {/* Search */}
-          <div className="relative w-full md:w-48 border rounded-md  border-[#085E9C]">
-            <input
-              type="text"
-              placeholder="بحث"
-              value={searchQuery}
-                           onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full py-2 pl-8 pr-4 border border-gray-300 rounded-md  focus:outline-none  "
+        {/* Header */}
+        <div className="flex flex-col md:flex-row p-4 bg-white items-start md:items-center justify-between gap-2">
+          <div className="flex flex-col md:flex-row gap-2 items-start md:items-center w-full md:w-auto">
+            <div className="text-md w-32 font-bold text-[#085E9C]">
+              الأسئلة المعتمدة
+            </div>
+            <div className="relative w-full md:w-48 border rounded-md border-[#085E9C]">
+              <input
+                type="text"
+                placeholder="ابحث ب السوال"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full py-2 pl-8 pr-4 border border-gray-300 rounded-md focus:outline-none"
+              />
+              <FiSearch className="absolute left-3 top-3 text-gray-500" />
+            </div>
+            <CustomDropdown
+              options={[
+                { value: "", label: "الأحدث" },
+                { value: "الفئة", label: "الفئة" },
+                { value: "المشرف", label: "المشرف" },
+              ]}
+              selected={statusFilter}
+              onChange={setStatusFilter}
             />
-            <FiSearch className="absolute left-3 top-3 text-gray-500" />
           </div>
 
-          {/* Dropdown */}
-        <CustomDropdown
-  options={[
-    { value: "", label: "الأحدث  " },
-    { value: "الفئة", label: "الفئة" },
-    { value: "  المشرف  ", label: " المشرف  " },
-        
+          {/* Points */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[#ffc629] font-bold border bg-[#085E9C] border-[#085E9C] rounded px-4 py-2">
+              200
+            </span>
+            <span className="text-[#ffc629] font-bold border border-[#085E9C] rounded px-4 py-2">
+              400
+            </span>
+            <span className="text-[#ffc629] font-bold border border-[#085E9C] rounded px-4 py-2">
+              600
+            </span>
+            <span className="text-[#085E9C] flex gap-1 border border-[#085E9C] rounded p-2">
+              <span className="border border-[#085E9C] rounded px-3"></span>
+              <span className="text-[#085E9C] border border-[#085E9C] rounded px-3">
+                اعتماد
+              </span>
+            </span>
+          </div>
 
-  ]}
-  selected={statusFilter}
-  onChange={setStatusFilter}
-/>
-    </div>
-    <div className="flex items-center gap-2 ">
-      <span className="text-[#ffc629] font-bold   border bg-[#085E9C] border-[#085E9C] rounded px-4 py-2 " >200</span>
-      <span className="text-[#ffc629]  font-bold border border-[#085E9C]  rounded px-4 py-2 ">400</span>
-      <span className="text-[#ffc629]  font-bold border border-[#085E9C] rounded px-4 py-2 ">600</span>
-      <span className="text-[#085E9C] flex gap-1 border border-[#085E9C] rounded p-2 ">
-        <span className=" border border-[#085E9C] rounded px-3  "></span>
-        <span className=" text-[#085E9C] border border-[#085E9C] rounded px-3  ">اعتماد</span>
-      </span>
+          {/* Add Question Button */}
+          <div className="flex items-center mt-2 md:mt-0">
+            <button
+              className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-4 py-2 rounded text-sm font-medium transition-colors"
+              onClick={() => setShowPriceModal(true)}
+            >
+              إضافة سؤال
+            </button>
+          </div>
+        </div>
 
-    </div>
-      <div className="flex items-center  space-x-4 space-x-reverse">
-              <button className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-4 py-2 rounded text-sm font-medium transition-colors"
-               onClick={() => setShowPriceModal(true)}
-              >
-إضافة سؤال           </button>
-            </div>
-      </div>
+        {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm">
+          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm min-w-[700px] md:min-w-full">
             <thead className="text-center">
               <tr className="px-4 py-2 font-medium text-[#085E9C]">
                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
-           
-                <th className="px-4 py-2 font-medium">  أسم الفئة    </th>
-                 <th className="px-4 py-2 font-medium">السؤال    </th>
-                <th className="px-4 py-2 font-medium">  الجواب    </th>
-                <th className="px-4 py-2 font-medium">  النقاط      </th>
-                <th className="px-4 py-2 font-medium">التلميح      </th>
-                 <th className="px-4 py-2 font-medium">  مشرف الفئة      </th>
-
-                <th className="px-4 py-2 font-medium">إدارة  </th>
-              
+                <th className="px-4 py-2 font-medium">أسم الفئة</th>
+                <th className="px-4 py-2 font-medium">السؤال</th>
+                <th className="px-4 py-2 font-medium">الجواب</th>
+                <th className="px-4 py-2 font-medium">النقاط</th>
+                <th className="px-4 py-2 font-medium">التلميح</th>
+                <th className="px-4 py-2 font-medium">مشرف الفئة</th>
+                <th className="px-4 py-2 font-medium">إدارة</th>
               </tr>
             </thead>
-
-          <tbody className="divide-y text-center divide-gray-200">
-  {questions?.data?.length > 0 ? (
-    questions.data
-      .filter(question => question?.is_active) 
-      .map((question, index) => (
-        <ProductRow
-          key={question._id || question.id}
-          product={question}
-          index={index}
-          setShowPriceModal={setShowPriceModal}
-          handleConfirmStatus={() => handleConfirmStatus(question)}
-          setSelectedImg={setSelectedImg}
-          setSelectedId={setSelectedId}
-        />
-      ))
-  ) : (
-    <tr>
-      <td colSpan={13} className="px-4 py-2 text-gray-700">
-        لم يتم العثور على منتجات.
-      </td>
-    </tr>
-  )}
-</tbody>
-
-
+            <tbody className="divide-y text-center divide-gray-200">
+              {questions?.data?.length > 0 ? (
+                questions.data.map((question, index) => (
+                  <ProductRow
+                    key={question._id || question.id}
+                    product={question}
+                    index={index}
+                    setShowPriceModal={setShowPriceModal}
+                    handleConfirmStatus={() => handleConfirmStatus(question)}
+                    setSelectedImg={setSelectedImg}
+                    setSelectedId={setSelectedId}
+                  />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={8} className="px-4 py-2 text-gray-700">
+                    لم يتم العثور على أسئلة.
+                  </td>
+                </tr>
+              )}
+            </tbody>
           </table>
         </div>
-        {selectedImg && (
-  <div
-    className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-    onClick={() => setSelectedImg(null)} 
-  >
-    <img
-      src={selectedImg}
-      alt="عرض الصورة"
-      className="max-w-full  max-h-full rounded shadow-lg"
-      onClick={e => e.stopPropagation()} 
-    />
-  </div>
-)}
-      </div>
-{
-        questions?.meta?.last_page && (
-          <Pagination pageCount={questions?.meta?.last_page} onPress={onPress} />
-        )
-      }<CustomModal isOpen={showPriceModal}>
-        <AddQuestion selectedId={selectedId} onClose={() => setShowPriceModal(false)} />
-      </CustomModal>
 
-      <CustomModal isOpen={showModal}>
-         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-blue-300">
-       
-        <p className="text-center mb-6">  هل تريد حذف كود الخصم  </p>
-        <div className="flex justify-center gap-4">
-             <button
-            onClick={() => setShowModal(false)}
-            className={`px-4 py-2 text-white rounded bg-[#ff426e]`}
+        {/* Selected Image Modal */}
+        {selectedImg && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+            onClick={() => setSelectedImg(null)}
           >
-            حذف
-          </button>
-          <button
-            onClick={() => setShowModal(false)}
-            className="px-4 py-2 border border-blue-500 text-blue-600 rounded hover:bg-blue-50"
-          >
-            إغلاق
-          </button>
-         
-        </div>
+            <img
+              src={selectedImg}
+              alt="عرض الصورة"
+              className="max-w-full max-h-full rounded shadow-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )}
+
+        {/* Pagination */}
+        {questions?.meta?.last_page && (
+          <Pagination pageCount={questions.meta.last_page} onPress={onPress} />
+        )}
+
+        {/* Add/Edit Question Modal */}
+        <CustomModal isOpen={showPriceModal}>
+          <AddQuestion
+            selectedId={selectedId}
+            onClose={() => setShowPriceModal(false)}
+          />
+        </CustomModal>
+
+        {/* Delete Confirmation Modal */}
+        <CustomModal isOpen={showModal}>
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-blue-300">
+              <p className="text-center mb-6">هل تريد حذف السؤال؟</p>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 text-white rounded bg-[#ff426e]"
+                >
+                  حذف
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 border border-blue-500 text-blue-600 rounded hover:bg-blue-50"
+                >
+                  إغلاق
+                </button>
+              </div>
+            </div>
+          </div>
+        </CustomModal>
       </div>
-    </div>
-      </CustomModal>
-      
     </div>
   );
 };
 
 export default Questions;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { useState } from "react";
-// import { FiSearch } from "react-icons/fi";
-// import { Link } from "react-router-dom";
-// import CustomDropdown from "../../components/CustomDropdown";
-// import Pagination from "../../components/pagination/Pagination";
-// import CustomModal from "../../components/Modals/CustomModal";
-// import AddQuestion from "./AddQuestion";
- 
-// const dummyProducts = [
-//   {
-//     _id: "1",
-//     name: " دول وعوصم      ",
-//     question: "ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان والتي لا تستطيع الوصول الى البحار الا عبر حدود برية",
-//     answer: "  ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان  ",
-//     count: 200,
-//    see: "سنوات 2",
-//    admin: "محمد الناصر",
- 
-//     status: "نشط",
-//   },
-//   {
-//     _id: "2",
-//     name: " دول وعوصم      ",
-//     question: "ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان والتي لا تستطيع الوصول الى البحار الا عبر حدود برية",
-//     answer: "  ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان  ",
-//     count: 400,
-//    see: "سنوات 2",
-//    admin: "محمد الناصر",
- 
-//     status: "نشط",
-//   },
-//   {
-//     _id: "3",
-//     name: " دول وعوصم      ",
-//     question: "ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان والتي لا تستطيع الوصول الى البحار الا عبر حدود برية",
-//     answer: "  ماهي الدولة التي ليست لها حدود بحرية وتعتبر دولة حبيسة  بين أكثر من 25 دولة ومنها أوزباكستان وطاجيكستان  ",
-//     count: 600,
-//    see: " -",
-//    admin: "محمد الناصر",
- 
-//     status: "نشط",
-//   },
-  
-  
-
-//  ];
-
-// const ProductRow = ({ product, index ,setShowPriceModal}) => {
-    
-//   return (
-//     <tr key={product._id}>
-//       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
-//       <td className="px-4 py-2 text-gray-700">
-//         <Link to={`/productDetails/${product._id}`}><div className="w-20">{product.name}</div></Link>
-//       </td>
-//       <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.question}</div></td>
-//       <td className="px-4 py-2 text-gray-700"><div className="w-72">{product.answer}</div></td>
-//       <td className="px-4 py-2 text-white"><div className={`w-16 px-4 py-1 rounded ${
-//     product.count === 200
-//       ? "bg-[#309222]"
-//       : product.count === 400
-//       ? "bg-[#9647c4]"
-//       : "bg-[#ae1113]"
-//   }`}>
-        
-//         {product.count}</div></td>
-//       <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.see}</div></td>
-//             <td className="px-4 py-2 text-gray-700"><div className="w-20">{product.admin}</div></td>
-  
-//          <td className="px-4 py-2">
-//             <div className="flex  items-center justify-center w-40 gap-2">
-//                 <span className="p-1 border cursor-pointer rounded bg-[#085E9C]"
-//                  onClick={() => setShowPriceModal(true)}>
-//                 <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
-//             </span>
-//                              <span className="p-1 border cursor-pointer rounded bg-[#085E9C]" 
-//                              onClick={() => setShowPriceModal(true)}
-//                              >
-//                 <img src="/images/group/see.png" alt="" className="w-5 h-5" />
-//             </span>
-//                     <span className=" text-[#085E9C] border border-[#085E9C] rounded px-3 py-1 ">اعتماد</span>
-
-//             </div>
-//       </td>
-//     </tr>
-//   );
-// };
-
-// const Questions = () => {
-//   const [products] = useState(dummyProducts);
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [statusFilter, setStatusFilter] = useState("");
-//       const [showPriceModal, setShowPriceModal] = useState(false);
-//       const [showModal, setShowModal] = useState(false);
-
- 
-
- 
-
-
-//   return (
-//     <div className="overflow-x-hidden">
-//       <div className="mx-2">
-       
-
- 
-//  {/* Header Controls */}
-//     {/* Header */}
-     
-// <div className="flex  p-4  bg-white md:flex-row items-center justify-between gap-2 ">
-//     <div className="flex gap-2 items-center w-full md:w-auto">
-//           <div className="text-md w-32 font-bold text-[#085E9C]">الأسئلة المعتمدة    </div>
-//  {/* Search */}
-//           <div className="relative w-full md:w-48 border rounded-md  border-[#085E9C]">
-//             <input
-//               type="text"
-//               placeholder="بحث"
-//               value={searchQuery}
-//                            onChange={(e) => setSearchQuery(e.target.value)}
-//               className="w-full py-2 pl-8 pr-4 border border-gray-300 rounded-md  focus:outline-none  "
-//             />
-//             <FiSearch className="absolute left-3 top-3 text-gray-500" />
-//           </div>
-
-//           {/* Dropdown */}
-//         <CustomDropdown
-//   options={[
-//     { value: "", label: "الأحدث  " },
-//     { value: "الفئة", label: "الفئة" },
-//     { value: "  المشرف  ", label: " المشرف  " },
-        
-
-//   ]}
-//   selected={statusFilter}
-//   onChange={setStatusFilter}
-// />
-//     </div>
-//     <div className="flex items-center gap-2 ">
-//       <span className="text-[#ffc629] font-bold   border bg-[#085E9C] border-[#085E9C] rounded px-4 py-2 " >200</span>
-//       <span className="text-[#ffc629]  font-bold border border-[#085E9C]  rounded px-4 py-2 ">400</span>
-//       <span className="text-[#ffc629]  font-bold border border-[#085E9C] rounded px-4 py-2 ">600</span>
-//       <span className="text-[#085E9C] flex gap-1 border border-[#085E9C] rounded p-2 ">
-//         <span className=" border border-[#085E9C] rounded px-3  "></span>
-//         <span className=" text-[#085E9C] border border-[#085E9C] rounded px-3  ">اعتماد</span>
-//       </span>
-
-//     </div>
-//       <div className="flex items-center  space-x-4 space-x-reverse">
-//               <button className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-4 py-2 rounded text-sm font-medium transition-colors"
-//                onClick={() => setShowPriceModal(true)}
-//               >
-// إضافة سؤال           </button>
-//             </div>
-//       </div>
-//         <div className="overflow-x-auto">
-//           <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm">
-//             <thead className="text-center">
-//               <tr className="px-4 py-2 font-medium text-[#085E9C]">
-//                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
-           
-//                 <th className="px-4 py-2 font-medium">  أسم الفئة    </th>
-//                  <th className="px-4 py-2 font-medium">السؤال    </th>
-//                 <th className="px-4 py-2 font-medium">  الجواب    </th>
-//                 <th className="px-4 py-2 font-medium">  النقاط      </th>
-//                 <th className="px-4 py-2 font-medium">التلميح      </th>
-//                  <th className="px-4 py-2 font-medium">  مشرف الفئة      </th>
-
-//                 <th className="px-4 py-2 font-medium">إدارة  </th>
-              
-//               </tr>
-//             </thead>
-
-//             <tbody className="divide-y text-center divide-gray-200">
-//               {products.length > 0 ? (
-//                 products.map((product, index) => (
-//                   <ProductRow key={product._id} product={product} index={index}   setShowPriceModal={setShowPriceModal} />
-//                 ))
-//               ) : (
-//                 <tr>
-//                   <td colSpan={13} className="px-4 py-2 text-gray-700">
-//                     لم يتم العثور على منتجات.
-//                   </td>
-//                 </tr>
-//               )}
-//             </tbody>
-//           </table>
-//         </div>
-//       </div>
-//               <Pagination pageCount={6} onPress={1} />
-// <CustomModal isOpen={showPriceModal}>
-//         <AddQuestion onClose={() => setShowPriceModal(false)} />
-//       </CustomModal>
-
-//       <CustomModal isOpen={showModal}>
-//          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-//       <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-blue-300">
-       
-//         <p className="text-center mb-6">  هل تريد حذف كود الخصم  </p>
-//         <div className="flex justify-center gap-4">
-//              <button
-//             onClick={() => setShowModal(false)}
-//             className={`px-4 py-2 text-white rounded bg-[#ff426e]`}
-//           >
-//             حذف
-//           </button>
-//           <button
-//             onClick={() => setShowModal(false)}
-//             className="px-4 py-2 border border-blue-500 text-blue-600 rounded hover:bg-blue-50"
-//           >
-//             إغلاق
-//           </button>
-         
-//         </div>
-//       </div>
-//     </div>
-//       </CustomModal>
-      
-//     </div>
-//   );
-// };
-
-// export default Questions;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

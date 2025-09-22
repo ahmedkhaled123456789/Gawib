@@ -1,410 +1,255 @@
-
-import { useState ,useEffect} from "react";
+import { useState, useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { Loader2, Trash2Icon } from "lucide-react";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
-import CustomModal from "../../components/CustomModal";
 import Dashboard from "../../components/Dashboard/Dashboard";
- import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { getUser, updateUser } from "../../store/userSlice";
+import {
+  getUser,
+  updateUser,
+  setSearchQuery,
+  deleteUser,
+} from "../../store/userSlice";
 import { getCounts } from "../../store/adminSlice";
 
-const ProductRow = ({ product, index ,onStatusClick}) => {
-  return (
-    <tr key={product._id}>
-      <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
-      <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product._id}`}><div className="w-24">{product.first_name}{product.last_name}</div></Link>
-      </td>
-      <td className="px-4 py-2 text-gray-700"><div className="w-40">{product.email}</div></td>
-      <td className="px-4 py-2 text-gray-700">{product.phone_number}</td>
-      <td className="px-4 py-2 text-gray-700">{product.nationality&& "_"}</td>
-            <td className="px-4 py-2 text-gray-700">{product.created_at}</td>
+import Loader from "../../components/Loader";
+import { toast } from "sonner";
 
-            <td className="px-4 py-2 text-gray-700"><div className="w-24">{product.played_games&& "_"}</div></td>
-            <td className="px-4 py-2    text-gray-700"> <div className="w-14"> <div  className={` w-2 h-2 p-2  rounded-md ${
-            product.status === 1 ? 'bg-[#588a17]' : 'bg-transparent'
+const ProductRow = ({
+  product,
+  index,
+  onStatusClick,
+  onDeleteClick,
+  loadingStatus,
+  loadingDelete,
+}: any) => (
+  <tr key={product.id}>
+    <td className="px-2 py-2 font-medium text-gray-900">{index + 1}</td>
+    <td className="px-2 py-2 text-gray-700">
+      <Link to={`/productDetails/${product.id}`}>
+        <div className="w-24 truncate">
+          {product.first_name} {product.last_name}
+        </div>
+      </Link>
+    </td>
+    <td className="px-2 py-2 text-gray-700 truncate">{product.email}</td>
+    <td className="px-2 py-2 text-gray-700 truncate">{product.phone_number}</td>
+    <td className="px-2 py-2 text-gray-700">{product.nationality || "_"}</td>
+    <td className="px-2 py-2 text-gray-700">{product.created_at || "_"}</td>
+    <td className="px-2 py-2 text-gray-700">{product.played_games ?? "_"}</td>
+    <td className="px-2 py-2 text-gray-700">
+      <div className="w-14">
+        <div
+          className={`w-2 h-2 p-2 rounded-md ${
+            product.status ? "bg-[#5da401]" : "bg-transparent"
           }`}
-              ></div></div>
-             
-            </td>
+        ></div>
+      </div>
+    </td>
+    <td className="px-2 py-2 text-gray-700">
+      {product.total_purchases_amount ?? "_"}
+    </td>
+    <td className="px-2 py-2 flex gap-2 justify-center">
+      {/* زر الحالة */}
+      <button
+        onClick={onStatusClick}
+        className={`flex-1 min-w-[70px] px-3 py-1 rounded font-semibold flex items-center justify-center gap-1 text-xs md:text-sm ${
+          product.status ? "bg-[#5da401]" : "bg-[#ff426e]"
+        }`}
+        disabled={loadingStatus}
+      >
+        {loadingStatus ? (
+          <Loader2 className="animate-spin h-4 w-4" />
+        ) : product.status ? (
+          "نشط"
+        ) : (
+          "موقوف"
+        )}
+      </button>
 
-      <td className="px-4 py-2 text-gray-700"> <div className="w-32">{product.total_purchases_amount}</div></td>
-       <td  className="px-4 py-2 text-white">
-  <button
-          onClick={onStatusClick}
-          className={`px-4 py-2 w-full rounded font-semibold cursor-pointer ${
-            product.status === 1 ? 'bg-[#588a17]' : 'bg-[#ff426e]'
-          }`}
-        >
-          {product.status===1 ?"نشط":"موقوف"}
-        </button>
-  
-</td>
-    </tr>
-  );
-};
+      {/* زر الحذف */}
+      <button
+        onClick={onDeleteClick}
+        className="flex-1 min-w-[70px] px-3 py-1 rounded bg-[#d31d48] text-white font-semibold text-xs md:text-sm hover:bg-[#d9363e] transition flex items-center justify-center"
+        disabled={loadingDelete}
+      >
+        {loadingDelete ? (
+          <Loader2 className="animate-spin h-4 w-4" />
+        ) : (
+          <Trash2Icon />
+        )}
+      </button>
+    </td>
+  </tr>
+);
 
 const AllUsers = () => {
- const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
+  const { users, loading, currentPage, searchQuery } = useSelector(
+    (state: RootState) => state.user
+  );
 
-  const { users, loading } = useSelector((state: RootState) => state.user);
-    const { counts } = useSelector((state: RootState) => state.admin);
+  const { counts } = useSelector((state: RootState) => state.admin);
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  // === loading منفصل لكل عملية ===
+  const [loadingStatusIds, setLoadingStatusIds] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [loadingDeleteIds, setLoadingDeleteIds] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [sortOption, setSortOption] = useState<string>("");
+
   useEffect(() => {
-    dispatch(getUser(1));
-        dispatch(getCounts());
+    dispatch(getUser({ page: currentPage, search: searchQuery }));
+    // جلب الـ counts
+    dispatch(getCounts());
+  }, [dispatch, currentPage, searchQuery]);
 
-  }, [dispatch]);
+  const handleSearch = (e: any) => dispatch(setSearchQuery(e.target.value));
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const handleStatusClick = (product) => {
-    setSelectedProduct(product);
-    setModalOpen(true);
+  // ===== تغيير الحالة =====
+  const handleStatusClick = async (product: any) => {
+    try {
+      setLoadingStatusIds((prev) => ({ ...prev, [product.id]: true }));
+      await dispatch(
+        updateUser({ id: product.id, status: !product.status })
+      ).unwrap();
+      toast.success(
+        `تم تحديث حالة المستخدم: ${!product.status ? "نشط" : "موقوف"}`
+      );
+    } catch (err: any) {
+      toast.error(err?.message || "حدث خطأ أثناء تحديث الحالة");
+    } finally {
+      setLoadingStatusIds((prev) => ({ ...prev, [product.id]: false }));
+    }
   };
 
- const handleConfirmStatus = (data: { id: string; status: 0 | 1 }) => {
-   dispatch(
-     updateUser({
-       id: data.id,
-       formData: { status: data.status },
-     }) 
-   );
-   setModalOpen(false);
- };
+  // ===== حذف المستخدم باستخدام toast =====
+  const handleDeleteUser = (id: string) => {
+    toast("هل أنت متأكد من حذف المستخدم؟", {
+      action: {
+        label: "نعم",
+        onClick: async () => {
+          try {
+            setLoadingDeleteIds((prev) => ({ ...prev, [id]: true }));
+            await dispatch(deleteUser(id)).unwrap();
+            toast.success("تم حذف المستخدم بنجاح");
+          } catch (err: any) {
+            toast.error(err?.message || "حدث خطأ أثناء حذف المستخدم");
+          } finally {
+            setLoadingDeleteIds((prev) => ({ ...prev, [id]: false }));
+          }
+        },
+      },
+    });
+  };
 
-const onPress = async (page) => { 
-  
-  await dispatch(getUser(page))
-}
+  const onPress = async (page: number) => {
+    await dispatch(getUser({ page, search: searchQuery }));
+  };
+
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
+        <Dashboard counts={counts} />
+        {/* Header */}
+        <div className="flex flex-col w-full md:flex-row p-4 bg-white items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row gap-4 items-center w-full md:w-auto">
+            <div className="text-xl font-bold text-[#085E9C]">المستخدمين</div>
 
-<div className="">
-         <Dashboard counts={counts}/>
-        </div>
- {/* Header Controls */}
-      <div className="flex flex-col p-4  bg-white md:flex-row items-center justify-between gap-4 ">
-    <div className="flex gap-4 items-center w-full md:w-auto">
-          <div className="text-xl ml-16 font-bold text-[#085E9C]">المستخدمين</div>
- {/* Search */}
-          <div className="relative w-full md:w-64 border rounded-md  border-[#085E9C]">
-            <input
-              type="text"
-              placeholder="بحث"
-              value={searchQuery}
-              onChange={handleSearch}
-              className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-md  focus:outline-none  "
+            <div className="relative w-full max-w-xs md:w-64 border rounded-md border-[#085E9C]">
+              <input
+                type="number"
+                placeholder="البحث برقم الهاتف"
+                value={searchQuery}
+                onChange={handleSearch}
+                className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-md focus:outline-none"
+              />
+              <FiSearch className="absolute left-3 top-3 text-gray-500" />
+            </div>
+
+            <CustomDropdown
+              options={[
+                { value: "", label: "الأحدث" },
+                { value: "الجنسية", label: "الجنسية" },
+                { value: "تاريخ التسجيل", label: "تاريخ التسجيل" },
+                { value: "عدد الألعاب", label: "عدد الألعاب" },
+                { value: "المشتريات", label: "المشتريات" },
+                { value: "حالة الحساب", label: "حالة الحساب" },
+              ]}
+              selected={sortOption}
+              onChange={(value) => setSortOption(value)}
             />
-            <FiSearch className="absolute left-3 top-3 text-gray-500" />
           </div>
 
-          {/* Dropdown */}
-        <CustomDropdown
-  options={[
-    { value: "", label: "الأحدث  " },
-    { value: "الجنسية", label: "الجنسية" },
-    { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-        { value: " عدد الألعاب", label: " عدد الألعاب" },
-    { value: " المشتريات", label: " المشتريات" },
-    { value: "  حالة الحساب", label: "  حالة الحساب" },
+          <div>
+            <Link
+              to="/add-user"
+              className="px-4 py-2 text-white bg-[#085E9C] rounded-md text-lg font-medium hover:bg-[#064a7c] transition-colors"
+            >
+              إضافة مستخدم
+            </Link>
+          </div>
+        </div>
 
-  ]}
-  selected={statusFilter}
-  onChange={setStatusFilter}
-/>
-    </div>
-        
-      </div>
+        {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm">
+          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm min-w-[700px]">
             <thead className="text-right">
-              <tr className="px-4 py-2 font-medium text-center text-[#085E9C]">
-                <th className="px-4 w-auto py-2 font-medium">رقم</th>
-                <th className="px-4 py-2  font-medium">الأسم  </th>
-                <th className="px-4 py-2 font-medium">البريد الإلكتروني</th>
-                <th className="px-4 py-2 font-medium">رقم الجوال  </th>
-                <th className="px-4 py-2 font-medium">الجنسية</th>
-                <th className="px-4 py-2 font-medium">تاريخ التسجيل</th>
-                <th className="px-4 py-2 font-medium">عدد الألعاب  </th>
-                <th className="px-4 py-2 font-medium">نشط الان    </th>
-                <th className="px-4 py-2 font-medium"> إجمالي المشتريات  </th>
-                <th className="px-4 py-2 font-medium">حالة الحساب</th>
-              
+              <tr className="px-2 py-2 font-medium text-center text-[#085E9C] whitespace-nowrap">
+                <th>رقم</th>
+                <th>الأسم</th>
+                <th>البريد الإلكتروني</th>
+                <th>رقم الجوال</th>
+                <th>الجنسية</th>
+                <th>تاريخ التسجيل</th>
+                <th>عدد الألعاب</th>
+                <th>نشط الان</th>
+                <th>إجمالي المشتريات</th>
+                <th>الإجراءات</th>
               </tr>
             </thead>
-
             <tbody className="divide-y text-center divide-gray-200">
-             {users?.data.data.length > 0 ? (
-  users?.data.data.map((product, index) => (
-    <ProductRow
-      key={product.id}
-      product={product}
-      index={index}
-      onStatusClick={() => handleStatusClick(product)}
-    />
-  ))
-) : loading ? (
-  <tr><td colSpan={13}>جاري التحميل...</td></tr>
-) : (
-  <tr><td colSpan={13}>لم يتم العثور على مستخدمين.</td></tr>
-)}
-
+              {users?.data?.length ? (
+                users.data.map((product, index) => (
+                  <ProductRow
+                    key={product.id}
+                    product={product}
+                    index={index}
+                    onStatusClick={() => handleStatusClick(product)}
+                    onDeleteClick={() =>
+                      handleDeleteUser(product.id.toString())
+                    }
+                    loadingStatus={!!loadingStatusIds[product.id]}
+                    loadingDelete={!!loadingDeleteIds[product.id]}
+                  />
+                ))
+              ) : loading ? (
+                <tr>
+                  <td colSpan={10}>
+                    <Loader />
+                  </td>
+                </tr>
+              ) : (
+                <tr>
+                  <td colSpan={10}>لم يتم العثور على مستخدمين.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {users?.meta?.last_page && (
+          <Pagination pageCount={users.meta.last_page} onPress={onPress} />
+        )}
       </div>
-      {
-        users?.data?.last_page && (
-          <Pagination pageCount={users?.data?.last_page} onPress={onPress} />
-        )
-      }
-{selectedProduct && (
-  <CustomModal
-    isOpen={modalOpen}
-    onClose={() => setModalOpen(false)}
-    onConfirm={handleConfirmStatus}
-    status={selectedProduct.status} 
-    id={selectedProduct.id}
-  />
-)}
     </div>
   );
 };
 
 export default AllUsers;
-
-
-
-// import { useState } from "react";
-// import { FiSearch } from "react-icons/fi";
-// import { Link } from "react-router-dom";
-// import CustomDropdown from "../../components/CustomDropdown";
-// import Pagination from "../../components/pagination/Pagination";
-// import CustomModal from "../../components/CustomModal";
-// import Dashboard from "../../components/Dashboard/Dashboard";
- 
-// const dummyProducts = [
-//   {
-//     _id: "1",
-//     name: " علي حسين",
-//     email: "ماهر اليوعلي ماهر ",
-//     phone: "966505963256",
-//     nationality: "السعودية",
-//     Date: "#27/08/2025",
-//     status: "نشط",
-//     count: 10,
-//     total: 1000,
-  
-//   },
-// {
-//     _id: "2",
-//     name: " علي حسين",
-//     email: "ماهر اليوعلي ماهر    ",
-//     phone: "966505963256",
-//     nationality: "سوريا",
-//     Date: "#27/08/2025",
-//     status: "نشط",
-//     count: 20,
-//     total: 1000,
-  
-//   },
-//   {
-//     _id: "3",
-//     name: " علي حسين",
-//     email: "ماهر اليوعلي ماهر    ",
-//     phone: "966505963256",
-//     nationality: "الولايات المتحدة",
-//     Date: "#27/08/2025",
-//     status: "موقوف",
-//     count: 1,
-//     total: 3000,
-  
-//   },
-//  ];
-
-// const ProductRow = ({ product, index ,onStatusClick}) => {
-//   return (
-//     <tr key={product._id}>
-//       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
-//       <td className="px-4 py-2 text-gray-700">
-//         <Link to={`/productDetails/${product._id}`}><div className="w-24">{product.name}</div></Link>
-//       </td>
-//       <td className="px-4 py-2 text-gray-700"><div className="w-40">{product.email}</div></td>
-//       <td className="px-4 py-2 text-gray-700">{product.phone}</td>
-//       <td className="px-4 py-2 text-gray-700">{product.nationality}</td>
-//             <td className="px-4 py-2 text-gray-700">{product.Date}</td>
-
-//             <td className="px-4 py-2 text-gray-700"><div className="w-24">{product.count}</div></td>
-//             <td className="px-4 py-2    text-gray-700"> <div className="w-14"> <div  className={` w-2 h-2 p-2  rounded-md ${
-//             product.status === 'نشط' ? 'bg-[#588a17]' : 'bg-transparent'
-//           }`}
-//               ></div></div>
-             
-//             </td>
-
-//       <td className="px-4 py-2 text-gray-700"> <div className="w-32">{product.total}</div></td>
-//        <td  className="px-4 py-2 text-white">
-//   <button
-//           onClick={onStatusClick}
-//           className={`px-4 py-2 w-full rounded font-semibold cursor-pointer ${
-//             product.status === 'نشط' ? 'bg-[#588a17]' : 'bg-[#ff426e]'
-//           }`}
-//         >
-//           {product.status}
-//         </button>
-  
-// </td>
-//     </tr>
-//   );
-// };
-
-// const AllUsers = () => {
-//   const [products] = useState(dummyProducts);
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [statusFilter, setStatusFilter] = useState("");
-
-//   const handleSearch = (e) => {
-//     setSearchQuery(e.target.value);
-//   };
-
-//  const [modalOpen, setModalOpen] = useState(false);
-// const [selectedProduct, setSelectedProduct] = useState(null);
-
-// const handleStatusClick = (product) => {
-//   setSelectedProduct(product);
-//   setModalOpen(true);
-// };
-
-// const handleConfirmStatus = () => {
-//    setModalOpen(false);
-//   alert(`تم تعديل حالة المستخدم ${selectedProduct?.name}`);
-// };
-
-
-//   return (
-//     <div className="overflow-x-hidden">
-//       <div className="mx-2">
-
-// <div className="">
-//          <Dashboard/>
-//         </div>
-//  {/* Header Controls */}
-//       <div className="flex flex-col p-4  bg-white md:flex-row items-center justify-between gap-4 ">
-//     <div className="flex gap-4 items-center w-full md:w-auto">
-//           <div className="text-xl ml-16 font-bold text-[#085E9C]">المستخدمين</div>
-//  {/* Search */}
-//           <div className="relative w-full md:w-64 border rounded-md  border-[#085E9C]">
-//             <input
-//               type="text"
-//               placeholder="بحث"
-//               value={searchQuery}
-//               onChange={handleSearch}
-//               className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-md  focus:outline-none  "
-//             />
-//             <FiSearch className="absolute left-3 top-3 text-gray-500" />
-//           </div>
-
-//           {/* Dropdown */}
-//         <CustomDropdown
-//   options={[
-//     { value: "", label: "الأحدث  " },
-//     { value: "الجنسية", label: "الجنسية" },
-//     { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-//         { value: " عدد الألعاب", label: " عدد الألعاب" },
-//     { value: " المشتريات", label: " المشتريات" },
-//     { value: "  حالة الحساب", label: "  حالة الحساب" },
-
-//   ]}
-//   selected={statusFilter}
-//   onChange={setStatusFilter}
-// />
-//     </div>
-        
-//       </div>
-//         <div className="overflow-x-auto">
-//           <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm">
-//             <thead className="text-right">
-//               <tr className="px-4 py-2 font-medium text-center text-[#085E9C]">
-//                 <th className="px-4 w-auto py-2 font-medium">رقم</th>
-//                 <th className="px-4 py-2  font-medium">الأسم  </th>
-//                 <th className="px-4 py-2 font-medium">البريد الإلكتروني</th>
-//                 <th className="px-4 py-2 font-medium">رقم الجوال  </th>
-//                 <th className="px-4 py-2 font-medium">الجنسية</th>
-//                 <th className="px-4 py-2 font-medium">تاريخ التسجيل</th>
-//                 <th className="px-4 py-2 font-medium">عدد الألعاب  </th>
-//                 <th className="px-4 py-2 font-medium">نشط الان    </th>
-//                 <th className="px-4 py-2 font-medium"> إجمالي المشتريات  </th>
-//                 <th className="px-4 py-2 font-medium">حالة الحساب</th>
-              
-//               </tr>
-//             </thead>
-
-//             <tbody className="divide-y text-center divide-gray-200">
-//               {products.length > 0 ? (
-//                 products.map((product, index) => (
-//                   <ProductRow key={product._id} product={product} index={index}   onStatusClick={() => handleStatusClick(product)} />
-//                 ))
-//               ) : (
-//                 <tr>
-//                   <td colSpan={13} className="px-4 py-2 text-gray-700">
-//                     لم يتم العثور على منتجات.
-//                   </td>
-//                 </tr>
-//               )}
-//             </tbody>
-//           </table>
-//         </div>
-//       </div>
-//               <Pagination pageCount={6} onPress={1} />
-// {selectedProduct && (
-//   <CustomModal
-//     isOpen={modalOpen}
-//     onClose={() => setModalOpen(false)}
-//     onConfirm={handleConfirmStatus}
-//     status={selectedProduct.status}
-//   />
-// )}
-//     </div>
-//   );
-// };
-
-// export default AllUsers;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

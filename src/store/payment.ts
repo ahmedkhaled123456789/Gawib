@@ -1,16 +1,17 @@
 // features/payment/paymentSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { ApiResponse, Paginated, Payment } from "../types/payment";
+import { ApiResponse, Payment } from "../types/payment";
 import { useGetDataToken } from "../utils/api";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
- 
-export type PaginatedPayments = ApiResponse<Paginated<Payment>>;
+
+export type PaginatedPayments = ApiResponse<Payment[]>;
+
 
 interface PaymentState {
-  payments: PaginatedPayments | null; 
-  selectedPayment: Payment | null; 
+  payments: PaginatedPayments | null;
+  selectedPayment: Payment | null;
   loading: boolean;
   error: string | null;
 }
@@ -24,23 +25,22 @@ const initialState: PaymentState = {
 
 // ============ Get All Payments ============
 export const getPayments = createAsyncThunk<
-  PaginatedPayments, 
+  PaginatedPayments,
   number,
   { rejectValue: string }
->(
-  "payments/getPayments",
-  async (page, thunkAPI) => {
-    try {
-      const res = await useGetDataToken<PaginatedPayments>(`admin/payments?page=${page}`);
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(err.response?.data.message || "getPayments failed");
-    }
+>("payments/getPayments", async (page, thunkAPI) => {
+  try {
+    const res = await useGetDataToken<PaginatedPayments>(
+      `admin/payments?page=${page}`
+    );
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getPayments failed"
+    );
   }
-);
-
-
+});
 
 // ============ Get One Payment ============
 export const getPaymentById = createAsyncThunk<
@@ -73,7 +73,7 @@ export const getPaymentById = createAsyncThunk<
 //     const err = error as AxiosError<{ message: string }>;
 //     return thunkAPI.rejectWithValue(
 //       err.response?.data.message || "createPayment failed"
-//     ); 
+//     );
 //   }
 // });
 
@@ -105,7 +105,7 @@ export const deletePayment = createAsyncThunk<
 >("payments/deletePayment", async (id, thunkAPI) => {
   try {
     const res = await useDeleteData(`admin/payments/${id}`);
-    thunkAPI.dispatch(getPayments(1)); 
+    thunkAPI.dispatch(getPayments(1));
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -122,11 +122,11 @@ const paymentSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Get All
-     .addCase(getPayments.fulfilled, (state, action) => {
-  state.payments = action.payload;    
-  state.loading = false;
-  state.error = null;
-})
+      .addCase(getPayments.fulfilled, (state, action) => {
+        state.payments = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
 
       // Get By ID
       .addCase(getPaymentById.fulfilled, (state, action) => {
@@ -134,8 +134,7 @@ const paymentSlice = createSlice({
         state.loading = false;
         state.error = null;
       })
-     
-     
+
       // Common Pending
       .addMatcher(
         (action) => action.type.endsWith("/pending"),

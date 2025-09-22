@@ -104,7 +104,7 @@ const authSlice = createSlice({
   // ✅ حفظ بيانات المستخدم (اختياري)
   const userInfo = action.payload.data?.authenticatable;
   if (userInfo) {
-    localStorage.setItem("user", JSON.stringify(userInfo));
+    localStorage.setItem("userinfo", JSON.stringify(userInfo));
   }
 })
 

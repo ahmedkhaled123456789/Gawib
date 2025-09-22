@@ -12,6 +12,7 @@ import questionsReducer from "./questionsSlice";
 import userReducer from "./userSlice";
 import adminReducer from "./adminSlice";
 import paymentReducer from "./payment";
+import userActionsReducer from "./UserActionsSlic";
 
 const store = configureStore({
   reducer: {
@@ -24,9 +25,11 @@ const store = configureStore({
     categories: categoriesReducer,
     settings: settingsReducer,
     questions: questionsReducer,
-    user:userReducer,
-    admin:adminReducer,
-    payment:paymentReducer,
+    user: userReducer,
+    admin: adminReducer,
+    payment: paymentReducer,
+
+    userActions: userActionsReducer,
   },
 });
 

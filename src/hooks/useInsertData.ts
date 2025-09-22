@@ -22,9 +22,8 @@ const useInsertData = async <T>(
   }
 };
 
-
 const useInsertData2 = async <TResponse, TParams>(
- url: string,
+  url: string,
   params: TParams,
   config?: AxiosRequestConfig
 ): Promise<TResponse> => {
@@ -39,12 +38,11 @@ const useInsertData2 = async <TResponse, TParams>(
     const res = await baseUrl.post<TResponse>(url, params, defaultConfig);
     return res.data;
   } catch (error) {
-    console.error(`Error inserting data to ${url}:`, error);
-    throw new Error("Failed to insert data");
+    console.error(`❌ Error inserting data to ${url}:`, error);
+    // هنا نرمي الخطأ الأصلي بدل ما نعمل Error جديد
+    throw error;
   }
 };
-
-
 
 const useInsertDataWithImage = async <T>(
   url: string,
@@ -55,7 +53,7 @@ const useInsertDataWithImage = async <T>(
     const mergedConfig: AxiosRequestConfig = {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
-         ...config.headers,
+        ...config.headers,
       },
       ...config,
     };
@@ -68,4 +66,4 @@ const useInsertDataWithImage = async <T>(
   }
 };
 
- export { useInsertData, useInsertDataWithImage ,useInsertData2};
+export { useInsertData, useInsertDataWithImage, useInsertData2 };
