@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
-import { getAllGamesForDropdown, createGame } from "../../store/gameSlice";
+import { createGame } from "../../store/gameSlice"; // Assuming you still use this to create the category
+import { getAllCategoriesForDropdown } from "../../store/categoriesSlice";
 import { toast } from "sonner";
 
 interface AddNewCategoriesProps {
@@ -11,9 +12,9 @@ interface AddNewCategoriesProps {
 
 const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { games } = useSelector((state: RootState) => state.game);
+  const { categories } = useSelector((state: RootState) => state.categories);
 
-  const [selectedGame, setSelectedGame] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
@@ -23,19 +24,19 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    dispatch(getAllGamesForDropdown());
+    dispatch(getAllCategoriesForDropdown());
   }, [dispatch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedGame) {
-      toast.error("يرجى اختيار اللعبة");
+    if (!selectedCategory) {
+      toast.error("يرجى اختيار الفئه");
       return;
     }
 
     const formData = new FormData();
-    formData.append("category_id", selectedGame);
+    formData.append("category_id", selectedCategory);
     formData.append("name", name);
     formData.append("description", description);
     if (image) formData.append("image", image);
@@ -43,14 +44,14 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
     formData.append("admin_id", adminId.toString());
 
     try {
-      setLoading(true); // بدأ التحميل
-      await dispatch(createGame(formData)).unwrap();
+      setLoading(true);
+      await dispatch(createGame(formData)).unwrap(); // Use correct action for creating
       toast.success("تم حفظ التصنيف بنجاح!");
       onClose();
     } catch (err) {
       toast.error("حدث خطأ أثناء حفظ التصنيف");
     } finally {
-      setLoading(false); // انتهاء التحميل
+      setLoading(false);
     }
   };
 
@@ -64,28 +65,28 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
     <div className="w-full p-5">
       <div className="bg-white rounded-md p-4 border shadow">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="text-[#085E9C] font-bold">اختر اللعبة</label>
+          <label className="text-[#085E9C] font-bold">اختر الفئه</label>
           <select
-            value={selectedGame}
-            onChange={(e) => setSelectedGame(e.target.value)}
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
             className="border border-[#085E9C] rounded px-3 py-2 text-sm outline-none"
             required
           >
-            <option value="">-- اختر لعبة --</option>
-            {games?.data?.map((game: any) => (
-              <option key={game.id} value={game.id}>
-                {game.name}
+            <option value="">-- اختر الفئه --</option>
+            {categories?.data?.map((cat: any) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
               </option>
             ))}
           </select>
 
-          <label className="text-[#085E9C] font-bold">اسم التصنيف</label>
+          <label className="text-[#085E9C] font-bold">اسم الفئه الجديد</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="border border-[#085E9C] rounded px-3 py-2 text-sm outline-none"
-            placeholder="ادخل اسم التصنيف"
+            placeholder="ادخل اسم الفئه"
             required
           />
 
@@ -157,7 +158,7 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
                 setName("");
                 setDescription("");
                 setImage(null);
-                setSelectedGame("");
+                setSelectedCategory("");
               }}
               className="flex-1 bg-[#ff426e] text-white rounded p-2"
             >

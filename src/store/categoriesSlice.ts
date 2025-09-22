@@ -91,6 +91,23 @@ export const getCategories = createAsyncThunk<
   }
 });
 
+// ===== Get all categories for dropdown =====
+export const getAllCategoriesForDropdown = createAsyncThunk<
+  CategoriesResponse,
+  number | void,
+  { rejectValue: string }
+>("category/getCategories", async (_, thunkAPI) => {
+  try {
+    const res = await useGetDataToken<CategoriesResponse>(`admin/categories`);
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getCategories failed"
+    );
+  }
+});
+
 // ===== Add category =====
 export const addCategory = createAsyncThunk<
   Category,

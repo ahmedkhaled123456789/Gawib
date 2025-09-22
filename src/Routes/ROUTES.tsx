@@ -6,7 +6,6 @@ import Categories from "../screen/categories/Categories";
 import Prices from "../screen/prices/Prices";
 import Admins from "../screen/admins/Admins";
 import Questions from "../screen/questions/Questions";
-import Posted_questions from "../screen/Posted_questions/Posted_questions";
 import SettingsPage from "../screen/settings/SettingsPage";
 import Game from "../screen/game/Game";
 import Groups from "../screen/group/Groups";
@@ -17,6 +16,8 @@ import Discount from "../screen/discount/Discount";
 import ProductDetalis from "../screen/user/ProductDetalis";
 import SocialMedia from "../screen/socialLonk/SocialMedia";
 import AddUser from "../screen/user/AddUser";
+import GamePackages from "../screen/GamePackages/GamePackages";
+import PostedQuestions from "../screen/PostedQuestions/posted-questions";
 
 export const ROUTES = [
   {
@@ -37,7 +38,8 @@ export const ROUTES = [
           { path: "prices", element: <Prices /> },
           { path: "admins", element: <Admins /> },
           { path: "questions", element: <Questions /> },
-          { path: "Posted_questions", element: <Posted_questions /> },
+          {path: "posted-questions", element: <PostedQuestions /> },
+          { path: "game-packages", element: <GamePackages /> },
           { path: "settings", element: <SettingsPage /> },
           { path: "socialMedia", element: <SocialMedia /> },
           { path: "game", element: <Game /> },

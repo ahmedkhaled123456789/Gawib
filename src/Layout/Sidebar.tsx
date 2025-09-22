@@ -2,11 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import "./Header.css";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
-import {
-  IoIosAlert,
-  IoMdClose,
-
-} from "react-icons/io";
+import { IoIosAlert, IoMdClose } from "react-icons/io";
 import { IoSettingsOutline } from "react-icons/io5";
 
 import { BiPhoneCall } from "react-icons/bi";
@@ -21,10 +17,7 @@ import {
   FaUsers,
   FaFileCircleQuestion,
 } from "react-icons/fa6";
-import {
-  RiAdminLine,
-  RiDiscountPercentLine,
-} from "react-icons/ri";
+import { RiAdminLine, RiDiscountPercentLine } from "react-icons/ri";
 import { PiQuestionMarkFill } from "react-icons/pi";
 import { TbSocial } from "react-icons/tb";
 import { LogOut } from "lucide-react";
@@ -45,26 +38,83 @@ const Sidebar: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   const handleLogout = () => {
-    localStorage.removeItem("token"); 
-        localStorage.removeItem("user");  
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
     navigate("/login");
   };
   const menuItems = [
     { icon: <FaUsers className="size-6" />, label: "المستخدمين", path: "/" },
-    { icon: <RiAdminLine className="size-6" />, label: "المشرفين", path: "/admins" },
-    { icon: <FaRegObjectUngroup className="size-6" />, label: "المجموعات", path: "/groups" },
-    { icon: <FaLayerGroup className="size-6" />, label: "الفئات", path: "/categories" },
-    { icon: <PiQuestionMarkFill className="size-6" />, label: "الأسئلة المعتمدة", path: "/questions" },
-    { icon: <FaFileCircleQuestion className="size-6" />, label: "الأسئلة المنشورة", path: "/Posted_questions" },
-    { icon: <MdOutlineCrueltyFree className="size-6" />, label: "اللعبة المجانية", path: "/game" },
-    { icon: <MdOutlinePriceChange className="size-6" />, label: "باقات الاسعار", path: "/prices" },
-    { icon: <RiDiscountPercentLine className="size-6" />, label: "كود خصم", path: "/discount" },
-    { icon: <MdOutlinePointOfSale className="size-6" />, label: "المبيعات", path: "/sales" },
-    { icon: <IoIosAlert className="size-6" />, label: "المبيعات المستردة", path: "/salesRecovered" },
-    { icon: <BiPhoneCall className="size-6" />, label: "اتصل بنا", path: "/contactus" },
-    { icon: <IoSettingsOutline className="size-6" />, label: "الاعدادت", path: "/settings" },
-    { icon: <TbSocial className="size-6" />, label: "التواصل الاجتماعي", path: "/socialMedia" },
+    {
+      icon: <RiAdminLine className="size-6" />,
+      label: "المشرفين",
+      path: "/admins",
+    },
+    {
+      icon: <FaRegObjectUngroup className="size-6" />,
+      label: "المجموعات",
+      path: "/groups",
+    },
+    {
+      icon: <FaLayerGroup className="size-6" />,
+      label: "الفئات",
+      path: "/categories",
+    },
+    {
+      icon: <PiQuestionMarkFill className="size-6" />,
+      label: "الأسئلة المعتمدة",
+      path: "/questions",
+    },
+    {
+      icon: <PiQuestionMarkFill className="size-6" />,
+      label: "الأسئلة المنشوره",
+      path: "/posted-questions",
+    },
+    {
+      icon: <FaFileCircleQuestion className="size-6" />,
+      label: "باقة الألعاب",
+      path: "/game-packages",
+    },
+    {
+      icon: <MdOutlineCrueltyFree className="size-6" />,
+      label: "اللعبة المجانية",
+      path: "/game",
+    },
+    {
+      icon: <MdOutlinePriceChange className="size-6" />,
+      label: "باقات الاسعار",
+      path: "/prices",
+    },
+    {
+      icon: <RiDiscountPercentLine className="size-6" />,
+      label: "كود خصم",
+      path: "/discount",
+    },
+    {
+      icon: <MdOutlinePointOfSale className="size-6" />,
+      label: "المبيعات",
+      path: "/sales",
+    },
+    {
+      icon: <IoIosAlert className="size-6" />,
+      label: "المبيعات المستردة",
+      path: "/salesRecovered",
+    },
+    {
+      icon: <BiPhoneCall className="size-6" />,
+      label: "اتصل بنا",
+      path: "/contactus",
+    },
+    {
+      icon: <IoSettingsOutline className="size-6" />,
+      label: "الاعدادت",
+      path: "/settings",
+    },
+    {
+      icon: <TbSocial className="size-6" />,
+      label: "التواصل الاجتماعي",
+      path: "/socialMedia",
+    },
   ];
 
   return (
@@ -100,9 +150,12 @@ const Sidebar: React.FC = () => {
           {menuItems.map((item, index) => (
             <li
               key={index}
- className={`shadow flex items-center gap-x-2 my-4 p-2 rounded-md cursor-pointer transition-all ${
-    location.pathname === item.path ? "bg-[#085E9C] text-white" : "hover:bg-[#085E9C] hover:text-white"
-  }`}              onClick={() => navigate(item.path)}
+              className={`shadow flex items-center gap-x-2 my-4 p-2 rounded-md cursor-pointer transition-all ${
+                location.pathname === item.path
+                  ? "bg-[#085E9C] text-white"
+                  : "hover:bg-[#085E9C] hover:text-white"
+              }`}
+              onClick={() => navigate(item.path)}
             >
               {item.icon}
               <span className={`${isOpen ? "inline" : "hidden"} text-md`}>
@@ -110,14 +163,16 @@ const Sidebar: React.FC = () => {
               </span>
             </li>
           ))}
-         <li
-      onClick={handleLogout}
-      className={`shadow flex items-center gap-x-2 my-4 p-2 rounded-md cursor-pointer transition-all
+          <li
+            onClick={handleLogout}
+            className={`shadow flex items-center gap-x-2 my-4 p-2 rounded-md cursor-pointer transition-all
         hover:bg-[#085E9C] hover:text-white`}
-    >
-      <LogOut />
-      <span className={`${isOpen ? "inline" : "hidden"} text-md`}>خروج</span>
-    </li>
+          >
+            <LogOut />
+            <span className={`${isOpen ? "inline" : "hidden"} text-md`}>
+              خروج
+            </span>
+          </li>
         </ul>
       </div>
     </div>

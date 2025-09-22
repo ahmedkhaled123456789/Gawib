@@ -15,7 +15,7 @@ import { Loader2, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 // ================= PostedGames Component =================
-const PostedGames = () => {
+const GamePackages = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { gamePackages, loading } = useSelector(
     (state: RootState) => state.gamePackage
@@ -90,7 +90,7 @@ const handleDelete = (id: string) => {
       <td className="px-4 py-2">{pkg.price}</td>
       <td className="px-4 py-2">{pkg.number_of_buys}</td>
       <td className="px-4 py-2">
-        {pkg.is_active === "1" ? "مفعل" : "غير مفعل"}
+        {pkg.is_active === true ? "مفعل" : "غير مفعل"}
       </td>
       <td className="px-4 py-2">{pkg.created_at}</td>
       <td className="px-4 py-2">{pkg.updated_at}</td>
@@ -201,4 +201,4 @@ const handleDelete = (id: string) => {
   );
 };
 
-export default PostedGames;
+export default GamePackages;
