@@ -1,22 +1,13 @@
 import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
+// import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
 import AddQuestion from "../questions/AddQuestion";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { getQuestions, updateQuestion } from "../../store/questionsSlice";
-import { toast } from "sonner";
-
-interface ProductRowProps {
-  product: any;
-  setSelectedImg: (url: string | null) => void;
-  setSelectedId: (id: string | null) => void;
-  handleConfirmStatus: () => void;
-  index: number;
-  setShowPriceModal: (v: boolean) => void;
-}
 
 const ProductRow = ({
   product,
@@ -25,7 +16,7 @@ const ProductRow = ({
   handleConfirmStatus,
   index,
   setShowPriceModal,
-}: ProductRowProps) => {
+}: any) => {
   return (
     <tr key={product.id}>
       <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
@@ -35,10 +26,10 @@ const ProductRow = ({
         </Link>
       </td>
       <td className="px-4 py-2 text-gray-700 w-72 truncate">
-        {product.question?.text}
+        {product.question.text}
       </td>
       <td className="px-4 py-2 text-gray-700 w-72 truncate">
-        {product.answer?.text}
+        {product.answer.text}
       </td>
       <td className="px-4 py-2 text-white">
         <div
@@ -53,9 +44,11 @@ const ProductRow = ({
           {product.points}
         </div>
       </td>
-      <td className="px-4 py-2 text-gray-700 w-20">{product.hint || "—"}</td>
       <td className="px-4 py-2 text-gray-700 w-20">
-        {product.admin_name || "—"}
+        {product.hint || "سنوات 2"}
+      </td>
+      <td className="px-4 py-2 text-gray-700 w-20">
+        {product.admin_name || "محمد الناصر"}
       </td>
       <td className="px-4 py-2">
         <div className="flex items-center justify-center w-40 gap-2 flex-wrap">
@@ -65,25 +58,20 @@ const ProductRow = ({
               setSelectedId(product.id);
               setShowPriceModal(true);
             }}
-            title="تعديل"
           >
-            <img src="/images/group/edit.png" alt="edit" className="w-5 h-5" />
+            <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
           </span>
-
           <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
             <img
               src="/images/group/see.png"
               alt={`${product.game_name} logo`}
               className="w-6 h-6 cursor-pointer"
-              onClick={() => setSelectedImg(product.question?.image)}
-              title="عرض الصورة"
+              onClick={() => setSelectedImg(product.question.image)}
             />
           </span>
-
           <button
             onClick={handleConfirmStatus}
             className="text-[#085E9C] border border-[#085E9C] rounded px-3 py-1 hover:bg-[#085E9C] hover:text-white"
-            title="تبديل حالة الاعتماد"
           >
             اعتماد
           </button>
@@ -101,55 +89,30 @@ const PostedQuestions = () => {
   const [showPriceModal, setShowPriceModal] = useState(false);
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [loadingToggleId, setLoadingToggleId] = useState<number | null>(null); // optional: indicate toggle loading
 
-  // Fetch page 1 on mount / when search changes (debounced) — request only active questions (is_active=1)
   useEffect(() => {
-    const delay = setTimeout(() => {
-      dispatch(getQuestions({ page: 1, search: searchQuery, is_active: 1 }));
-      setCurrentPage(1);
-    }, 500);
+    const delayDebounceFn = setTimeout(() => {
+      dispatch(getQuestions({ page: 1, search: searchQuery }));
+    }, 500); // debounce 500ms
 
-    return () => clearTimeout(delay);
+    return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, dispatch]);
 
+  const handleConfirmStatus = (data: { id: string; is_active: boolean }) => {
+    dispatch(
+      updateQuestion({
+        id: data.id,
+        formData: { is_active: !data.is_active, _method: "PUT" },
+      })
+    );
+  };
+
   const onPress = async (page: number) => {
-    setCurrentPage(page);
-    await dispatch(getQuestions({ page, search: searchQuery, is_active: 1 }));
+    await dispatch(getQuestions({ page, search: searchQuery }));
   };
 
-  // Toggle active status (send FormData with _method = PUT). Backend might expect "1"/"0" or boolean.
-  const handleConfirmStatus = async (q: any) => {
-    try {
-      setLoadingToggleId(q.id);
-      const formData = new FormData();
-      // toggle: if currently true => send 0 to deactivate, else send 1
-      const next = q.is_active ? "0" : "1";
-      formData.append("is_active", next);
-      formData.append("_method", "PUT");
-
-      await dispatch(updateQuestion({ id: q.id, formData })).unwrap();
-
-      toast.success(
-        q.is_active ? "تم إلغاء اعتماد السؤال" : "تم اعتماد السؤال"
-      );
-
-      // إعادة جلب الصفحة الحالية بعد التحديث عشان البيانات تكون متزامنة
-      await dispatch(
-        getQuestions({ page: currentPage, search: searchQuery, is_active: 1 })
-      );
-    } catch (err: any) {
-      toast.error(err?.message || "حدث خطأ أثناء تحديث الحالة");
-    } finally {
-      setLoadingToggleId(null);
-    }
-  };
-
-  // Since we asked server for active-only, this is a safety local-filter
-  const activeQuestions = questions?.data?.filter(
-    (q: any) => q.is_active === true
-  );
+  // فلتر على is_active
+  const activeQuestions = questions?.data?.filter((q: any) => q.is_active);
 
   return (
     <div className="overflow-x-hidden">
@@ -160,7 +123,6 @@ const PostedQuestions = () => {
             <div className="text-md w-32 font-bold text-[#085E9C]">
               الأسئلة المنشورة
             </div>
-
             <div className="relative w-full md:w-48 border rounded-md border-[#085E9C]">
               <input
                 type="text"
@@ -240,12 +202,7 @@ const PostedQuestions = () => {
 
         {/* Pagination */}
         {questions?.meta?.last_page && (
-          <div className="mt-4">
-            <Pagination
-              pageCount={questions.meta.last_page}
-              onPress={onPress}
-            />
-          </div>
+          <Pagination pageCount={questions.meta.last_page} onPress={onPress} />
         )}
 
         {/* Add/Edit Question Modal */}
