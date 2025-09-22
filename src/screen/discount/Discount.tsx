@@ -28,11 +28,11 @@ const ProductRow = ({
         </Link>
       </td>
       <td className="px-4 py-2 text-gray-700">
-  <div className="w-32">{product.game_package?.name || "-"}</div>
-</td>
-<td className="px-4 py-2 text-gray-700">
-  <div className="w-32">{product.game_package?.price || "0"}</div>
-</td>
+        <div className="w-32">{product.game_package?.name || "-"}</div>
+      </td>
+      <td className="px-4 py-2 text-gray-700">
+        <div className="w-32">{product.game_package?.price || "0"}</div>
+      </td>
 
       {/* <td className="px-4 py-2 text-gray-700">
            <div className="w-32"> {product.nowPrice}%</div>  </td> */}

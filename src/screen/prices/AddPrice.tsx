@@ -2,9 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ButtonGroup from "../../components/ButtonGroup";
- import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
-import { createGamePackage, getGamePackageById, updateGamePackage } from "../../store/GamePackagesSlice";
+import {
+  createGamePackage,
+  getGamePackageById,
+  updateGamePackage,
+  GamePackage,
+} from "../../store/GamePackagesSlice";
 
 interface InputFieldProps {
   label: string;
@@ -14,63 +19,74 @@ interface InputFieldProps {
   type: string;
 }
 
-const InputField = ({ label, placeholder, set, val,type }: InputFieldProps) => {
+const InputField = ({
+  label,
+  placeholder,
+  set,
+  val,
+  type,
+}: InputFieldProps) => {
   return (
-    <div className="flex flex-col text-[#085E9C] mb-4 w-full ">
-      <label className="mb-1 text-lg font-bold ">{label}</label>
+    <div className="flex flex-col text-[#085E9C] mb-4 w-full">
+      <label className="mb-1 text-lg font-bold">{label}</label>
       <input
         value={val}
         onChange={(e) => set(e.target.value)}
         type={type}
         placeholder={placeholder}
-        className="w-full rounded border border-[#085E9C]  p-3 text-sm shadow-md outline-none text-right"
+        className="w-full rounded border border-[#085E9C] p-3 text-sm shadow-md outline-none text-right"
       />
     </div>
   );
 };
 
-// AddAdmins.tsx
-const AddPrice = ({ selectedId, onClose }: { selectedId?: string; onClose: () => void }) => {
+const AddPrice = ({
+  selectedId,
+  onClose,
+}: {
+  selectedId?: string;
+  onClose: () => void;
+}) => {
   const dispatch = useDispatch<AppDispatch>();
- const [name, setName] = useState("");
+  const [name, setName] = useState("");
   const [count, setCount] = useState("");
   const [price, setPrice] = useState("");
   const prevId = useRef<string | null>(null);
-  
- useEffect(() => {
-     if (selectedId && selectedId !== prevId.current) {
-    prevId.current = selectedId; 
+
+  // Load existing package if editing
+  useEffect(() => {
+    if (selectedId && selectedId !== prevId.current) {
+      prevId.current = selectedId;
       dispatch(getGamePackageById(selectedId))
         .unwrap()
-        .then((data) => {
-      setName(data?.name);
-    setCount(data?.games_count);
-    setPrice(data?.price);
- 
-        }
-      )
+        .then((data: GamePackage) => {
+          setName(data.name);
+          setCount(data.games_count.toString()); // تحويل number -> string للـ input
+          setPrice(data.price.toString()); // تحويل number -> string للـ input
+        })
         .catch(() => {
-          toast.error("فشل تحميل البيانات  ");
+          toast.error("فشل تحميل البيانات");
         });
     }
   }, [selectedId, dispatch]);
 
- const submitData = () => {
+  // Submit handler
+  const submitData = () => {
     if (!name || !count || !price) {
       toast.warn("يرجى استكمال جميع الحقول!");
       return;
     }
 
-    const payload = {
+    const payload: Partial<GamePackage> = {
       name,
-      games_count: count,
-      price: price,
+      games_count: Number(count), // تحويل string -> number
+      price: Number(price), // تحويل string -> number
       is_active: "1",
       is_free: 0,
     };
 
     if (selectedId) {
-      // Edit
+      // Edit package
       dispatch(updateGamePackage({ id: selectedId, data: payload }))
         .unwrap()
         .then(() => {
@@ -80,7 +96,7 @@ const AddPrice = ({ selectedId, onClose }: { selectedId?: string; onClose: () =>
         })
         .catch((err) => toast.error(err || "حدث خطأ أثناء التعديل"));
     } else {
-      //  Add
+      // Add new package
       dispatch(createGamePackage(payload))
         .unwrap()
         .then(() => {
@@ -91,23 +107,44 @@ const AddPrice = ({ selectedId, onClose }: { selectedId?: string; onClose: () =>
         .catch((err) => toast.error(err || "حدث خطأ أثناء الإضافة"));
     }
   };
-   const resetHandle = () => {
+
+  const resetHandle = () => {
     setName("");
     setCount("");
     setPrice("");
-
   };
+
   return (
     <div className="w-[60%] p-5 mb-4">
       <div className="bg-white rounded-md p-10 mb-5">
         <form className="flex flex-wrap items-center justify-center gap-5 pt-5">
-          <InputField val={name} set={setName} type="text" label="اسم الباقة" placeholder="أدخل اسم الباقة" />
-          <InputField val={count} set={setCount} type="number" label="عدد الألعاب" placeholder="أدخل عدد الألعاب" />
-          <InputField val={price} set={setPrice} type="number" label="السعر  " placeholder="أدخل السعر" />
-  
+          <InputField
+            val={name}
+            set={setName}
+            type="text"
+            label="اسم الباقة"
+            placeholder="أدخل اسم الباقة"
+          />
+          <InputField
+            val={count}
+            set={setCount}
+            type="number"
+            label="عدد الألعاب"
+            placeholder="أدخل عدد الألعاب"
+          />
+          <InputField
+            val={price}
+            set={setPrice}
+            type="number"
+            label="السعر"
+            placeholder="أدخل السعر"
+          />
         </form>
-                  <ButtonGroup handleSubmit={submitData} resetHandle={resetHandle} onClose={onClose} />
-
+        <ButtonGroup
+          handleSubmit={submitData}
+          resetHandle={resetHandle}
+          onClose={onClose}
+        />
       </div>
       <ToastContainer />
     </div>
@@ -115,6 +152,3 @@ const AddPrice = ({ selectedId, onClose }: { selectedId?: string; onClose: () =>
 };
 
 export default AddPrice;
-
-
- 
