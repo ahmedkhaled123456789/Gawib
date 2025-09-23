@@ -4,6 +4,7 @@ import type { AppDispatch, RootState } from "../store";
 import { loginUser } from "../store/auth/authSlice";
 import LoginForm from "./LoginForm";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Auth: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -25,19 +26,36 @@ const Auth: React.FC = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleLogin = () => {
-    const payload =
-      loginMethod === "email"
-        ? { email: form.email, password: form.password }
-        : { phone: form.phone_number, password: form.password };
+  const handleLogin = async () => {
+    try {
+      if (loginMethod === "email") {
+        if (!form.email || !form.password) {
+          toast.error("من فضلك أدخل البريد الإلكتروني وكلمة المرور");
+          return;
+        }
+      } else {
+        if (!form.phone_number || !form.password) {
+          toast.error("من فضلك أدخل رقم الجوال وكلمة المرور");
+          return;
+        }
+      }
 
-    dispatch(loginUser(payload));
-  };
-  useEffect(() => {
-    if (token) {
-      navigate("/");
+      const payload =
+        loginMethod === "email"
+          ? { email: form.email, password: form.password }
+          : { phone: form.phone_number, password: form.password };
+
+      await dispatch(loginUser(payload)).unwrap();
+
+      toast.success("تم تسجيل الدخول بنجاح ✨");
+    } catch (err: any) {
+      toast.error(err || "الإيميل أو رقم الجوال أو كلمة المرور غير صحيحة");
     }
-  }, [token, navigate]);
+  };
+
+  useEffect(() => {
+    if (token) navigate("/dashboard");
+  }, [token]);
   return (
     <div className="flex items-center justify-center h-screen bg-gray-50 px-4">
       <div className="w-full max-w-md p-6 bg-white shadow-md rounded-md">

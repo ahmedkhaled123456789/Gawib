@@ -51,7 +51,7 @@ export default function Admins() {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
-  const { admins, loading, error } = useSelector(
+  const { admins, loading } = useSelector(
     (state: RootState) => state.admin
   );
 
@@ -96,7 +96,7 @@ export default function Admins() {
 
       <div className="space-y-6 p-2 pt-10 bg-white">
         {loading && <p>جارٍ التحميل...</p>}
-        {error && <p className="text-red-500">{error}</p>}
+        {/* {error && <p className="text-red-500">{error}</p>} */}
 
         {Array.isArray(admins?.data) && admins.data.length > 0
           ? admins.data.map((sup, idx) => (

@@ -28,10 +28,7 @@ const AddQuestion = ({
   const [see, setSee] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [image2, setImage2] = useState<File | null>(null);
-  const [selectedGame, setSelectedGame] = useState<{
-    value: string;
-    label: string;
-  } | null>(null);
+  const [selectedGame, setSelectedGame] = useState(null);
   const [isActive, setIsActive] = useState(false);
 
   const [gameOptions, setGameOptions] = useState<
@@ -83,9 +80,13 @@ const AddQuestion = ({
   }, [selectedId, dispatch, gameOptions]);
 
   const handleSubmit = () => {
+    if (!question.trim() || !answer.trim() || !selectedGame) {
+      toast.error("يرجى ملء جميع الحقول المطلوبة");
+      return;
+    }
     const formData = new FormData();
     formData.append("points", activePoints?.toString() || "0");
-    formData.append("game_id", selectedGame?.value || "");
+    formData.append("game_id", selectedGame || "");
     formData.append("question.text", question);
     if (image) formData.append("question.image", image);
     formData.append("answer.text", answer);

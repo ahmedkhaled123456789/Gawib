@@ -15,15 +15,15 @@ type AddGamePackageProps = {
 
 const AddGamePackage = ({ onClose, onSave }: AddGamePackageProps) => {
   const [name, setName] = useState("");
-  const [gamesCount, setGamesCount] = useState<number>(1);
-  const [price, setPrice] = useState<number>(0);
+  const [gamesCount, setGamesCount] = useState<number>();
+  const [price, setPrice] = useState<number>();
   const [isFree, setIsFree] = useState<0 | 1>(0);
   const [isActive, setIsActive] = useState<0 | 1>(1);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async () => {
-    if (!name || gamesCount <= 0 || price < 0) {
-      toast.error("يرجى استكمال جميع الحقول بشكل صحيح!");
+    if (!name.trim() || !gamesCount || !price) {
+      toast.error("يرجى استكمال جميع الحقول!");
       return;
     }
 
@@ -36,7 +36,6 @@ const AddGamePackage = ({ onClose, onSave }: AddGamePackageProps) => {
         is_free: isFree,
         is_active: isActive,
       });
-      // success handled by parent, but we can show a small confirmation here too
       toast.success("تم حفظ الباقة بنجاح!");
       onClose();
     } catch (err: any) {
@@ -117,7 +116,9 @@ const AddGamePackage = ({ onClose, onSave }: AddGamePackageProps) => {
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className={`flex-1 ${saving ? "opacity-70 cursor-not-allowed" : ""} bg-[#085E9C] text-white py-2 rounded hover:bg-blue-700`}
+            className={`flex-1 ${
+              saving ? "opacity-70 cursor-not-allowed" : ""
+            } bg-[#085E9C] text-white py-2 rounded hover:bg-blue-700`}
           >
             {saving ? "جارٍ الحفظ..." : "حفظ"}
           </button>

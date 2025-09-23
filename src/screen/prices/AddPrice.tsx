@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import {  toast } from "sonner"
 import ButtonGroup from "../../components/ButtonGroup";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
@@ -73,7 +72,7 @@ const AddPrice = ({
   // Submit handler
   const submitData = () => {
     if (!name || !count || !price) {
-      toast.warn("يرجى استكمال جميع الحقول!");
+      toast.error("يرجى استكمال جميع الحقول!");
       return;
     }
 
@@ -146,7 +145,6 @@ const AddPrice = ({
           onClose={onClose}
         />
       </div>
-      <ToastContainer />
     </div>
   );
 };

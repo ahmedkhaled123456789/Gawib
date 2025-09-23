@@ -11,7 +11,7 @@ import {
   getCategories,
   updateCategory,
 } from "../../store/categoriesSlice";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import Pagination from "../../components/pagination/Pagination";
 
 const Groups: React.FC = () => {
@@ -73,10 +73,10 @@ const Groups: React.FC = () => {
 
   const handleConfirmForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nameGroup) {
-      toast.warn("يرجى استكمال جميع الحقول!");
-      return;
-    }
+     if (!nameGroup || !descriptionGroup || !image) {
+    toast.error("يرجى استكمال جميع الحقول!");
+    return;
+  }
 
     const formData = new FormData();
     formData.append("name", nameGroup);

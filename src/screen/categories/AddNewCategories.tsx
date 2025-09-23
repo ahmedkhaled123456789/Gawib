@@ -44,6 +44,10 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
     formData.append("admin_id", adminId.toString());
 
     try {
+      if (!name.trim() || !description.trim() || !selectedCategory.trim()) {
+        toast.error("يرجى ملء جميع الحقول المطلوبة");
+        return;
+      }
       setLoading(true);
       await dispatch(createGame(formData)).unwrap(); // Use correct action for creating
       toast.success("تم حفظ التصنيف بنجاح!");

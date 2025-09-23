@@ -69,7 +69,7 @@ const AddAdmins = ({ onClose }: { onClose: () => void }) => {
         resetHandle();
         onClose();
       } else {
-        toast.error("حدث خطأ أثناء الإضافة");
+        toast.error("الاميل او رقم الهاتف موجود مسبقاً");
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
