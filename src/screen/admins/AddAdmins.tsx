@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "sonner";
 import "react-toastify/dist/ReactToastify.css";
 import ButtonGroup from "../../components/ButtonGroup";
 import { useDispatch } from "react-redux";
@@ -48,7 +48,7 @@ const AddAdmins = ({ onClose }: { onClose: () => void }) => {
     e.preventDefault();
 
     if (!name || !phone_number || !email || !password) {
-      toast.warn("يرجى استكمال جميع الحقول!");
+      toast.error("يرجى استكمال جميع الحقول!");
       return;
     }
 
@@ -73,7 +73,7 @@ const AddAdmins = ({ onClose }: { onClose: () => void }) => {
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast.error("فشل الإرسال");
+      toast.error(error as string || "حدث خطأ ما، يرجى المحاولة مرة أخرى.");
     }
   };
 
@@ -93,6 +93,7 @@ const AddAdmins = ({ onClose }: { onClose: () => void }) => {
             <PhoneInput
               country={"eg"}
               value={phone_number.replace("+", "")}
+              enableSearch
               onChange={(value: string) => setPhoneNumber(`+${value}`)}
               inputProps={{
                 name: "phone_number",
@@ -122,7 +123,6 @@ const AddAdmins = ({ onClose }: { onClose: () => void }) => {
           />
         </form>
       </div>
-      <ToastContainer />
     </div>
   );
 };
