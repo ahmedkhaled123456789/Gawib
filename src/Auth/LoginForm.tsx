@@ -6,9 +6,12 @@ interface LoginFormProps {
   loginMethod: "email" | "phone";
   setLoginMethod: (method: "email" | "phone") => void;
   form: {
+    first_name?: string;
+    last_name?: string;
     email: string;
     phone_number: string;
     password: string;
+    password_confirmation?: string;
   };
   setForm: React.Dispatch<React.SetStateAction<any>>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -57,7 +60,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
       <div className="space-y-4 w-full max-w-md mx-auto">
         {loginMethod === "phone" && (
           <PhoneInput
-            country={"eg"}
+            country={"sa"}
+            enableSearch
             value={form.phone_number?.replace("+", "") || ""}
             onChange={(value: string) =>
               setForm((prev: any) => ({

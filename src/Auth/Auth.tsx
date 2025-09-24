@@ -11,6 +11,7 @@ const Auth: React.FC = () => {
   const { loading, error } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState<"phone" | "email">("phone");
+
   const token = localStorage.getItem("token");
 
   const [form, setForm] = useState({
@@ -43,7 +44,7 @@ const Auth: React.FC = () => {
       const payload =
         loginMethod === "email"
           ? { email: form.email, password: form.password }
-          : { phone: form.phone_number, password: form.password };
+          : { phone_number: form.phone_number, password: form.password }; // ← هنا صححت الحقل
 
       await dispatch(loginUser(payload)).unwrap();
 
@@ -56,6 +57,7 @@ const Auth: React.FC = () => {
   useEffect(() => {
     if (token) navigate("/");
   }, [token]);
+
   return (
     <div className="flex items-center justify-center h-screen bg-gray-50 px-4">
       <div className="w-full max-w-md p-6 bg-white shadow-md rounded-md">
