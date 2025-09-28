@@ -11,10 +11,10 @@ const useGetData = async <T>(
     withCredentials: true,
     headers: {
       ...(options?.headers || {}),
-    //   'User-Agent': 'Dart/3.2 (dart:io)',
-    // 'Accept': 'application/json',
-    // 'Accept-Encoding': 'gzip',
-    // 'Connection': 'keep-alive'
+      //   'User-Agent': 'Dart/3.2 (dart:io)',
+      // 'Accept': 'application/json',
+      // 'Accept-Encoding': 'gzip',
+      // 'Connection': 'keep-alive'
     },
   };
 
@@ -27,7 +27,7 @@ const useGetData = async <T>(
   }
 };
 
- const getDataToken = async <T,>(url: string): Promise<T> => {
+const getDataToken = async <T>(url: string): Promise<T> => {
   const token = localStorage.getItem("token");
   const config: AxiosRequestConfig = {
     headers: { Authorization: `Bearer ${token}` },
@@ -42,4 +42,20 @@ const useGetData = async <T>(
   }
 };
 
-export { useGetData, getDataToken };
+// ================== get data by id ==================
+const getDataById = async <T>(url: string, id: string | number): Promise<T> => {
+  const token = localStorage.getItem("token");
+  const config: AxiosRequestConfig = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  try {
+    const res = await baseUrl.get<T>(`${url}/${id}`, config);
+    return res.data;
+  } catch (error) {
+    console.error(`❌ Error fetching data from ${url}/${id}:`, error);
+    throw new Error("Failed to fetch data by id");
+  }
+};
+
+export { useGetData, getDataToken, getDataById };

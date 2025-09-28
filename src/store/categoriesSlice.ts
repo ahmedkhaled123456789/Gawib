@@ -1,8 +1,6 @@
 // src/store/categoriesSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
-import { useGetData } from "../hooks/useGetData";
-import { useInUpdateData } from "../hooks/useUpdateData";
 import { useGetDataToken } from "../utils/api";
 import useDeleteData from "../hooks/useDeleteData";
 import { useInsertDataWithImage } from "../hooks/useInsertData";
@@ -57,12 +55,14 @@ const initialState: CategoryState = {
 
 // ===== Get single category =====
 export const getCategory = createAsyncThunk<
-  Category,
+  { data: Category },
   { id: string },
   { rejectValue: string }
 >("category/getCategory", async ({ id }, thunkAPI) => {
   try {
-    const res = await useGetData<Category>(`admin/categories/${id}`);
+    const res = await useGetDataToken<{ data: Category }>(
+      `admin/categories/${id}`
+    );
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -72,15 +72,17 @@ export const getCategory = createAsyncThunk<
   }
 });
 
-// ===== Get all categories with pagination =====
+// ===== Get all categories with pagination (argument اختياري) =====
 export const getCategories = createAsyncThunk<
   CategoriesResponse,
-  number | void,
+  { page?: number; search?: string } | void,
   { rejectValue: string }
->("category/getCategories", async (page = 1, thunkAPI) => {
+>("category/getCategories", async (params, thunkAPI) => {
+  const { page = 1, search = "" } = params || {};
   try {
+    const query = search ? `&filter[search]=${search}` : "";
     const res = await useGetDataToken<CategoriesResponse>(
-      `admin/categories?page=${page}`
+      `admin/categories?page=${page}${query}`
     );
     return res;
   } catch (error) {
@@ -94,9 +96,9 @@ export const getCategories = createAsyncThunk<
 // ===== Get all categories for dropdown =====
 export const getAllCategoriesForDropdown = createAsyncThunk<
   CategoriesResponse,
-  number | void,
+  void,
   { rejectValue: string }
->("category/getCategories", async (_, thunkAPI) => {
+>("category/getAllCategoriesForDropdown", async (_, thunkAPI) => {
   try {
     const res = await useGetDataToken<CategoriesResponse>(`admin/categories`);
     return res;
@@ -119,7 +121,7 @@ export const addCategory = createAsyncThunk<
       "admin/categories",
       formData
     );
-    thunkAPI.dispatch(getCategories()); // refresh list
+    thunkAPI.dispatch(getCategories()); // refresh list بدون خطأ type
     return res;
   } catch (error) {
     console.error("Error adding category:", error);
@@ -129,17 +131,17 @@ export const addCategory = createAsyncThunk<
 
 // ===== Update category =====
 export const updateCategory = createAsyncThunk<
-  Category,
-  { id: string; formData: Partial<Category> },
+  Category, // نوع الإرجاع
+  { id: string; formData: FormData }, // نوع الوسائط
   { rejectValue: string }
 >("category/updateCategory", async ({ id, formData }, thunkAPI) => {
   try {
-    const res = await useInUpdateData<Partial<Category>, Category>(
+    const res = await useInsertDataWithImage<Category>( // هنا نحدد النوع Category
       `admin/categories/${id}`,
       formData
     );
-    thunkAPI.dispatch(getCategories()); // refresh list
-    return res;
+    thunkAPI.dispatch(getCategories()); // تحديث القائمة
+    return res; // نعيد Category
   } catch (error) {
     console.error("Error updating category:", error);
     return thunkAPI.rejectWithValue("فشل في تعديل التصنيف");
@@ -171,12 +173,13 @@ const categoriesSlice = createSlice({
       // Get single category
       .addCase(
         getCategory.fulfilled,
-        (state, action: PayloadAction<Category>) => {
-          state.category = action.payload;
+        (state, action: PayloadAction<{ data: Category }>) => {
+          state.category = action.payload.data;
           state.loading = false;
           state.error = null;
         }
       )
+
       // Get all categories
       .addCase(getCategories.pending, (state) => {
         state.loading = true;

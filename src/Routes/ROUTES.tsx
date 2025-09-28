@@ -13,11 +13,13 @@ import Sales from "../screen/sales/Sales";
 import SalesRecovered from "../screen/salesRecovered/SalesRecovered";
 import ContactUs from "../screen/contactUs/ContactUs";
 import Discount from "../screen/discount/Discount";
-import ProductDetalis from "../screen/user/ProductDetalis";
+import UpdateUser from "../screen/user/UpdateUser";
 import SocialMedia from "../screen/socialLonk/SocialMedia";
 import AddUser from "../screen/user/AddUser";
 import GamePackages from "../screen/GamePackages/GamePackages";
 import PostedQuestions from "../screen/PostedQuestions/posted-questions";
+import UpdateAdmin from "../screen/admins/UpdateAdmin";
+import UpdateGroup from "../screen/group/UpdateGroup";
 
 export const ROUTES = [
   {
@@ -37,18 +39,20 @@ export const ROUTES = [
           { path: "categories", element: <Categories /> },
           { path: "prices", element: <Prices /> },
           { path: "admins", element: <Admins /> },
+          { path: "admin/edit/:id", element: <UpdateAdmin /> },
           { path: "questions", element: <Questions /> },
-          {path: "posted-questions", element: <PostedQuestions /> },
+          { path: "posted-questions", element: <PostedQuestions /> },
           { path: "game-packages", element: <GamePackages /> },
           { path: "settings", element: <SettingsPage /> },
           { path: "socialMedia", element: <SocialMedia /> },
           { path: "game", element: <Game /> },
           { path: "groups", element: <Groups /> },
+          { path: "group/edit/:id", element: <UpdateGroup /> },
           { path: "sales", element: <Sales /> },
           { path: "salesRecovered", element: <SalesRecovered /> },
           { path: "contactus", element: <ContactUs /> },
           { path: "discount", element: <Discount /> },
-          { path: "productDetails", element: <ProductDetalis /> },
+          { path: "user/:id", element: <UpdateUser /> },
         ],
       },
     ],

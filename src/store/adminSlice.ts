@@ -1,10 +1,9 @@
-import { useGetDataToken } from './../utils/api';
+import { useGetDataToken } from "./../utils/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useGetData } from "../utils/api";
 import { AxiosError } from "axios";
 import useDeleteData from "../hooks/useDeleteData";
 import { useInUpdateData } from "../hooks/useUpdateData";
- import {useInsertData}  from "../hooks/useInsertData";
+import { useInsertData } from "../hooks/useInsertData";
 
 interface AdminData {
   name: string;
@@ -17,9 +16,10 @@ interface AdminData {
 
 interface CountsResponse {
   data: AdminData;
+  message: string;
 }
 interface AdminState {
- admins: CountsResponse | null;
+  admins: CountsResponse | null;
   counts: AdminData | null;
   loading: boolean;
   error: string | null;
@@ -27,22 +27,26 @@ interface AdminState {
 
 const initialState: AdminState = {
   admins: null,
-  counts:null,
+  counts: null,
   loading: false,
   error: null,
 };
 
-
 // ============ Get All Admins ============
-export const getCounts = createAsyncThunk("admin/counts", async (_, thunkAPI) => {
-  try {
-    const res = await useGetDataToken<CountsResponse>(`admin/system-counts`);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "getAdmins failed");
+export const getCounts = createAsyncThunk(
+  "admin/counts",
+  async (_, thunkAPI) => {
+    try {
+      const res = await useGetDataToken<CountsResponse>(`admin/system-counts`);
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "getAdmins failed"
+      );
+    }
   }
-});
+);
 
 // ============ Get All Admins ============
 export const getAdmins = createAsyncThunk<
@@ -55,7 +59,9 @@ export const getAdmins = createAsyncThunk<
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "getAdmins failed");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getAdmins failed"
+    );
   }
 });
 
@@ -66,11 +72,13 @@ export const getAdminById = createAsyncThunk<
   { rejectValue: string }
 >("admin/getAdminById", async (id, thunkAPI) => {
   try {
-    const res = await useGetData<CountsResponse>(`admin/admins/${id}`);
+    const res = await useGetDataToken<CountsResponse>(`admin/admins/${id}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "getAdminById failed");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getAdminById failed"
+    );
   }
 });
 
@@ -82,33 +90,35 @@ export const createAdmin = createAsyncThunk<
 >("admin/createAdmin", async (data, thunkAPI) => {
   try {
     const res = await useInsertData<AdminData>(`admin/admins`, data);
-     thunkAPI.dispatch(getAdmins());
+    thunkAPI.dispatch(getAdmins());
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "createAdmin failed");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "createAdmin failed"
+    );
   }
 });
-
 
 // ============ Update Admin ============
 export const updateAdmin = createAsyncThunk<
   CountsResponse,
-  { id: string; data: Partial<CountsResponse> },
+  { id: string; data: Partial<AdminData> },
   { rejectValue: string }
 >("admin/updateAdmin", async ({ id, data }, thunkAPI) => {
   try {
-    const res = await useInUpdateData<Partial<CountsResponse>, CountsResponse>(
+    const res = await useInUpdateData<Partial<AdminData>, CountsResponse>(
       `admin/admins/${id}`,
       data
     );
-    return res; // ده هيبقى CountsResponse
+    return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "updateAdmin failed");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "updateAdmin failed"
+    );
   }
 });
-
 
 // ============ Delete Admin ============
 export const deleteAdmin = createAsyncThunk<
@@ -121,78 +131,73 @@ export const deleteAdmin = createAsyncThunk<
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "deleteAdmin failed");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "deleteAdmin failed"
+    );
   }
 });
 
 const adminSlice = createSlice({
   name: "admin",
   initialState,
-  reducers: {
-   
-    
-  },
+  reducers: {},
   extraReducers: (builder) => {
-     // Get All Admins
-  builder.addCase(getCounts.fulfilled, (state, action) => {
-    state.counts = action.payload?.data;
-    state.loading = false;
-    state.error = null;
-  });
-  // Get All Admins
-  builder.addCase(getAdmins.fulfilled, (state, action) => {
-    state.admins = action.payload;
-    state.loading = false;
-    state.error = null;
-  });
+    // Get All Admins
+    builder.addCase(getCounts.fulfilled, (state, action) => {
+      state.counts = action.payload?.data;
+      state.loading = false;
+      state.error = null;
+    });
+    // Get All Admins
+    builder.addCase(getAdmins.fulfilled, (state, action) => {
+      state.admins = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
 
-  // Get Admin By ID
-  builder.addCase(getAdminById.fulfilled, (state, action) => {
-    state.admins = action.payload;
-    state.loading = false;
-    state.error = null;
-  });
+    // Get Admin By ID
+    builder.addCase(getAdminById.fulfilled, (state, action) => {
+      state.admins = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
 
-  // Create Admin
-builder.addCase(createAdmin.fulfilled, (state) => {
-  state.loading = false;
-  state.error = null;
-});
+    // Create Admin
+    builder.addCase(createAdmin.fulfilled, (state) => {
+      state.loading = false;
+      state.error = null;
+    });
 
+    // Update Admin
+    builder.addCase(updateAdmin.fulfilled, (state, action) => {
+      state.admins = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
 
-  // Update Admin
-  builder.addCase(updateAdmin.fulfilled, (state, action) => {
-    state.admins = action.payload;
-    state.loading = false;
-    state.error = null;
-  });
+    // Delete Admin
+    builder.addCase(deleteAdmin.fulfilled, (state) => {
+      state.admins = null;
+      state.loading = false;
+      state.error = null;
+    });
 
-  // Delete Admin
-  builder.addCase(deleteAdmin.fulfilled, (state) => {
-    state.admins = null; 
-    state.loading = false;
-    state.error = null;
-  });
-
-  // Handling Rejected (اختياري)
-  builder
-    .addMatcher(
-      (action) => action.type.endsWith("/rejected"),
-      (state, action: any) => {
-        state.loading = false;
-        state.error = action.payload || "Something went wrong";
-      }
-    )
-    .addMatcher(
-      (action) => action.type.endsWith("/pending"),
-      (state) => {
-        state.loading = true;
-        state.error = null;
-      }
-    );
-}
-
-
- 
+    // Handling Rejected (اختياري)
+    builder
+      .addMatcher(
+        (action) => action.type.endsWith("/rejected"),
+        (state, action: any) => {
+          state.loading = false;
+          state.error = action.payload || "Something went wrong";
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith("/pending"),
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      );
+  },
 });
 export default adminSlice.reducer;

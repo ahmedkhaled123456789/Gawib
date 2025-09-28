@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FiSearch } from "react-icons/fi";
-import CustomDropdown from "../../components/CustomDropdown";
+import { EditIcon, Search, Trash2 } from "lucide-react";
+// import CustomDropdown from "../../components/CustomDropdown";
 import CustomModalGroup from "../../components/Modals/CustomModalGroup";
 import CustomModal from "../../components/Modals/CustomModal";
 import AddGroup from "./AddGroup";
@@ -10,16 +10,18 @@ import {
   addCategory,
   getCategories,
   updateCategory,
+  deleteCategory,
 } from "../../store/categoriesSlice";
 import { toast } from "sonner";
 import Pagination from "../../components/pagination/Pagination";
+import { Link } from "react-router-dom";
 
 const Groups: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { categories } = useSelector((state: RootState) => state.categories);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState("");
+  // const [statusFilter, setStatusFilter] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modalFormOpen, setModalFormOpen] = useState(false);
@@ -52,15 +54,34 @@ const Groups: React.FC = () => {
     setSelectedProduct(Group);
     setModalOpen(true);
   };
+  const handleDeleteGroup = (id: string) => {
+    toast("هل أنت متأكد من حذف هذه المجموعة؟", {
+      action: {
+        label: "حذف",
+        onClick: async () => {
+          try {
+            const resultAction = await dispatch(deleteCategory(id));
+            if (deleteCategory.fulfilled.match(resultAction)) {
+              toast.success("تم حذف المجموعة بنجاح!");
+            } else {
+              toast.error("حدث خطأ أثناء الحذف");
+            }
+          } catch {
+            toast.error("فشل الاتصال بالسيرفر");
+          }
+        },
+      },
+    });
+  };
 
-  const handleConfirmStatus = (data: {
-    id: string;
-    is_active: false | true;
-  }) => {
+  const handleConfirmStatus = (data: { id: string; is_active: boolean }) => {
+    const formData = new FormData();
+    formData.append("is_active", JSON.stringify(data.is_active));
+
     dispatch(
       updateCategory({
         id: data.id,
-        formData: { is_active: data.is_active },
+        formData: formData,
       })
     );
     setModalOpen(false);
@@ -73,10 +94,10 @@ const Groups: React.FC = () => {
 
   const handleConfirmForm = async (e: React.FormEvent) => {
     e.preventDefault();
-     if (!nameGroup || !descriptionGroup || !image) {
-    toast.error("يرجى استكمال جميع الحقول!");
-    return;
-  }
+    if (!nameGroup || !descriptionGroup || !image) {
+      toast.error("يرجى استكمال جميع الحقول!");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("name", nameGroup);
@@ -85,7 +106,6 @@ const Groups: React.FC = () => {
 
     try {
       const resultAction = await dispatch(addCategory(formData));
-
       if (addCategory.fulfilled.match(resultAction)) {
         toast.success("تمت إضافة المجموعة بنجاح!");
         setModalFormOpen(false);
@@ -97,25 +117,31 @@ const Groups: React.FC = () => {
       toast.error("فشل الاتصال بالسيرفر");
     }
   };
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      dispatch(getCategories({ page: 1, search: searchQuery }));
+      setCurrentPage(1);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, dispatch]);
 
   useEffect(() => {
-    dispatch(getCategories(currentPage));
-  }, [currentPage, dispatch]);
+    dispatch(getCategories({ page: currentPage, search: searchQuery }));
+  }, [currentPage, searchQuery, dispatch]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const GroupsCard = ({ Group, onStatusClick }) => (
-    <div className="bg-[#fafbff] border border-[#000] rounded p-4 w-full max-w-[200px] flex flex-col items-center">
-      {/* Category Name */}
+  const GroupsCard = ({ Group, onStatusClick, onDeleteClick }) => (
+    <div className="bg-[#fafbff] border border-[#000] rounded p-4 w-full max-w-[200px] flex flex-col items-center relative">
       <div className="text-center mb-3 w-full">
         <div className="border border-[#085E9C] rounded p-2 text-sm font-medium text-[#000] text-center">
           {Group.name}
         </div>
       </div>
 
-      {/* Image */}
       <div className="text-center mb-3 w-full">
         <div className="border border-[#085E9C] rounded text-xs min-h-[40px] flex items-center justify-center p-3">
           {Group.image ? (
@@ -130,19 +156,16 @@ const Groups: React.FC = () => {
         </div>
       </div>
 
-      {/* Description */}
       <div className="text-center mb-3 border p-3 border-[#085E9C] text-[#000] w-full">
         <p className="text-xs leading-relaxed">{Group.description || "_"}</p>
       </div>
 
-      {/* Question Count */}
       <div className="text-center mb-3 w-full">
         <div className="border border-[#085E9C] text-[#000] rounded px-3 py-1 text-sm font-medium text-center">
           445
         </div>
       </div>
 
-      {/* Action Button */}
       <div className="text-center mb-3 w-full">
         <button
           className="bg-[#085E9C] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-blue-700 transition-colors w-full"
@@ -152,7 +175,6 @@ const Groups: React.FC = () => {
         </button>
       </div>
 
-      {/* Status */}
       <div className="text-center mb-2 w-full">
         <span
           className={`px-2 py-1 rounded text-xs font-medium ${
@@ -163,9 +185,25 @@ const Groups: React.FC = () => {
         </span>
       </div>
 
-      {/* Supervisor */}
-      <div className="text-center w-full">
+      <div className="text-center w-full mt-2">
         <p className="text-xs text-gray-700 font-medium">ماهر البوعلي</p>
+      </div>
+      <div className="flex justify-center gap-2 mt-2 w-full">
+        {/* زر التعديل */}
+        <Link
+          to={`/group/edit/${Group.id}`}
+          className="flex items-center bg-[#085E9C]  px-2 py-1 cursor-pointer text-white rounded text-xs"
+        >
+          <EditIcon size={16} />
+        </Link>
+
+        {/* زر الحذف */}
+        <div
+          className="flex items-center bg-red-500 px-2 py-1 cursor-pointer text-white rounded text-xs"
+          onClick={onDeleteClick}
+        >
+          <Trash2 size={16} />
+        </div>
       </div>
     </div>
   );
@@ -181,27 +219,27 @@ const Groups: React.FC = () => {
           <div className="relative w-full md:w-64 border rounded-md border-[#085E9C]">
             <input
               type="text"
-              placeholder="بحث"
+              placeholder="البحث ب الاسم"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-md focus:outline-none text-right"
             />
-            <FiSearch className="absolute left-3 top-3 text-gray-500" />
+            <Search className="absolute left-3 top-3 text-gray-500" />
           </div>
 
           {/* Dropdown */}
-          <CustomDropdown
+          {/* <CustomDropdown
             options={[
-              { value: "", label: "الأحدث  " },
+              { value: "", label: "الأحدث" },
               { value: "الجنسية", label: "الجنسية" },
-              { value: " تاريخ التسجيل", label: " تاريخ التسجيل" },
-              { value: " عدد الألعاب", label: " عدد الألعاب" },
-              { value: " المشتريات", label: " المشتريات" },
-              { value: "  حالة الحساب", label: "  حالة الحساب" },
+              { value: "تاريخ التسجيل", label: "تاريخ التسجيل" },
+              { value: "عدد الألعاب", label: "عدد الألعاب" },
+              { value: "المشتريات", label: "المشتريات" },
+              { value: "حالة الحساب", label: "حالة الحساب" },
             ]}
             selected={statusFilter}
             onChange={setStatusFilter}
-          />
+          /> */}
         </div>
 
         <div className="flex items-center space-x-4 space-x-reverse mt-2 md:mt-0">
@@ -217,7 +255,6 @@ const Groups: React.FC = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="bg-white border-2 border-[#085E9C] overflow-hidden">
-          {/* Tabs */}
           <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between p-4">
             <button className="w-full sm:w-[40%] bg-white rounded py-4 px-6 text-center font-bold text-[#085E9C] border border-[#085E9C]">
               جغرافيا والعالم
@@ -237,7 +274,6 @@ const Groups: React.FC = () => {
             <AddGroup onClose={() => setShowGroupModal(false)} />
           </CustomModal>
 
-          {/* Content */}
           <div className="p-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 justify-center">
               {Array.isArray(categories?.data) &&
@@ -247,6 +283,7 @@ const Groups: React.FC = () => {
                     key={index}
                     Group={Group}
                     onStatusClick={() => handleStatusClick(Group)}
+                    onDeleteClick={() => handleDeleteGroup(Group.id.toString())}
                   />
                 ))
               ) : (
@@ -344,9 +381,10 @@ const Groups: React.FC = () => {
           </div>
         </div>
       )}
+
       {/* Pagination */}
       {categories?.meta?.last_page > 1 && (
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 flex justify-start">
           <Pagination
             pageCount={categories.meta.last_page}
             onPress={handlePageChange}

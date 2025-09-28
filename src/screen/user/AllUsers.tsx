@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { Loader2, Trash2Icon } from "lucide-react";
+import { EditIcon, Loader2, Trash2Icon } from "lucide-react";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import Dashboard from "../../components/Dashboard/Dashboard";
@@ -14,26 +14,21 @@ import {
   deleteUser,
 } from "../../store/userSlice";
 import { getCounts } from "../../store/adminSlice";
-
 import Loader from "../../components/Loader";
 import { toast } from "sonner";
 
+// === Row component ===
 const ProductRow = ({
   product,
-  index,
   onStatusClick,
   onDeleteClick,
   loadingStatus,
   loadingDelete,
 }: any) => (
   <tr key={product.id}>
-    <td className="px-2 py-2 font-medium text-gray-900">{index + 1}</td>
+    <td className="px-2 py-2 font-medium text-gray-900">{product.id}</td>
     <td className="px-2 py-2 text-gray-700">
-      <Link to={`/productDetails/${product.id}`}>
-        <div className="w-24 truncate">
-          {product.first_name} {product.last_name}
-        </div>
-      </Link>
+      {product.first_name} {product.last_name}
     </td>
     <td className="px-2 py-2 text-gray-700 truncate">{product.email}</td>
     <td className="px-2 py-2 text-gray-700 truncate">{product.phone_number}</td>
@@ -70,6 +65,13 @@ const ProductRow = ({
         )}
       </button>
 
+      {/* زر  التعديل*/}
+      <Link to={`/user/${product.id}`}>
+        <button className="flex-1 min-w-[70px] px-3 py-1 rounded bg-[#085E9C] text-white font-semibold text-xs md:text-sm hover:bg-[#0a6bb9] transition flex items-center justify-center">
+          <EditIcon />
+        </button>
+      </Link>
+
       {/* زر الحذف */}
       <button
         onClick={onDeleteClick}
@@ -91,7 +93,6 @@ const AllUsers = () => {
   const { users, loading, currentPage, searchQuery } = useSelector(
     (state: RootState) => state.user
   );
-
   const { counts } = useSelector((state: RootState) => state.admin);
 
   // === loading منفصل لكل عملية ===
@@ -104,10 +105,11 @@ const AllUsers = () => {
   const [sortOption, setSortOption] = useState<string>("");
 
   useEffect(() => {
-    dispatch(getUser({ page: currentPage, search: searchQuery }));
-    // جلب الـ counts
+    dispatch(
+      getUser({ page: currentPage, search: searchQuery, sort: sortOption })
+    );
     dispatch(getCounts());
-  }, [dispatch, currentPage, searchQuery]);
+  }, [dispatch, currentPage, searchQuery, sortOption]);
 
   const handleSearch = (e: any) => dispatch(setSearchQuery(e.target.value));
 
@@ -128,7 +130,7 @@ const AllUsers = () => {
     }
   };
 
-  // ===== حذف المستخدم باستخدام toast =====
+  // ===== حذف المستخدم =====
   const handleDeleteUser = (id: string) => {
     toast("هل أنت متأكد من حذف المستخدم؟", {
       action: {
@@ -149,7 +151,7 @@ const AllUsers = () => {
   };
 
   const onPress = async (page: number) => {
-    await dispatch(getUser({ page, search: searchQuery }));
+    await dispatch(getUser({ page, search: searchQuery, sort: sortOption }));
   };
 
   return (
@@ -172,14 +174,15 @@ const AllUsers = () => {
               <FiSearch className="absolute left-3 top-3 text-gray-500" />
             </div>
 
+            {/* Dropdown */}
             <CustomDropdown
               options={[
                 { value: "", label: "الأحدث" },
-                { value: "الجنسية", label: "الجنسية" },
-                { value: "تاريخ التسجيل", label: "تاريخ التسجيل" },
-                { value: "عدد الألعاب", label: "عدد الألعاب" },
-                { value: "المشتريات", label: "المشتريات" },
-                { value: "حالة الحساب", label: "حالة الحساب" },
+                { value: "nationality", label: "الجنسية" },
+                { value: "created_at", label: "تاريخ التسجيل" },
+                { value: "games", label: "عدد الألعاب" },
+                { value: "buys", label: "المشتريات" },
+                { value: "status", label: "حالة الحساب" },
               ]}
               selected={sortOption}
               onChange={(value) => setSortOption(value)}
@@ -201,7 +204,7 @@ const AllUsers = () => {
           <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm min-w-[700px]">
             <thead className="text-right">
               <tr className="px-2 py-2 font-medium text-center text-[#085E9C] whitespace-nowrap">
-                <th>رقم</th>
+                <th>ID</th>
                 <th>الأسم</th>
                 <th>البريد الإلكتروني</th>
                 <th>رقم الجوال</th>

@@ -4,9 +4,10 @@ import { AxiosError } from "axios";
 import { useGetDataToken } from "../utils/api";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
+import { getDataById } from "../hooks/useGetData";
 
 export interface UserItem {
-  id: number;
+  id: string | number;
   first_name: string;
   last_name: string;
   email: string;
@@ -16,6 +17,7 @@ export interface UserItem {
   created_at?: string;
   played_games?: number;
   total_purchases_amount?: number;
+  message?: string;
 }
 
 export interface UsersResponse {
@@ -51,6 +53,7 @@ interface UserState {
   error: string | null;
   currentPage: number;
   searchQuery: string;
+  sortOption: string;
 }
 
 const initialState: UserState = {
@@ -59,19 +62,25 @@ const initialState: UserState = {
   error: null,
   currentPage: 1,
   searchQuery: "",
+  sortOption: "",
 };
 
 // ==================== getUser ====================
 export const getUser = createAsyncThunk<
   UsersResponse,
-  { page?: number; search?: string },
+  { page?: number; search?: string; sort?: string }, // ✅ أضفنا sort
   { rejectValue: string }
->("user/getUser", async ({ page = 1, search = "" }, thunkAPI) => {
+>("user/getUser", async ({ page = 1, search = "", sort = "" }, thunkAPI) => {
   try {
-    const query = search ? `&filter[search]=${search}` : "";
-    const res = await useGetDataToken<UsersResponse>(
-      `admin/users?page=${page}${query}`
-    );
+    const query = [
+      `page=${page}`,
+      search ? `filter[search]=${search}` : "",
+      sort ? `sort=${sort}` : "",
+    ]
+      .filter(Boolean)
+      .join("&");
+
+    const res = await useGetDataToken<UsersResponse>(`admin/users?${query}`);
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -81,19 +90,36 @@ export const getUser = createAsyncThunk<
   }
 });
 
+// ==================== getUserById ====================
+export const getUserById = createAsyncThunk<
+  UserItem,
+  string, // id المستخدم
+  { rejectValue: string }
+>("user/getUserById", async (id, thunkAPI) => {
+  try {
+    const res = await getDataById<{ data: UserItem }>("admin/users", id);
+    return res.data; // بيرجع user واحد
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getUserById failed"
+    );
+  }
+});
+
 // ==================== updateUser ====================
 export const updateUser = createAsyncThunk<
   UserItem,
-  { id: string; status: boolean },
+  { id: string } & Partial<UserItem>, // كل الحقول optional + id
   { rejectValue: string }
->("user/updateUser", async ({ id, status }, thunkAPI) => {
+>("user/updateUser", async ({ id, ...formData }, thunkAPI) => {
   try {
-    // useInUpdateData بيرجع الشكل: { success, status, message, data }
-    const res = await useInUpdateData<{ status: boolean }, { data: UserItem }>(
+    // formData فيه كل الحقول اللي جايه من الـ form
+    const res = await useInUpdateData<Partial<UserItem>, { data: UserItem }>(
       `admin/users/${id}`,
-      { status }
+      formData
     );
-    return res.data; // ✅ فقط الـ user updated
+    return res.data; // ✅ الـ user بعد التحديث
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(
@@ -101,6 +127,9 @@ export const updateUser = createAsyncThunk<
     );
   }
 });
+
+
+
 
 // ==================== deleteUser ====================
 export const deleteUser = createAsyncThunk<
@@ -146,6 +175,23 @@ const userSlice = createSlice({
       .addCase(getUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Error fetching users";
+      })
+
+      // ===== GET BY ID =====
+      .addCase(getUserById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        getUserById.fulfilled,
+        (state, action: PayloadAction<UserItem>) => {
+          state.users = { ...state.users, data: [action.payload] };
+          state.loading = false;
+        }
+      )
+      .addCase(getUserById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Error fetching user";
       })
 
       // ===== UPDATE =====

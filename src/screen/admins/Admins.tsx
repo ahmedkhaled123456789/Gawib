@@ -5,31 +5,44 @@ import CustomModal from "../../components/Modals/CustomModal";
 import { AppDispatch, RootState } from "../../store";
 import { getAdmins, deleteAdmin } from "../../store/adminSlice";
 import { toast } from "sonner";
-import { Trash } from "lucide-react";
+import { Trash, EditIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const SupervisorCard = ({ supervisor, onDelete }) => {
   return (
     <div className="border border-[#085E9C] p-4 rounded shadow bg-white space-y-4">
       {/* Main Info */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-2 items-center font-bold text-[#085E9C]">
-        <div className="border rounded border-[#085E9C] p-3 text-center col-span-1">
-          {supervisor.name}
+      <div className="w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2  md:grid-cols-4 xl:grid-cols-6 gap-8 w-full items-center font-bold text-[#085E9C] text-base">
+          <div className="border rounded border-[#085E9C] p-4 text-center col-span-1 min-w-[200px]">
+            {supervisor.name}
+          </div>
+          <div className="bg-yellow-400 text-center border rounded border-[#085E9C] p-4 col-span-1 min-w-[200px]">
+            {supervisor.phone_number}
+          </div>
+          <div className="bg-yellow-400 text-center border rounded border-[#085E9C] p-4 col-span-1 min-w-[200px]">
+            {supervisor.email}
+          </div>
+          <div className="bg-yellow-400 text-center border rounded border-[#085E9C] p-4 col-span-1 min-w-[200px]">
+            Admin
+          </div>
+
+          {/* Edit + Delete Buttons */}
+          <div className="flex justify-center items-center gap-3 col-span-2 md:col-span-1 flex-wrap min-w-[150px]">
+            <Link to={`/admin/edit/${supervisor.id}`}>
+              <button className="px-4 py-2 rounded bg-[#085E9C] text-white font-semibold text-sm hover:bg-[#0a6bb9] transition flex items-center justify-center">
+                <EditIcon className="w-5 h-5" />
+              </button>
+            </Link>
+
+            <button
+              className="bg-red-500 hover:bg-red-600 text-white rounded px-4 py-2 flex justify-center items-center"
+              onClick={() => onDelete(supervisor.id)}
+            >
+              <Trash className="w-5 h-5" />
+            </button>
+          </div>
         </div>
-        <div className="bg-yellow-400 text-center border rounded border-[#085E9C] p-3 col-span-1">
-          {supervisor.phone_number}
-        </div>
-        <div className="bg-yellow-400 text-center border rounded border-[#085E9C] p-3 col-span-1">
-          {supervisor.email}
-        </div>
-        <div className="bg-yellow-400 text-center border rounded border-[#085E9C] p-3 col-span-1">
-          Admin
-        </div>
-        <button
-          className="bg-red-500 hover:bg-red-600 text-white border rounded border-[#085E9C] py-3 col-span-1 flex justify-center items-center"
-          onClick={() => onDelete(supervisor.id)}
-        >
-          <Trash className="w-5 h-5" />
-        </button>
       </div>
 
       {/* Categories */}
@@ -37,7 +50,7 @@ const SupervisorCard = ({ supervisor, onDelete }) => {
         {supervisor.categories?.map((cat, i) => (
           <div
             key={i}
-            className="border font-[500] rounded border-[#085E9C] text-center py-1 text-sm sm:text-base"
+            className="border font-[500] rounded border-[#085E9C] text-center py-1 text-sm sm:text-base truncate"
           >
             {cat}
           </div>
@@ -51,16 +64,13 @@ export default function Admins() {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
-  const { admins, loading } = useSelector(
-    (state: RootState) => state.admin
-  );
+  const { admins, loading } = useSelector((state: RootState) => state.admin);
 
   useEffect(() => {
     dispatch(getAdmins());
   }, [dispatch]);
 
   const handleDelete = async (id: string) => {
-    // نعرض Toast للإشعار قبل الحذف
     toast("هل أنت متأكد من حذف هذا المشرف؟", {
       action: {
         label: "نعم",
@@ -68,7 +78,7 @@ export default function Admins() {
           try {
             await dispatch(deleteAdmin(id)).unwrap();
             toast.success("تم حذف المشرف بنجاح");
-            dispatch(getAdmins()); // إعادة تحميل البيانات بعد الحذف
+            dispatch(getAdmins());
           } catch (err) {
             toast("حدث خطأ أثناء الحذف");
           }
@@ -79,7 +89,8 @@ export default function Admins() {
 
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center bg-white border-b-[#085E9C] border-b p-2">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-center bg-white border-b-[#085E9C] border-b p-2 gap-4">
         <h1 className="text-xl font-bold text-[#085E9C]">المشرفين</h1>
 
         <button
@@ -94,9 +105,9 @@ export default function Admins() {
         </CustomModal>
       </div>
 
+      {/* Supervisor List */}
       <div className="space-y-6 p-2 pt-10 bg-white">
-        {loading && <p>جارٍ التحميل...</p>}
-        {/* {error && <p className="text-red-500">{error}</p>} */}
+        {loading && <p className="text-center">جارٍ التحميل...</p>}
 
         {Array.isArray(admins?.data) && admins.data.length > 0
           ? admins.data.map((sup, idx) => (
