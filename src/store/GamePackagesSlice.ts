@@ -11,7 +11,7 @@ export interface GamePackage {
   id: string;
   is_active?: string | number | boolean;
   name: string;
-  is_free: number;
+  is_free: 0 | 1;
   price: number;
   games_count: number;
   number_of_buys?: number;
@@ -51,12 +51,19 @@ const initialState: GamePackagesState = {
 // Get All Packages
 export const getGamePackages = createAsyncThunk<
   GamePackagesResponse,
-  number,
+  { page: number; search?: string; sort?: string },
   { rejectValue: string }
->("gamePackages/getGamePackages", async (page, thunkAPI) => {
+>("gamePackages/getGamePackages", async ({ page, search, sort }, thunkAPI) => {
   try {
+    const query = [
+      search ? `filter[search]=${encodeURIComponent(search)}` : null,
+      sort ? `sort=${sort}` : null,
+    ]
+      .filter(Boolean)
+      .join("&");
+
     const res = await useGetDataToken<GamePackagesResponse>(
-      `admin/game-packages?page=${page}&sort=-number_of_buys`
+      `admin/game-packages?page=${page}${query ? `&${query}` : ""}`
     );
     return res;
   } catch (error) {
@@ -88,19 +95,23 @@ export const getGamePackageById = createAsyncThunk<
 export const createGamePackage = createAsyncThunk<
   GamePackage,
   Partial<GamePackage>,
-  { rejectValue: string }
+  { rejectValue: any }
 >("gamePackages/createGamePackage", async (data, thunkAPI) => {
   try {
     const res = await useInsertData<Partial<GamePackage>>(
       `admin/game-packages`,
       data
     );
-    thunkAPI.dispatch(getGamePackages(1));
+    thunkAPI.dispatch(getGamePackages({ page: 1 }));
     return res as GamePackage;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
+  } catch (error: any) {
+    console.error("❌ createGamePackage error:", error);
+
+    // نمرر الرسالة أو الكائن الكامل من backend
     return thunkAPI.rejectWithValue(
-      err.response?.data.message || "createGamePackage failed"
+      error.response?.data?.message ||
+        error.message ||
+        "createGamePackage failed"
     );
   }
 });
@@ -116,7 +127,7 @@ export const updateGamePackage = createAsyncThunk<
       `admin/game-packages/${id}`,
       data
     );
-    thunkAPI.dispatch(getGamePackages(1));
+    thunkAPI.dispatch(getGamePackages({ page: 1 }));
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -134,7 +145,7 @@ export const deleteGamePackage = createAsyncThunk<
 >("gamePackages/deleteGamePackage", async (id, thunkAPI) => {
   try {
     const res = await useDeleteData(`admin/game-packages/${id}`);
-    thunkAPI.dispatch(getGamePackages(1));
+    thunkAPI.dispatch(getGamePackages({ page: 1 }));
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -176,22 +187,6 @@ const gamePackagesSlice = createSlice({
       state.loading = false;
       state.error = null;
     });
-
-    builder
-      .addMatcher(
-        (action) => action.type.endsWith("/rejected"),
-        (state, action: any) => {
-          state.loading = false;
-          state.error = action.payload || "Something went wrong";
-        }
-      )
-      .addMatcher(
-        (action) => action.type.endsWith("/pending"),
-        (state) => {
-          state.loading = true;
-          state.error = null;
-        }
-      );
   },
 });
 

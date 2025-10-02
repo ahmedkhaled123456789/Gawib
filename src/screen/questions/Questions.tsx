@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import CustomDropdown from "../../components/CustomDropdown";
@@ -7,29 +7,38 @@ import CustomModal from "../../components/Modals/CustomModal";
 import AddQuestion from "./AddQuestion";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { getQuestions, updateQuestion } from "../../store/questionsSlice";
+import { getQuestions, deleteQuestion } from "../../store/questionsSlice";
+import { Trash } from "lucide-react";
+import { toast } from "sonner";
 
 const ProductRow = ({
   product,
-  setSelectedImg,
   setSelectedId,
-  handleConfirmStatus,
-  index,
   setShowPriceModal,
+  handleDelete,
 }) => {
+  const renderContent = (data) => {
+    if (!data) return "—";
+    if (data.text) return data.text;
+    if (data.image) return <span className="text-blue-500">📷 صورة</span>;
+    if (data.video) return <span className="text-red-500">🎬 فيديو</span>;
+    if (data.sound) return <span className="text-green-500">🎵 صوت</span>;
+    return "—";
+  };
+
   return (
-    <tr key={product._id}>
-      <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
+    <tr key={product.id}>
+      <td className="px-4 py-2 font-medium text-gray-900">{product.id}</td>
       <td className="px-4 py-2 text-gray-700">
-        <Link to={`/productDetails/${product._id}`}>
+        <Link to={`/productDetails/${product.id}`}>
           <div className="w-20 truncate">{product.game_name}</div>
         </Link>
       </td>
       <td className="px-4 py-2 text-gray-700 w-72 truncate">
-        {product?.question?.text}
+        {renderContent(product?.question)}
       </td>
       <td className="px-4 py-2 text-gray-700 w-72 truncate">
-        {product?.answer?.text}
+        {renderContent(product?.answer)}
       </td>
       <td className="px-4 py-2 text-white">
         <div
@@ -38,43 +47,35 @@ const ProductRow = ({
               ? "bg-[#309222]"
               : product.points === 400
               ? "bg-[#9647c4]"
-              : "bg-[#ae1113]"
+              : product.points === 600
+              ? "bg-[#ae1113]"
+              : "bg-gray-500"
           }`}
         >
           {product.points}
         </div>
       </td>
+      <td className="px-4 py-2 text-gray-700 w-20">{product.hint || "—"}</td>
       <td className="px-4 py-2 text-gray-700 w-20">
-        {product.see || "سنوات 2"}
-      </td>
-      <td className="px-4 py-2 text-gray-700 w-20">
-        {product.admin || "محمد الناصر"}
+        {product.admin_name || "محمد الناصر"}
       </td>
       <td className="px-4 py-2">
         <div className="flex items-center justify-center w-40 gap-2 flex-wrap">
           <span
             className="p-1 border cursor-pointer rounded bg-[#085E9C]"
             onClick={() => {
-              setSelectedId(product._id || product.id);
+              setSelectedId(product.id);
               setShowPriceModal(true);
             }}
           >
             <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
           </span>
-          <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
-            <img
-              src="/images/group/see.png"
-              alt={`${product.categoryName} logo`}
-              className="w-6 h-6 cursor-pointer"
-              onClick={() => setSelectedImg(product.question.image)}
-            />
-          </span>
-          <button
-            onClick={handleConfirmStatus}
-            className="text-[#085E9C] border border-[#085E9C] rounded px-3 py-1 hover:bg-[#085E9C] hover:text-white"
+          <span
+            className="cursor-pointer text-red-700"
+            onClick={() => handleDelete(product.id)}
           >
-            اعتماد
-          </button>
+            <Trash className="w-5 h-5" />
+          </span>
         </div>
       </td>
     </tr>
@@ -87,31 +88,80 @@ const Questions = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [pointsFilter, setPointsFilter] = useState<string | null>(null);
   const [showPriceModal, setShowPriceModal] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [selectedImg, setSelectedImg] = useState<any>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
+  // جلب البيانات
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      dispatch(getQuestions({ page: 1, search: searchQuery }));
-    }, 500); // debounce 500ms
+      dispatch(
+        getQuestions({
+          page: 1,
+          search: searchQuery,
+          sort: statusFilter,
+          points: pointsFilter || undefined,
+        })
+      );
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, dispatch]);
+  }, [searchQuery, statusFilter, pointsFilter, dispatch]);
 
-  const handleConfirmStatus = (data: { id: string; is_active: "0" | "1" }) => {
-    dispatch(
-      updateQuestion({
-        id: data.id,
-        formData: { is_active: !data.is_active, _method: "PUT" },
+  const onPress = async (page: number) => {
+    await dispatch(
+      getQuestions({
+        page,
+        search: searchQuery,
+        sort: statusFilter,
+        points: pointsFilter || undefined,
       })
     );
   };
 
-  const onPress = async (page: number) => {
-    await dispatch(getQuestions({ page, search: searchQuery }));
+  // الحذف
+  const handleDelete = (id: string) => {
+    toast("هل أنت متأكد من حذف السؤال؟", {
+      action: {
+        label: "حذف",
+        onClick: () => {
+          dispatch(deleteQuestion(id)).then(() => {
+            dispatch(
+              getQuestions({
+                page: 1,
+                search: searchQuery,
+                sort: statusFilter,
+                points: pointsFilter || undefined,
+              })
+            );
+          });
+          toast.success("تم حذف السؤال");
+        },
+      },
+    });
   };
+
+const sortedQuestions = useMemo(() => {
+  if (!questions?.data || !Array.isArray(questions.data)) return [];
+
+  if (statusFilter === "الفئة") {
+    return [...questions.data].sort((a, b) =>
+      (a.game_name || "").localeCompare(b.game_name || "")
+    );
+  }
+
+  if (statusFilter === "المشرف") {
+    return [...questions.data].sort((a, b) =>
+      (a.admin_name || "").localeCompare(b.admin_name || "")
+    );
+  }
+
+  return [...questions.data].sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+}, [questions, statusFilter]);
 
   return (
     <div className="overflow-x-hidden">
@@ -125,7 +175,7 @@ const Questions = () => {
             <div className="relative w-full md:w-48 border rounded-md border-[#085E9C]">
               <input
                 type="text"
-                placeholder="ابحث ب السوال"
+                placeholder="ابحث بالفئة او السؤال"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full py-2 pl-8 pr-4 border border-gray-300 rounded-md focus:outline-none"
@@ -134,7 +184,7 @@ const Questions = () => {
             </div>
             <CustomDropdown
               options={[
-                { value: "", label: "الأحدث" },
+                { value: "created_at", label: "الأحدث" },
                 { value: "الفئة", label: "الفئة" },
                 { value: "المشرف", label: "المشرف" },
               ]}
@@ -143,62 +193,65 @@ const Questions = () => {
             />
           </div>
 
-          {/* Points */}
+          {/* Points Filter */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[#ffc629] font-bold border bg-[#085E9C] border-[#085E9C] rounded px-4 py-2">
-              200
-            </span>
-            <span className="text-[#ffc629] font-bold border border-[#085E9C] rounded px-4 py-2">
-              400
-            </span>
-            <span className="text-[#ffc629] font-bold border border-[#085E9C] rounded px-4 py-2">
-              600
-            </span>
-            <span className="text-[#085E9C] flex gap-1 border border-[#085E9C] rounded p-2">
-              <span className="border border-[#085E9C] rounded px-3"></span>
-              <span className="text-[#085E9C] border border-[#085E9C] rounded px-3">
-                اعتماد
+            {[200, 400, 600].map((point) => (
+              <span
+                key={point}
+                className={`text-[#ffc629] font-bold border cursor-pointer px-4 py-2 rounded ${
+                  pointsFilter === point.toString()
+                    ? "bg-[#085E9C] border-[#085E9C]"
+                    : "border border-[#085E9C]"
+                }`}
+                onClick={() =>
+                  setPointsFilter(
+                    pointsFilter === point.toString() ? null : point.toString()
+                  )
+                }
+              >
+                {point}
               </span>
-            </span>
+            ))}
           </div>
 
-          {/* Add Question Button */}
+          {/* إضافة سؤال */}
           <div className="flex items-center mt-2 md:mt-0">
             <button
               className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-4 py-2 rounded text-sm font-medium transition-colors"
-              onClick={() => setShowPriceModal(true)}
+              onClick={() => {
+                setSelectedId(null);
+                setShowPriceModal(true);
+              }}
             >
               إضافة سؤال
             </button>
           </div>
         </div>
 
-        {/* Table */}
+        {/* الجدول */}
         <div className="overflow-x-auto">
           <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm min-w-[700px] md:min-w-full">
             <thead className="text-center">
               <tr className="px-4 py-2 font-medium text-[#085E9C]">
-                <th className="px-4 w-auto py-2 font-medium">رقم</th>
-                <th className="px-4 py-2 font-medium">أسم الفئة</th>
-                <th className="px-4 py-2 font-medium">السؤال</th>
-                <th className="px-4 py-2 font-medium">الجواب</th>
-                <th className="px-4 py-2 font-medium">النقاط</th>
-                <th className="px-4 py-2 font-medium">التلميح</th>
-                <th className="px-4 py-2 font-medium">مشرف الفئة</th>
-                <th className="px-4 py-2 font-medium">إدارة</th>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">أسم الفئة</th>
+                <th className="px-4 py-2">السؤال</th>
+                <th className="px-4 py-2">الجواب</th>
+                <th className="px-4 py-2">النقاط</th>
+                <th className="px-4 py-2">التلميح</th>
+                <th className="px-4 py-2">مشرف الفئة</th>
+                <th className="px-4 py-2">إدارة</th>
               </tr>
             </thead>
             <tbody className="divide-y text-center divide-gray-200">
-              {questions?.data?.length > 0 ? (
-                questions.data.map((question, index) => (
+              {sortedQuestions.length > 0 ? (
+                sortedQuestions.map((question) => (
                   <ProductRow
-                    key={question._id || question.id}
+                    key={question.id}
                     product={question}
-                    index={index}
                     setShowPriceModal={setShowPriceModal}
-                    handleConfirmStatus={() => handleConfirmStatus(question)}
-                    setSelectedImg={setSelectedImg}
                     setSelectedId={setSelectedId}
+                    handleDelete={handleDelete}
                   />
                 ))
               ) : (
@@ -212,7 +265,7 @@ const Questions = () => {
           </table>
         </div>
 
-        {/* Selected Image Modal */}
+        {/* صورة */}
         {selectedImg && (
           <div
             className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
@@ -232,35 +285,16 @@ const Questions = () => {
           <Pagination pageCount={questions.meta.last_page} onPress={onPress} />
         )}
 
-        {/* Add/Edit Question Modal */}
+        {/* Add/Edit Modal */}
         <CustomModal isOpen={showPriceModal}>
           <AddQuestion
+            key={selectedId || "new"}
             selectedId={selectedId}
-            onClose={() => setShowPriceModal(false)}
+            onClose={() => {
+              setSelectedId(null);
+              setShowPriceModal(false);
+            }}
           />
-        </CustomModal>
-
-        {/* Delete Confirmation Modal */}
-        <CustomModal isOpen={showModal}>
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white rounded-md p-6 shadow-lg w-full max-w-md border border-blue-300">
-              <p className="text-center mb-6">هل تريد حذف السؤال؟</p>
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-white rounded bg-[#ff426e]"
-                >
-                  حذف
-                </button>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-blue-500 text-blue-600 rounded hover:bg-blue-50"
-                >
-                  إغلاق
-                </button>
-              </div>
-            </div>
-          </div>
         </CustomModal>
       </div>
     </div>

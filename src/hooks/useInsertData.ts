@@ -16,11 +16,12 @@ const useInsertData = async <T>(
 
     const res = await baseUrl.post<T>(url, params, defaultConfig);
     return res.data;
-  } catch (error) {
-    console.error(`Error inserting data to ${url}:`, error);
-    throw new Error("Failed to insert data");
+  } catch (error: any) {
+    console.error(`Error inserting data to ${url}:`, error.response?.data || error.message);
+    throw error; 
   }
 };
+
 
 const useInsertData2 = async <TResponse, TParams>(
   url: string,

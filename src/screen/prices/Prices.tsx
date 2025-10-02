@@ -78,7 +78,7 @@ const Prices = () => {
   );
 
   useEffect(() => {
-    dispatch(getGamePackages(1));
+    dispatch(getGamePackages({ page: 1 }));
   }, [dispatch]);
 
   if (loading) return <div>جاري التحميل...</div>;

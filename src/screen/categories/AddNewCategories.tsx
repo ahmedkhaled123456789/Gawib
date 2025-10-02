@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
-import { createGame } from "../../store/gameSlice"; // Assuming you still use this to create the category
+import { createGame } from "../../store/gameSlice";
 import { getAllCategoriesForDropdown } from "../../store/categoriesSlice";
 import { toast } from "sonner";
 
@@ -12,7 +12,9 @@ interface AddNewCategoriesProps {
 
 const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
   const dispatch = useDispatch<AppDispatch>();
-  const { categories } = useSelector((state: RootState) => state.categories);
+  const { dropdownCategories } = useSelector(
+    (state: RootState) => state.categories
+  );
 
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [name, setName] = useState("");
@@ -53,7 +55,7 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
       toast.success("تم حفظ التصنيف بنجاح!");
       onClose();
     } catch (err) {
-      toast.error("حدث خطأ أثناء حفظ التصنيف");
+    toast.error(err as string); // ⬅️ هنا التعديل
     } finally {
       setLoading(false);
     }
@@ -74,10 +76,9 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="border border-[#085E9C] rounded px-3 py-2 text-sm outline-none"
-            required
           >
             <option value="">-- اختر الفئه --</option>
-            {categories?.data?.map((cat: any) => (
+            {dropdownCategories?.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
               </option>

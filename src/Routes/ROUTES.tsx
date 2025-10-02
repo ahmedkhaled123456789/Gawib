@@ -3,7 +3,7 @@ import DashboardLayout from "../Layout/DashboardLayout";
 import PrivateRoute from "./PrivateRoute";
 import AllUsers from "../screen/user/AllUsers";
 import Categories from "../screen/categories/Categories";
-import Prices from "../screen/prices/Prices";
+// import Prices from "../screen/prices/Prices";
 import Admins from "../screen/admins/Admins";
 import Questions from "../screen/questions/Questions";
 import SettingsPage from "../screen/settings/SettingsPage";
@@ -37,7 +37,7 @@ export const ROUTES = [
           { path: "", element: <AllUsers /> },
           { path: "add-user", element: <AddUser /> },
           { path: "categories", element: <Categories /> },
-          { path: "prices", element: <Prices /> },
+          // { path: "prices", element: <Prices /> },
           { path: "admins", element: <Admins /> },
           { path: "admin/edit/:id", element: <UpdateAdmin /> },
           { path: "questions", element: <Questions /> },

@@ -6,8 +6,10 @@ import CustomModal from "../../components/Modals/CustomModal";
 import AddCategories from "./AddCategories";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { getGames } from "../../store/gameSlice";
+import { getGames, deleteGame } from "../../store/gameSlice";
 import AddNewCategories from "./AddNewCategories";
+import { EditIcon, TrashIcon } from "lucide-react";
+import { toast } from "sonner";
 
 const QuestionStats = ({ stats }) => {
   const colors = [
@@ -46,14 +48,6 @@ const QuestionStats = ({ stats }) => {
         </span>
         <span className={`px-2 py-1 rounded font-bold ${colorsText[2]}`}>
           {stats.active_points_600}
-        </span>
-      </div>
-      <div className="grid grid-cols-1 gap-1">
-        <span className={`px-2 py-1 rounded text-white font-bold ${colors[3]}`}>
-          {stats.total || 100}
-        </span>
-        <span className={`px-2 py-1 rounded font-bold ${colorsText[3]}`}>
-          {stats.total || 100}
         </span>
       </div>
     </div>
@@ -99,14 +93,6 @@ const QuestionStatsNon = ({ stats }) => {
           {stats.non_active_points_600}
         </span>
       </div>
-      <div className="grid grid-cols-1 gap-1">
-        <span className={`px-2 py-1 rounded text-white font-bold ${colors[3]}`}>
-          {stats.total || 100}
-        </span>
-        <span className={`px-2 py-1 rounded font-bold ${colorsText[3]}`}>
-          {stats.total || 100}
-        </span>
-      </div>
     </div>
   );
 };
@@ -115,12 +101,12 @@ const CategoriesRow = ({
   product,
   setSelectedImg,
   setSelectedId,
-  index,
   setShowCatModal,
+  handleDelete,
 }) => {
   return (
     <tr key={product.id} className="text-center">
-      <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
+      <td className="px-4 py-2 font-medium text-gray-900">{product.id}</td>
       <td className="px-4 py-2 text-gray-700">
         <div className="w-24">{product.name}</div>
       </td>
@@ -158,15 +144,21 @@ const CategoriesRow = ({
           {product.is_active ? "منشورة" : "موقوفة"}
         </span>
       </td>
-      <td className="px-4 py-2">
+      <td className="px-4 py-2 flex items-center justify-center gap-2">
         <button
-          className="py-2 w-24 bg-[#085e9c] text-white rounded cursor-pointer"
+          className="p-2 bg-[#085e9c] text-white rounded-full hover:bg-[#064b7a] transition flex items-center justify-center"
           onClick={() => {
             setSelectedId(product.id);
             setShowCatModal(true);
           }}
         >
-          إضافة صورة
+          <EditIcon size={18} />
+        </button>
+        <button
+          className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition flex items-center justify-center"
+          onClick={() => handleDelete(product.id)}
+        >
+          <TrashIcon size={18} />
         </button>
       </td>
     </tr>
@@ -178,25 +170,38 @@ const Categories = () => {
   const { games } = useSelector((state: RootState) => state.game);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [sort, setSort] = useState("-created_at"); // state واحد يحوي العمود والاتجاه
   const [showCatModal, setShowCatModal] = useState(false);
   const [showAddCatModal, setShowAddCatModal] = useState(false);
   const [selectedImg, setSelectedImg] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
   const userinfo = JSON.parse(localStorage.getItem("userinfo") || "{}");
-  const adminId = userinfo?.id ?? 0; // fallback لو مش موجود
-  // ---- Fetch Games on Search or Page Change ----
+  const adminId = userinfo?.id ?? 0;
+
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      dispatch(getGames({ page: 1, search: searchQuery }));
+      dispatch(getGames({ page: 1, search: searchQuery, sort }));
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+  }, [searchQuery, sort]);
 
   const onPress = async (page) => {
-    await dispatch(getGames({ page, search: searchQuery }));
+    await dispatch(getGames({ page, search: searchQuery, sort }));
+  };
+
+  const handleDelete = (id: string) => {
+    toast("هل تريد الحذف؟", {
+      action: {
+        label: "نعم",
+        onClick: () => {
+          dispatch(deleteGame(id)).then(() => {
+            dispatch(getGames({ page: 1, search: searchQuery, sort }));
+          });
+        },
+      },
+    });
   };
 
   return (
@@ -208,26 +213,33 @@ const Categories = () => {
           <div className="relative w-full md:w-64 border rounded-md border-[#085E9C]">
             <input
               type="text"
-              placeholder="بحث"
+              placeholder="ابحث باسم الفئة او أسم المجموعة"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-md focus:outline-none"
             />
             <FiSearch className="absolute left-3 top-3 text-gray-500" />
           </div>
+
           <CustomDropdown
             options={[
-              { value: "", label: "الأحدث" },
-              { value: "الجنسية", label: "الجنسية" },
-              { value: "تاريخ التسجيل", label: "تاريخ التسجيل" },
-              { value: "عدد الألعاب", label: "عدد الألعاب" },
-              { value: "المشتريات", label: "المشتريات" },
-              { value: "حالة الحساب", label: "حالة الحساب" },
+              { value: "created_at", label: "الأحدث" },
+              { value: "category", label: "الفئة" },
+              { value: "admin", label: "المشرف" },
+              { value: "number_of_plays", label: "عدد الألعاب" },
+              { value: "status", label: "الحالة" },
             ]}
-            selected={statusFilter}
-            onChange={setStatusFilter}
+            selected={sort.replace("-", "")}
+            onChange={(val) => {
+              if (sort.replace("-", "") === val) {
+                setSort(sort.startsWith("-") ? val : `-${val}`);
+              } else {
+                setSort(`-${val}`);
+              }
+            }}
           />
         </div>
+
         <div className="flex-shrink-0">
           <button
             className="py-2 w-36 bg-[#085e9c] text-white rounded"
@@ -243,7 +255,7 @@ const Categories = () => {
         <table className="min-w-full divide-y-2 divide-[#085E9C] bg-white text-sm">
           <thead className="text-center">
             <tr className="px-4 py-2 text-sm text-[#085E9C]">
-              <th className="px-4 w-auto py-2 font-medium">رقم</th>
+              <th className="px-4 py-2 font-medium">ID</th>
               <th className="px-4 py-2 font-medium">أسم المجموعة</th>
               <th className="px-4 py-2 font-medium">أسم الفئة</th>
               <th className="px-4 py-2 font-medium">مشرف الفئة</th>
@@ -253,7 +265,6 @@ const Categories = () => {
                   <span>200</span>
                   <span>400</span>
                   <span>600</span>
-                  <span>الكل</span>
                 </div>
               </th>
               <th className="px-4 py-2 font-medium">صورة الفئة</th>
@@ -263,7 +274,6 @@ const Categories = () => {
                   <span>200</span>
                   <span>400</span>
                   <span>600</span>
-                  <span>الكل</span>
                 </div>
               </th>
               <th className="px-4 py-2 font-medium">مستخدمي الفئة</th>
@@ -273,14 +283,14 @@ const Categories = () => {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {games?.data.length > 0 ? (
-              games.data.map((product, index) => (
+              games.data.map((product) => (
                 <CategoriesRow
                   setSelectedId={setSelectedId}
                   key={product._id}
                   setSelectedImg={setSelectedImg}
                   product={product}
                   setShowCatModal={setShowCatModal}
-                  index={index}
+                  handleDelete={handleDelete}
                 />
               ))
             ) : (

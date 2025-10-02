@@ -38,13 +38,14 @@ const initialState: QuestionsState = {
 // ========== Get All Questions ==========
 export const getQuestions = createAsyncThunk<
   QuestionData,
-  { page: number; search?: string },
+  { page: number; search?: string; sort?: string; points?: string },
   { rejectValue: string }
->("questions/getQuestions", async ({ page, search }, thunkAPI) => {
+>("questions/getQuestions", async ({ page, search, sort, points }, thunkAPI) => {
   try {
-    const url = search
-      ? `admin/questions?page=${page}&filter[search]=${encodeURIComponent(search)}`
-      : `admin/questions?page=${page}`;
+    let url = `admin/questions?page=${page}`;
+    if (search) url += `&filter[search]=${encodeURIComponent(search)}`;
+    if (sort) url += `&sort=${encodeURIComponent(sort)}`;
+    if (points) url += `&filter[points]=${encodeURIComponent(points)}`; 
     const res = await useGetDataToken<QuestionData>(url);
     return res;
   } catch (error) {

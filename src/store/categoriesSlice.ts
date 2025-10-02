@@ -39,7 +39,8 @@ export interface CategoriesResponse {
 
 interface CategoryState {
   category: Category | null;
-  categories: CategoriesResponse | null;
+  categories: CategoriesResponse | null; // للـ pagination
+  dropdownCategories: Category[]; // للـ dropdown
   loading: boolean;
   error: string | null;
 }
@@ -47,6 +48,7 @@ interface CategoryState {
 const initialState: CategoryState = {
   category: null,
   categories: null,
+  dropdownCategories: [],
   loading: false,
   error: null,
 };
@@ -72,7 +74,7 @@ export const getCategory = createAsyncThunk<
   }
 });
 
-// ===== Get all categories with pagination (argument اختياري) =====
+// ===== Get all categories with pagination =====
 export const getCategories = createAsyncThunk<
   CategoriesResponse,
   { page?: number; search?: string } | void,
@@ -95,13 +97,13 @@ export const getCategories = createAsyncThunk<
 
 // ===== Get all categories for dropdown =====
 export const getAllCategoriesForDropdown = createAsyncThunk<
-  CategoriesResponse,
+  Category[],
   void,
   { rejectValue: string }
 >("category/getAllCategoriesForDropdown", async (_, thunkAPI) => {
   try {
-    const res = await useGetDataToken<CategoriesResponse>(`admin/categories`);
-    return res;
+    const res = await useGetDataToken<{ data: Category[] }>(`admin/categories`);
+    return res.data; // Array نظيفة للـ dropdown
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(
@@ -121,7 +123,7 @@ export const addCategory = createAsyncThunk<
       "admin/categories",
       formData
     );
-    thunkAPI.dispatch(getCategories()); // refresh list بدون خطأ type
+    thunkAPI.dispatch(getCategories()); // refresh list
     return res;
   } catch (error) {
     console.error("Error adding category:", error);
@@ -131,17 +133,17 @@ export const addCategory = createAsyncThunk<
 
 // ===== Update category =====
 export const updateCategory = createAsyncThunk<
-  Category, // نوع الإرجاع
-  { id: string; formData: FormData }, // نوع الوسائط
+  Category,
+  { id: string; formData: FormData },
   { rejectValue: string }
 >("category/updateCategory", async ({ id, formData }, thunkAPI) => {
   try {
-    const res = await useInsertDataWithImage<Category>( // هنا نحدد النوع Category
+    const res = await useInsertDataWithImage<Category>(
       `admin/categories/${id}`,
       formData
     );
-    thunkAPI.dispatch(getCategories()); // تحديث القائمة
-    return res; // نعيد Category
+    thunkAPI.dispatch(getCategories()); // refresh list
+    return res;
   } catch (error) {
     console.error("Error updating category:", error);
     return thunkAPI.rejectWithValue("فشل في تعديل التصنيف");
@@ -180,7 +182,7 @@ const categoriesSlice = createSlice({
         }
       )
 
-      // Get all categories
+      // Get all categories with pagination
       .addCase(getCategories.pending, (state) => {
         state.loading = true;
       })
@@ -196,6 +198,24 @@ const categoriesSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "فشل في تحميل المجموعات";
       })
+
+      // Get categories for dropdown
+      .addCase(getAllCategoriesForDropdown.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(
+        getAllCategoriesForDropdown.fulfilled,
+        (state, action: PayloadAction<Category[]>) => {
+          state.dropdownCategories = action.payload;
+          state.loading = false;
+          state.error = null;
+        }
+      )
+      .addCase(getAllCategoriesForDropdown.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "فشل في تحميل القايمة المختصرة";
+      })
+
       // Add category
       .addCase(addCategory.pending, (state) => {
         state.loading = true;
@@ -208,6 +228,7 @@ const categoriesSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "فشل في إضافة التصنيف";
       })
+
       // Update category
       .addCase(updateCategory.pending, (state) => {
         state.loading = true;
@@ -220,6 +241,7 @@ const categoriesSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "فشل في تعديل التصنيف";
       })
+
       // Delete category
       .addCase(
         deleteCategory.fulfilled,
@@ -229,6 +251,9 @@ const categoriesSlice = createSlice({
               (cat) => cat.id.toString() !== action.payload
             );
           }
+          state.dropdownCategories = state.dropdownCategories.filter(
+            (cat) => cat.id.toString() !== action.payload
+          );
         }
       );
   },

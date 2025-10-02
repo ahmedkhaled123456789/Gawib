@@ -36,13 +36,16 @@ const initialState: GameState = {
 // ---- Get All Games with optional search ----
 export const getGames = createAsyncThunk<
   GameData,
-  { page: number; search?: string },
+  { page: number; search?: string; sort?: string },
   { rejectValue: string }
->("game/getGames", async ({ page, search }, thunkAPI) => {
+>("game/getGames", async ({ page, search, sort = "-created_at" }, thunkAPI) => {
   try {
     const url = search
-      ? `admin/games?page=${page}&filter[name]=${encodeURIComponent(search)}`
-      : `admin/games?page=${page}`;
+      ? `admin/games?page=${page}&filter[search]=${encodeURIComponent(
+          search
+        )}&sort=${sort}&is_paginated=true`
+      : `admin/games?page=${page}&sort=${sort}&is_paginated=true`;
+
     const res = await useGetDataToken<GameData>(url);
     return res;
   } catch (error) {
@@ -60,7 +63,9 @@ export const getAllGamesForDropdown = createAsyncThunk<
   { rejectValue: string }
 >("game/getAllGamesForDropdown", async (_, thunkAPI) => {
   try {
-    const res = await useGetDataToken<GameData>(`admin/games`);
+    const res = await useGetDataToken<GameData>(
+      `admin/games?is_paginated=false`
+    );
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -119,7 +124,7 @@ export const createGame = createAsyncThunk<
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(
-      err.response?.data.message || "createGame failed"
+      err.response?.data.message || "قيمة الحقل الاسم مُستخدمة من قبل"
     );
   }
 });
@@ -198,7 +203,6 @@ const gameSlice = createSlice({
         state.error = null;
       })
       .addCase(getAllGamesForDropdown.fulfilled, (state, action) => {
-        // لو الـ API بيرجع object فيه data زي { data: [...] } استخدم action.payload.data
         state.games = action.payload;
         state.loading = false;
         state.error = null;

@@ -5,10 +5,9 @@
 /* @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap'); */
 
 @font-face {
-  font-family: 'Cairo';
-  src: url('Cairo-Regular-normal.ttf') format('ttf');
+  font-family: "Cairo";
+  src: url("Cairo-Regular-normal.ttf") format("ttf");
 }
- 
 
 /* Global styles for RTL */
 html[dir="rtl"] {
@@ -31,29 +30,32 @@ html[dir="ltr"] {
 body {
   margin: 0;
   padding: 0;
-   font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scrollbar-width: none;
   background: #fff;
-
 }
 
 code {
- font-family: 'Tajawal', sans-serif;
+  font-family: "Tajawal", sans-serif;
 }
 
 /*=======Scroll bar=======*/
-::-webkit-scrollbar{
+::-webkit-scrollbar {
   width: 10px;
-   background:  #ccc;
- }
-::-webkit-scrollbar-thumb{
-  background:  #085E9C ;
+  background: #ccc;
+}
+::-webkit-scrollbar-thumb {
+  background: #085e9c;
   border-radius: 2em;
   cursor: pointer;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #085e9c;
+}
 
- }
-::-webkit-scrollbar-thumb:hover{
-  background: #085E9C;
- }
+.dropdown-menu {
+  max-height: 200px; 
+  overflow-y: auto; 
+}

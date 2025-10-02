@@ -9,7 +9,7 @@ import { BiPhoneCall } from "react-icons/bi";
 import {
   MdOutlineCrueltyFree,
   MdOutlinePointOfSale,
-  MdOutlinePriceChange,
+  // MdOutlinePriceChange,
 } from "react-icons/md";
 import {
   FaLayerGroup,
@@ -79,11 +79,11 @@ const Sidebar: React.FC = () => {
       label: "اللعبة المجانية",
       path: "/game",
     },
-    {
-      icon: <MdOutlinePriceChange className="size-6" />,
-      label: "باقات الاسعار",
-      path: "/prices",
-    },
+    // {
+    //   icon: <MdOutlinePriceChange className="size-6" />,
+    //   label: "باقات الاسعار",
+    //   path: "/prices",
+    // },
     {
       icon: <RiDiscountPercentLine className="size-6" />,
       label: "كود خصم",
