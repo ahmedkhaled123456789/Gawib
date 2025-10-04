@@ -9,7 +9,6 @@ import Questions from "../screen/questions/Questions";
 import SettingsPage from "../screen/settings/SettingsPage";
 import Game from "../screen/game/Game";
 import Groups from "../screen/group/Groups";
-import Sales from "../screen/sales/Sales";
 import SalesRecovered from "../screen/salesRecovered/SalesRecovered";
 import ContactUs from "../screen/contactUs/ContactUs";
 import Discount from "../screen/discount/Discount";
@@ -20,6 +19,7 @@ import GamePackages from "../screen/GamePackages/GamePackages";
 import PostedQuestions from "../screen/PostedQuestions/posted-questions";
 import UpdateAdmin from "../screen/admins/UpdateAdmin";
 import UpdateGroup from "../screen/group/UpdateGroup";
+import Payment from "../screen/sales/Payment";
 
 export const ROUTES = [
   {
@@ -48,7 +48,7 @@ export const ROUTES = [
           { path: "game", element: <Game /> },
           { path: "groups", element: <Groups /> },
           { path: "group/edit/:id", element: <UpdateGroup /> },
-          { path: "sales", element: <Sales /> },
+          { path: "payments", element: <Payment /> },
           { path: "salesRecovered", element: <SalesRecovered /> },
           { path: "contactus", element: <ContactUs /> },
           { path: "discount", element: <Discount /> },

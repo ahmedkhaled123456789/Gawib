@@ -1,17 +1,22 @@
+// settingsSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useGetDataToken } from "../utils/api";
- import { useInUpdateData } from "../hooks/useUpdateData";
- import { AxiosError } from "axios";
+import { useInUpdateData } from "../hooks/useUpdateData";
+import { useInsertData2 } from "../hooks/useInsertData";
+import { AxiosError } from "axios";
+import useDeleteData from "../hooks/useDeleteData";
 
-interface Setting {
-  [x: string]: any;
-  _id?: string;
+export interface Setting {
+  id?: number;
   key: string;
   value: string;
+  type: string;
 }
- interface SettingResponse {
+
+interface SettingResponse {
   data: Setting[];
 }
+
 interface SettingsState {
   settings: SettingResponse | null;
   loading: boolean;
@@ -24,7 +29,7 @@ const initialState: SettingsState = {
   error: null,
 };
 
-// ========== Get All ==========
+// ======== GET SETTINGS ========
 export const getSettings = createAsyncThunk<
   SettingResponse,
   void,
@@ -35,42 +40,71 @@ export const getSettings = createAsyncThunk<
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to fetch settings");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "Failed to fetch settings"
+    );
   }
 });
 
-
-
-
-
-
-// ========== Update ==========
+// ======== UPDATE SETTING ========
 export const updateSetting = createAsyncThunk<
   Setting,
-  { id: string; data: Partial<Setting> },
+  { id: number; data: Partial<Setting> },
   { rejectValue: string }
->(
-  "settings/update",
-  async ({ id, data }, thunkAPI) => {
-    try {
-      const res = await useInUpdateData<Partial<Setting>, Setting>(
-        `admin/settings/${id}`,
-        data
-      );
-           thunkAPI.dispatch(getSettings());
-      
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(
-        err.response?.data.message || "Failed to update setting"
-      );
-    }
+>("settings/update", async ({ id, data }, thunkAPI) => {
+  try {
+    const res = await useInUpdateData<Partial<Setting>, Setting>(
+      `admin/settings/${id}`,
+      data
+    );
+    thunkAPI.dispatch(getSettings());
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "Failed to update setting"
+    );
   }
-);
+});
 
+// ======== ADD SETTING ========
+export const addSetting = createAsyncThunk<
+  Setting,
+  { key: string; value: string; type: string },
+  { rejectValue: string }
+>("settings/add", async (data, thunkAPI) => {
+  try {
+    const res = await useInsertData2<
+      Setting,
+      { key: string; value: string; type: string }
+    >(`admin/settings`, data);
+    thunkAPI.dispatch(getSettings());
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "Failed to add setting"
+    );
+  }
+});
 
-
+// ======== DELETE SETTING ========
+export const deleteSetting = createAsyncThunk<
+  number, // نرجع الـ id المحذوف
+  number, // id المطلوب حذفه
+  { rejectValue: string }
+>("settings/delete", async (id, thunkAPI) => {
+  try {
+    await useDeleteData(`admin/settings/${id}`);
+    thunkAPI.dispatch(getSettings());
+    return id;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "Failed to delete setting"
+    );
+  }
+});
 
 const settingsSlice = createSlice({
   name: "settings",
@@ -83,29 +117,49 @@ const settingsSlice = createSlice({
       state.error = null;
     });
 
-  
-
-  
-
     builder.addCase(updateSetting.fulfilled, (state, action) => {
-  if (state.settings) {
-    state.settings.data = state.settings.data.map((setting) =>
-      setting._id === action.payload._id ? action.payload : setting
-    );
-  }
-  state.loading = false;
-  state.error = null;
-});
+      if (state.settings) {
+        state.settings.data = state.settings.data.map((setting) =>
+          setting.id === action.payload.id ? action.payload : setting
+        );
+      }
+      state.loading = false;
+      state.error = null;
+    });
+
+    builder.addCase(addSetting.fulfilled, (state, action) => {
+      if (state.settings) {
+        state.settings.data.push(action.payload);
+      }
+      state.loading = false;
+      state.error = null;
+    });
+
+    builder.addCase(deleteSetting.fulfilled, (state, action) => {
+      if (state.settings) {
+        state.settings.data = state.settings.data.filter(
+          (setting) => setting.id !== action.payload
+        );
+      }
+      state.loading = false;
+      state.error = null;
+    });
 
     builder
-      .addMatcher((action) => action.type.endsWith("/pending"), (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addMatcher((action) => action.type.endsWith("/rejected"), (state, action: any) => {
-        state.loading = false;
-        state.error = action.payload || "Something went wrong";
-      });
+      .addMatcher(
+        (action) => action.type.endsWith("/pending"),
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith("/rejected"),
+        (state, action: any) => {
+          state.loading = false;
+          state.error = action.payload || "Something went wrong";
+        }
+      );
   },
 });
 

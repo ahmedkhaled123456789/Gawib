@@ -1,19 +1,20 @@
-// pages/admin/Sales.tsx
 import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { Link } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
-import AddSales from "./AddSales";
-import { getPayments, deletePayment } from "../../store/payment";
+import { getPayments, deletePayment, updatePayment } from "../../store/payment";
 import { toast } from "sonner";
+import Refund from "./Refundt";
 
 const ProductRow = ({ product, setShowModal, dispatch }) => {
+  const [isChecked, setIsChecked] = useState(product.status === 1);
+  const [loading, setLoading] = useState(false);
+
   const handleDelete = () => {
     toast("هل تريد الحذف؟", {
       action: {
@@ -26,28 +27,35 @@ const ProductRow = ({ product, setShowModal, dispatch }) => {
     });
   };
 
+  const handleStatusToggle = async () => {
+    setLoading(true);
+    try {
+      await dispatch(
+        updatePayment({
+          id: product.id,
+          status: isChecked ? 0 : 1,
+        })
+      ).unwrap();
+      setIsChecked(!isChecked);
+      toast.success("تم تحديث الحالة بنجاح");
+    } catch (err) {
+      toast.error("فشل تحديث الحالة");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <tr key={product.id} className="text-xs sm:text-sm">
       <td className="px-2 sm:px-4 py-2 font-medium text-gray-900 whitespace-nowrap">
         {product.id}
       </td>
-      {/* بيانات العميل */}
       <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
-        <Link to={`/productDetails/${product.id}`}>
-          {product.user?.first_name} {product.user?.last_name}
-        </Link>
-      </td>
-      <td className="px-2 sm:px-4 py-2 text-gray-700 truncate max-w-[140px]">
-        {product.user?.email || "_"}
+        {product.user_id || "_"}
       </td>
       <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
-        {product.user?.phone_number || "_"}
+        {product.package_id || "_"}
       </td>
-      <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
-        {product.user?.nationality || "_"}
-      </td>
-
-      {/* بيانات الفاتورة */}
       <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
         {product.order_id}
       </td>
@@ -60,29 +68,23 @@ const ProductRow = ({ product, setShowModal, dispatch }) => {
       <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
         {product.created_at || "_"}
       </td>
-
-      {/* الدفع */}
       <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
-        {product.payment_method}
+        {product.payment_method || "_"}
       </td>
       <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
         {product.paytabs_response?.payment_info?.card_scheme || "_"} -
         {product.paytabs_response?.payment_info?.card_type || "_"}
       </td>
-      <td className="px-2 sm:px-4 py-2 text-gray-700 truncate max-w-[140px]">
-        {product.paytabs_response?.payment_description || "_"}
+      <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
+        {product.paytabs_response?.payment_info?.payment_description
+          ? product.paytabs_response.payment_info.payment_description
+              .replace(/\D/g, "")
+              .slice(-4)
+          : "_"}
       </td>
       <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
-        {product.amount} {product.paytabs_response?.cart_currency || ""}
+        {product.amount} {product.currency || ""}
       </td>
-      <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
-        {product.tax || "_"}
-      </td>
-      <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
-        {product.net_amount || product.amount}
-      </td>
-
-      {/* الحالة */}
       <td className="px-2 sm:px-4 py-2 text-gray-700 whitespace-nowrap">
         {product.status === 1 ? (
           <span className="text-green-600 font-medium">ناجحة</span>
@@ -90,26 +92,31 @@ const ProductRow = ({ product, setShowModal, dispatch }) => {
           <span className="text-red-600 font-medium">فاشلة</span>
         )}
         <div className="text-[10px] sm:text-xs text-gray-500 truncate max-w-[120px]">
-          {product.paytabs_response?.payment_result?.response_message}
+          {product.paytabs_response?.payment_result?.response_message || "_"}
         </div>
       </td>
 
       {/* إدارة */}
       <td className="px-2 sm:px-4 py-2">
         <div className="flex items-center justify-center gap-2">
-          {/* زر الطباعة */}
-          <span className="p-1 border cursor-pointer rounded bg-[#085E9C]">
-            <img
-              src="/images/group/print.png"
-              alt="print"
-              className="w-4 h-4 sm:w-5 sm:h-5"
-            />
-          </span>
+          {/* Checkbox لتعديل الحالة */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            {loading ? (
+              <Loader2 size={16} className="animate-spin text-[#085E9C]" />
+            ) : (
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={handleStatusToggle}
+                className="w-4 h-4 accent-[#085E9C]"
+              />
+            )}
+          </label>
 
           {/* زر الاسترداد */}
           <span
             className="p-1 px-2 sm:px-3 border cursor-pointer text-white rounded bg-[#085E9C] text-xs sm:text-sm"
-            onClick={() => setShowModal(true)}
+            onClick={() => setShowModal(product.id)} // 👈 هنا نبعث الـ id
           >
             استرداد
           </span>
@@ -128,14 +135,14 @@ const ProductRow = ({ product, setShowModal, dispatch }) => {
   );
 };
 
-const Sales = () => {
+const Payment = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { payments, loading, error } = useSelector(
     (state: RootState) => state.payment
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(getPayments(1));
@@ -171,10 +178,9 @@ const Sales = () => {
             <CustomDropdown
               options={[
                 { value: "", label: "الأحدث" },
-                { value: "الجنسية", label: "الجنسية" },
-                { value: "تاريخ الفاتورة", label: "تاريخ الفاتورة" },
-                { value: "طريقة الدفع", label: "طريقة الدفع" },
-                { value: "المبلغ", label: "المبلغ" },
+                { value: "order_id", label: "رقم الفاتورة" },
+                { value: "payment_method", label: "طريقة الدفع" },
+                { value: "amount", label: "المبلغ" },
               ]}
               selected={statusFilter}
               onChange={setStatusFilter}
@@ -188,10 +194,8 @@ const Sales = () => {
             <thead className="text-center text-xs sm:text-sm">
               <tr className="px-2 sm:px-4 py-2 font-medium text-[#085E9C]">
                 <th>ID</th>
-                <th>الاسم</th>
-                <th>البريد الإلكتروني</th>
-                <th>رقم الجوال</th>
-                <th>الجنسية</th>
+                <th>User ID</th>
+                <th>Package ID</th>
                 <th>رقم الفاتورة</th>
                 <th>رقم العملية</th>
                 <th>تاريخ العملية</th>
@@ -199,8 +203,6 @@ const Sales = () => {
                 <th>نوع البطاقة</th>
                 <th>آخر 4 أرقام</th>
                 <th>المبلغ</th>
-                <th>الضريبة</th>
-                <th>الصافي</th>
                 <th>الحالة</th>
                 <th>إدارة</th>
               </tr>
@@ -208,11 +210,11 @@ const Sales = () => {
             <tbody className="divide-y text-center divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={16}>جاري التحميل...</td>
+                  <td colSpan={12}>جاري التحميل...</td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={16} className="text-red-500">
+                  <td colSpan={12} className="text-red-500">
                     {error}
                   </td>
                 </tr>
@@ -227,7 +229,7 @@ const Sales = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={16} className="px-4 py-2 text-gray-700">
+                  <td colSpan={12} className="px-4 py-2 text-gray-700">
                     لم يتم العثور على نتائج.
                   </td>
                 </tr>
@@ -241,11 +243,13 @@ const Sales = () => {
         <Pagination pageCount={payments.meta.last_page} onPress={onPress} />
       )}
 
-      <CustomModal isOpen={showModal}>
-        <AddSales onClose={() => setShowModal(false)} />
+      <CustomModal isOpen={!!showModal}>
+        {showModal && (
+          <Refund paymentId={showModal} onClose={() => setShowModal(null)} />
+        )}
       </CustomModal>
     </div>
   );
 };
 
-export default Sales;
+export default Payment;

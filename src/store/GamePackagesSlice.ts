@@ -48,7 +48,7 @@ const initialState: GamePackagesState = {
 
 // ========== Thunks ==========
 
-// Get All Packages
+// ✅ Get All Packages (Paginated)
 export const getGamePackages = createAsyncThunk<
   GamePackagesResponse,
   { page: number; search?: string; sort?: string },
@@ -63,7 +63,9 @@ export const getGamePackages = createAsyncThunk<
       .join("&");
 
     const res = await useGetDataToken<GamePackagesResponse>(
-      `admin/game-packages?page=${page}${query ? `&${query}` : ""}`
+      `admin/game-packages?page=${page}&is_paginated=true${
+        query ? `&${query}` : ""
+      }`
     );
     return res;
   } catch (error) {
@@ -74,7 +76,26 @@ export const getGamePackages = createAsyncThunk<
   }
 });
 
-// Get One Package
+// ✅ Get All Packages (Without Pagination)
+export const getGamePackagesWithoutPagination = createAsyncThunk<
+  GamePackagesResponse,
+  void,
+  { rejectValue: string }
+>("gamePackages/getAllGamePackages", async (_, thunkAPI) => {
+  try {
+    const res = await useGetDataToken<GamePackagesResponse>(
+      `admin/game-packages?is_paginated=false`
+    );
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getAllGamePackages failed"
+    );
+  }
+});
+
+// ✅ Get One Package by ID
 export const getGamePackageById = createAsyncThunk<
   GamePackage,
   string,
@@ -91,7 +112,7 @@ export const getGamePackageById = createAsyncThunk<
   }
 });
 
-// Create Package
+// ✅ Create Package
 export const createGamePackage = createAsyncThunk<
   GamePackage,
   Partial<GamePackage>,
@@ -107,7 +128,6 @@ export const createGamePackage = createAsyncThunk<
   } catch (error: any) {
     console.error("❌ createGamePackage error:", error);
 
-    // نمرر الرسالة أو الكائن الكامل من backend
     return thunkAPI.rejectWithValue(
       error.response?.data?.message ||
         error.message ||
@@ -116,7 +136,7 @@ export const createGamePackage = createAsyncThunk<
   }
 });
 
-// Update Package
+// ✅ Update Package
 export const updateGamePackage = createAsyncThunk<
   GamePackage,
   { id: string; data: Partial<GamePackage> },
@@ -137,7 +157,7 @@ export const updateGamePackage = createAsyncThunk<
   }
 });
 
-// Delete Package
+// ✅ Delete Package
 export const deleteGamePackage = createAsyncThunk<
   { message: string },
   string,
@@ -166,6 +186,15 @@ const gamePackagesSlice = createSlice({
       state.loading = false;
       state.error = null;
     });
+
+    builder.addCase(
+      getGamePackagesWithoutPagination.fulfilled,
+      (state, action) => {
+        state.gamePackages = action.payload;
+        state.loading = false;
+        state.error = null;
+      }
+    );
 
     builder.addCase(getGamePackageById.fulfilled, (state, action) => {
       state.gamePackage = action.payload.data;

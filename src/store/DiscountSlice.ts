@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useGetDataToken } from "../utils/api";
-import {useInsertData} from "../hooks/useInsertData";
+import { useInsertData } from "../hooks/useInsertData";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
 import { AxiosError } from "axios";
@@ -8,13 +8,13 @@ import { AxiosError } from "axios";
 interface DiscountCode {
   id?: number;
   code?: string;
-  discount?: string;
+  discount?: string | number;
   starts_at?: string;
   ends_at?: string;
-  type?: number| boolean;
+  type?: number;
   status?: string;
   discounted_price?: number;
-  emails?: string | null;
+  emails?: string[];
   game_package?: {
     id: number;
     name: string;
@@ -43,9 +43,7 @@ interface DiscountIdResponse {
   status: number;
   message: string;
   data: DiscountCode;
- 
 }
-
 
 interface DiscountCodesState {
   discountCodes: DiscountResponse | null;
@@ -61,21 +59,28 @@ const initialState: DiscountCodesState = {
   error: null,
 };
 
-// ========== Get All ==========
- export const getDiscountCodes = createAsyncThunk<
-  DiscountResponse, 
-  number,
+// ========== Get All getDiscountCodes ==========
+export const getDiscountCodes = createAsyncThunk<
+  DiscountResponse,
+  { page: number; search?: string; status?: string; sort?: string },
   { rejectValue: string }
->("discountCodes/getAll", async (page, thunkAPI) => {
+>("discountCodes/getAll", async ({ page, search, status, sort }, thunkAPI) => {
   try {
-    const res = await useGetDataToken<DiscountResponse>(`admin/discount-codes?page=${page}`);
-    return res; 
+    let url = `admin/discount-codes?page=${page}`;
+
+    if (search) url += `&filter[search]=${search}`;
+    if (status) url += `&filter[status]=${status}`;
+    if (sort) url += `&sort=${sort}`;
+
+    const res = await useGetDataToken<DiscountResponse>(url);
+    return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to fetch discount codes");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "Failed to fetch discount codes"
+    );
   }
 });
-
 
 // ========== Get One ==========
 export const getDiscountCodeById = createAsyncThunk<
@@ -84,11 +89,15 @@ export const getDiscountCodeById = createAsyncThunk<
   { rejectValue: string }
 >("discountCodes/getOne", async (id, thunkAPI) => {
   try {
-    const res = await useGetDataToken<DiscountIdResponse>(`admin/discount-codes/${id}`);
+    const res = await useGetDataToken<DiscountIdResponse>(
+      `admin/discount-codes/${id}`
+    );
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to fetch discount code");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "Failed to fetch discount code"
+    );
   }
 });
 
@@ -97,61 +106,55 @@ export const createDiscountCode = createAsyncThunk<
   DiscountCode,
   DiscountCode,
   { rejectValue: string }
->(
-  "discountCodes/create",
-  async (data, thunkAPI) => {
-    try {
-      const res = await useInsertData<DiscountCode>(`admin/discount-codes`, data);
-       thunkAPI.dispatch(getDiscountCodes(1));
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(
-        err.response?.data.message || "Failed to create discount code"
-      );
-    }
+>("discountCodes/create", async (data, thunkAPI) => {
+  try {
+    const res = await useInsertData<DiscountCode>(`admin/discount-codes`, data);
+    thunkAPI.dispatch(getDiscountCodes({ page: 1 }));
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "Failed to create discount code"
+    );
   }
-);
-
+});
 
 // ========== Update ==========
 export const updateDiscountCode = createAsyncThunk<
   DiscountCode,
   { id: string; data: Partial<DiscountCode> },
   { rejectValue: string }
->(
-  "discountCodes/update",
-  async ({ id, data }, thunkAPI) => {
-    try {
-      const res = await useInUpdateData<Partial<DiscountCode>, DiscountCode>(
-        `admin/discount-codes/${id}`,
-        data
-      );
-      return res;
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      return thunkAPI.rejectWithValue(
-        err.response?.data.message || "Failed to update discount code"
-      );
-    }
+>("discountCodes/update", async ({ id, data }, thunkAPI) => {
+  try {
+    const res = await useInUpdateData<Partial<DiscountCode>, DiscountCode>(
+      `admin/discount-codes/${id}`,
+      data
+    );
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "Failed to update discount code"
+    );
   }
-);
-
+});
 
 // ========== Delete ==========
 export const deleteDiscountCode = createAsyncThunk<
   { message: string },
-  string,
+  number | string,
   { rejectValue: string }
 >("discountCodes/delete", async (id, thunkAPI) => {
   try {
     const res = await useDeleteData(`admin/discount-codes/${id}`);
-           thunkAPI.dispatch(getDiscountCodes(1));
+    thunkAPI.dispatch(getDiscountCodes({ page: 1 }));
 
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "Failed to delete discount code");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "Failed to delete discount code"
+    );
   }
 });
 
@@ -160,21 +163,20 @@ const discountCodesSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-   builder.addCase(getDiscountCodes.fulfilled, (state, action) => {
-  state.discountCodes = action.payload; 
-  state.loading = false;
-  state.error = null;
-});
+    builder.addCase(getDiscountCodes.fulfilled, (state, action) => {
+      state.discountCodes = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
 
-builder.addCase(getDiscountCodeById.fulfilled, (state, action) => {
-  state.discountCode = action.payload;
-   state.loading = false;
-  state.error = null;
-});
-
+    builder.addCase(getDiscountCodeById.fulfilled, (state, action) => {
+      state.discountCode = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
 
     builder.addCase(createDiscountCode.fulfilled, (state) => {
-       state.loading = false;
+      state.loading = false;
       state.error = null;
     });
 
@@ -189,20 +191,25 @@ builder.addCase(getDiscountCodeById.fulfilled, (state, action) => {
     });
 
     builder.addCase(deleteDiscountCode.fulfilled, (state) => {
-      
       state.loading = false;
       state.error = null;
     });
 
     builder
-      .addMatcher((action) => action.type.endsWith("/pending"), (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addMatcher((action) => action.type.endsWith("/rejected"), (state, action: any) => {
-        state.loading = false;
-        state.error = action.payload || "Something went wrong";
-      });
+      .addMatcher(
+        (action) => action.type.endsWith("/pending"),
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith("/rejected"),
+        (state, action: any) => {
+          state.loading = false;
+          state.error = action.payload || "Something went wrong";
+        }
+      );
   },
 });
 

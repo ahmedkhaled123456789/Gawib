@@ -71,20 +71,26 @@ const LoginForm: React.FC<LoginFormProps> = ({
             }
             inputProps={{
               name: "phone_number",
-              dir: "rtl",
+              className: "border-red-500",
+              dir: "ltr",
             }}
-            containerStyle={{ direction: "rtl" }}
+            containerStyle={{
+              width: "100%",
+              direction: "ltr",
+            }}
             inputStyle={{
               width: "100%",
-              textAlign: "right",
+              textAlign: "left",
               borderRadius: "6px",
-              paddingRight: "50px",
-              padding: "20px 10px",
+              paddingLeft: "48px",
+              paddingRight: "10px",
+              height: "42px",
+              border: "1px solid #d1d5db",
+              boxShadow: "none",
             }}
             buttonStyle={{
               backgroundColor: "transparent",
               border: "none",
-              position: "absolute",
               left: "0",
             }}
           />

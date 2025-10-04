@@ -5,36 +5,90 @@ import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
 import ContactForm from "./ContactForm";
-import { getContacts } from "../../store/contactSlice";
+import { deleteContact, getContacts } from "../../store/contactSlice";
 import { AppDispatch, RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+import { TrashIcon } from "lucide-react";
 
-const ProductRow = ({ product, index, setSelectedId, setShowModal }) => {
+const ProductRow = ({ product, setSelectedId, setShowModal }) => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleDelete = async () => {
+    toast("هل تريد حذف هذه الرسالة؟", {
+      action: {
+        label: "نعم",
+        onClick: async () => {
+          try {
+            await dispatch(deleteContact(product.id)).unwrap();
+            toast.success("تم حذف الرسالة بنجاح");
+          } catch (err) {
+            toast.error(err || "فشل الحذف");
+          }
+        },
+      },
+    });
+  };
+
   return (
     <tr key={product.id}>
-      <td className="px-4 py-2 font-medium text-gray-900">{index + 1}</td>
-      <td className="px-4 py-2 text-gray-700">
+      <td className="px-4 py-2 font-medium text-gray-900 w-[80px] text-center">
+        {product.id}
+      </td>
+
+      <td
+        className="px-4 py-2 text-gray-700 max-w-[160px] truncate"
+        title={`${product.first_name} ${product.last_name}`}
+      >
         <Link to={`/productDetails/${product.id}`}>
           {product.first_name} {product.last_name}
         </Link>
       </td>
-      <td className="px-4 py-2 text-gray-700">{product.email}</td>
-      <td className="px-4 py-2 text-gray-700">{product.message}</td>
-      <td className="px-4 py-2 text-gray-700">{product.answer || "—"}</td>
-      <td className="px-4 py-2 text-white">
+
+      <td
+        className="px-4 py-2 text-gray-700 max-w-[200px] truncate"
+        title={product.email}
+      >
+        {product.email}
+      </td>
+
+      <td
+        className="px-4 py-2 text-gray-700 max-w-[180px] truncate"
+        title={product.message}
+      >
+        {product.message}
+      </td>
+
+      <td
+        className="px-4 py-2 text-gray-700 max-w-[180px] truncate"
+        title={product.answer || "—"}
+      >
+        {product.answer || "—"}
+      </td>
+
+      <td className="px-4 py-2 text-white flex gap-2 justify-center">
+        {/* زرار الرد/عرض */}
         <button
           onClick={() => {
             setSelectedId(product.id);
             setShowModal(true);
           }}
           disabled={product.answer}
-          className={`px-4 py-2 w-full rounded font-semibold cursor-pointer ${
+          className={`px-4 py-2 rounded font-semibold cursor-pointer ${
             product.answer
               ? "text-[#085E9C] border border-[#085E9C]"
               : "bg-[#085E9C]"
           }`}
         >
           {product.answer ? "منتهي" : "جديد"}
+        </button>
+
+        {/* زرار الحذف */}
+        <button
+          onClick={handleDelete}
+          className="p-2 text-red-600 rounded hover:text-red-700"
+        >
+          <TrashIcon size={18} />
         </button>
       </td>
     </tr>
@@ -96,12 +150,12 @@ const ContactUs = () => {
           <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm">
             <thead className="text-center">
               <tr className="px-4 py-2 font-medium text-[#085E9C]">
-                <th className="px-4 py-2">رقم</th>
-                <th className="px-4 py-2">الاسم</th>
-                <th className="px-4 py-2">البريد الإلكتروني</th>
-                <th className="px-4 py-2">الرسالة</th>
-                <th className="px-4 py-2">الرد</th>
-                <th className="px-4 py-2">إدارة</th>
+                <th className="px-4 py-2 w-[80px]">رقم</th>
+                <th className="px-4 py-2 w-[160px]">الاسم</th>
+                <th className="px-4 py-2 w-[200px]">البريد الإلكتروني</th>
+                <th className="px-4 py-2 w-[220px]">الرسالة</th>
+                <th className="px-4 py-2 w-[180px]">الرد</th>
+                <th className="px-4 py-2 w-[120px]">إدارة</th>
               </tr>
             </thead>
 
@@ -119,11 +173,10 @@ const ContactUs = () => {
                   </td>
                 </tr>
               ) : Array.isArray(contacts?.data) && contacts.data.length > 0 ? (
-                contacts.data.map((product, index) => (
+                contacts.data.map((product) => (
                   <ProductRow
                     key={product.id}
                     product={product}
-                    index={index}
                     setShowModal={setShowModal}
                     setSelectedId={setSelectedId}
                   />

@@ -7,6 +7,7 @@ import {
 import { AxiosError } from "axios";
 import { insertData, useGetDataToken } from "../utils/api";
 import { useInUpdateData } from "../hooks/useUpdateData";
+import useDeleteData from "../hooks/useDeleteData";
 
 // ====== Types ======
 export interface ContactData {
@@ -20,7 +21,6 @@ export interface ContactData {
   updated_at: string;
 }
 
-/** واجهات meta و links على مستوى الـ response */
 interface MetaLink {
   url: string | null;
   label: string;
@@ -45,7 +45,6 @@ interface TopLinks {
   next?: string | null;
 }
 
-/** ApiResponse عام: data من النوع T, وممكن يوجد meta/links على الـ top-level */
 export interface ApiResponse<T> {
   success: boolean;
   status: number;
@@ -72,7 +71,7 @@ const initialState: ContactState = {
 
 // ================ Thunks ===============
 
-// GET ALL (data is ContactData[])
+// GET ALL
 export const getContacts = createAsyncThunk<
   ApiResponse<ContactData[]>,
   number,
@@ -134,14 +133,31 @@ export const updateContact = createAsyncThunk<
       data
     );
 
-    // لو عايز تعيد جلب الصفحة الأولى أو الحالية
     thunkAPI.dispatch(getContacts(1));
-
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(
       err.response?.data.message || "updateContact failed"
+    );
+  }
+});
+
+// DELETE
+// DELETE
+export const deleteContact = createAsyncThunk<
+  { id: number },
+  number,
+  { rejectValue: string }
+>("contact/deleteContact", async (id, thunkAPI) => {
+  try {
+    // هنا بنستخدم الهيلبر المخصص للحذف
+    await useDeleteData(`admin/contact-us/${id}`);
+    return { id };
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "deleteContact failed"
     );
   }
 });
@@ -183,7 +199,6 @@ const contactSlice = createSlice({
         addContact.fulfilled,
         (state, action: PayloadAction<ContactData>) => {
           if (state.contacts) {
-            // ضيف في أول المصفوفة
             state.contacts.data = [action.payload, ...state.contacts.data];
             if (state.contacts.meta) {
               state.contacts.meta.total = (state.contacts.meta.total || 0) + 1;
@@ -202,7 +217,19 @@ const contactSlice = createSlice({
             );
           }
         }
-      );
+      )
+
+      // DELETE
+      .addCase(deleteContact.fulfilled, (state, action) => {
+        if (state.contacts) {
+          state.contacts.data = state.contacts.data.filter(
+            (c) => c.id !== action.payload.id
+          );
+          if (state.contacts.meta) {
+            state.contacts.meta.total = (state.contacts.meta.total || 1) - 1;
+          }
+        }
+      });
   },
 });
 

@@ -1,83 +1,112 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import ButtonGroup from "../../components/ButtonGroup";
+import {
+  getDiscountCodeById,
+  updateDiscountCode,
+} from "../../store/DiscountSlice";
+import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
 import {
   getGamePackagesWithoutPagination,
   GamePackage,
 } from "../../store/GamePackagesSlice";
-import { createDiscountCode } from "../../store/DiscountSlice";
 import { Loader2 } from "lucide-react";
 
-const AddDiscount = ({ onClose }: { onClose: () => void }) => {
+const EditDiscount = ({
+  selectedId,
+  onClose,
+}: {
+  selectedId: string;
+  onClose: () => void;
+}) => {
   const { gamePackages, loading, error } = useSelector(
     (state: RootState) => state.gamePackage
   );
   const dispatch = useDispatch<AppDispatch>();
 
-  // States
-  const [discountPercent, setDiscountPercent] = useState<number>();
-  const [originalPrice, setOriginalPrice] = useState<number>(0);
-  const [finalPrice, setFinalPrice] = useState<number>(0);
+  const [code, setCode] = useState<string | number>("");
+  const [price, setPrice] = useState<string | number>("");
+  const [codePrice, setCodePrice] = useState<string | number>("0");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [emails, setEmails] = useState<string[]>([]);
   const [discountCodeName, setDiscountCodeName] = useState<string>("");
-  const [selectedPackage, setSelectedPackage] = useState<number | "">("");
+  const [selectedPackage, setSelectedPackage] = useState<string | number>("");
   const [discountType, setDiscountType] = useState<number>(0);
 
-  // ✅ حالة التحميل عند الإضافة
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  // 🟢 loader للحفظ
+  const [isSaving, setIsSaving] = useState(false);
 
+  // جلب بيانات الكود المختار
+  useEffect(() => {
+    if (selectedId) {
+      dispatch(getDiscountCodeById(selectedId))
+        .unwrap()
+        .then((data) => {
+          const discountData = data?.data;
+
+          setPrice(discountData?.game_package?.price?.toString() || "0");
+          setCode(discountData?.discount || "");
+          setCodePrice(discountData?.discounted_price?.toString() || "0");
+          setStartDate(discountData?.starts_at?.split(" ")[0] || "");
+          setEndDate(discountData?.ends_at?.split(" ")[0] || "");
+          setEmails(discountData?.emails || []);
+          setDiscountCodeName(discountData?.code || "");
+          setDiscountType(discountData?.type || 0);
+          setSelectedPackage(discountData?.game_package?.id?.toString() || "");
+        })
+        .catch(() => {
+          toast.error("فشل تحميل بيانات الكود");
+        });
+    }
+  }, [selectedId, dispatch]);
+
+  // جلب الباقات
   useEffect(() => {
     dispatch(getGamePackagesWithoutPagination());
   }, [dispatch]);
 
+  // حساب السعر بعد الخصم
   useEffect(() => {
-    if (originalPrice && discountPercent) {
-      const discounted =
-        Number(originalPrice) -
-        (Number(originalPrice) * Number(discountPercent)) / 100;
-      setFinalPrice(discounted);
+    if (price && code) {
+      const discounted = Number(price) - (Number(price) * Number(code)) / 100;
+      setCodePrice(discounted.toString());
     } else {
-      setFinalPrice(originalPrice);
+      setCodePrice(price);
     }
-  }, [originalPrice, discountPercent]);
+  }, [price, code]);
 
+  // تغيير الباقة
   const handleChangeDrop = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const pkgId = e.target.value;
-    setSelectedPackage(pkgId ? Number(pkgId) : "");
+    setSelectedPackage(pkgId);
 
     const selectedPkg = gamePackages?.data.find(
       (pkg: GamePackage) => pkg.id.toString() === pkgId
     );
 
     if (selectedPkg) {
-      setOriginalPrice(selectedPkg.price);
+      setPrice(selectedPkg.price.toString());
     } else {
-      setOriginalPrice(0);
+      setPrice("");
     }
   };
 
+  // تعديل الايميلات
   const handleEmailChange = (index: number, value: string) => {
     const newEmails = [...emails];
     newEmails[index] = value;
     setEmails(newEmails);
   };
+
   const addEmailField = () => setEmails([...emails, ""]);
   const removeEmailField = (index: number) =>
     setEmails(emails.filter((_, i) => i !== index));
 
-  // إرسال البيانات
+  // حفظ البيانات
   const submitData = () => {
-    if (
-      !originalPrice ||
-      !discountCodeName ||
-      !discountPercent ||
-      !startDate ||
-      !endDate
-    ) {
+    if (!price || !discountCodeName || !code || !startDate || !endDate) {
       toast.error("يرجى استكمال جميع الحقول!");
       return;
     }
@@ -87,34 +116,34 @@ const AddDiscount = ({ onClose }: { onClose: () => void }) => {
       return;
     }
 
-    const newDiscount = {
+    const updatedDiscount = {
       game_package_id: selectedPackage,
-      code: discountCodeName.toUpperCase().replace(/\s/g, ""),
-      discount: discountPercent,
+      discount: code,
       starts_at: startDate,
       ends_at: endDate,
       type: discountType,
+      code: discountCodeName,
       ...(discountType === 1 && {
         emails: emails.filter((e) => e.trim() !== ""),
       }),
     };
 
-    setIsSubmitting(true); // ✅ بدأ التحميل
-
-    dispatch(createDiscountCode(newDiscount))
+    setIsSaving(true); // بدأ الحفظ
+    dispatch(updateDiscountCode({ id: selectedId, data: updatedDiscount }))
       .unwrap()
       .then(() => {
-        toast.success("تم إضافة كود الخصم بنجاح!");
+        toast.success("تم تحديث كود الخصم بنجاح!");
         onClose();
       })
-      .catch((err) => toast.error(err))
-      .finally(() => setIsSubmitting(false)); // ✅ انهاء التحميل
+      .catch(() => toast.error("حدث خطأ أثناء تحديث الكود"))
+      .finally(() => setIsSaving(false)); // وقف الـ loader
   };
 
+  // Reset form
   const resetHandle = () => {
-    setOriginalPrice(0);
-    setDiscountPercent(0);
-    setFinalPrice(0);
+    setPrice("");
+    setCode("");
+    setCodePrice("0");
     setStartDate("");
     setEndDate("");
     setEmails([]);
@@ -150,73 +179,72 @@ const AddDiscount = ({ onClose }: { onClose: () => void }) => {
             )}
           </div>
 
-          {/* السعر الحالي */}
+          {/* Current Price */}
           <div className="flex flex-col text-[#085E9C] w-[48%]">
             <label className="mb-1 text-lg font-bold">السعر الحالي</label>
-            <div className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md text-right">
-              {originalPrice || 0}
+            <div className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right">
+              {price || 0}
             </div>
           </div>
 
-          {/* نسبة الخصم */}
+          {/* Discount Percentage */}
           <div className="flex flex-col text-[#085E9C] w-[48%]">
             <label className="mb-1 text-lg font-bold">نسبة كود الخصم</label>
             <input
-              value={discountPercent}
-              onChange={(e) => setDiscountPercent(Number(e.target.value))}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
               type="number"
               placeholder="أدخل نسبة كود الخصم"
-              className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md text-right"
+              className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right"
             />
           </div>
 
-          {/* السعر بعد الخصم */}
+          {/* Discount Price */}
           <div className="flex flex-col text-[#085E9C] w-[48%]">
             <label className="mb-1 text-lg font-bold">سعر كود الخصم</label>
-            <div className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md text-right">
-              {finalPrice || "0"}
+            <div className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right">
+              {codePrice || "0"}
             </div>
           </div>
 
-          {/* تاريخ البداية */}
+          {/* Start Date */}
           <div className="flex flex-col text-[#085E9C] w-[48%]">
             <label className="mb-1 text-lg font-bold">تاريخ البداية</label>
             <input
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               type="date"
-              className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md text-right"
+              className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right"
             />
           </div>
 
-          {/* تاريخ النهاية */}
+          {/* End Date */}
           <div className="flex flex-col text-[#085E9C] w-[48%]">
             <label className="mb-1 text-lg font-bold">تاريخ النهاية</label>
             <input
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               type="date"
-              className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md text-right"
+              className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right"
             />
           </div>
 
-          {/* اسم الكود */}
+          {/* Discount Code Name */}
           <div className="flex flex-col text-[#085E9C] w-[48%]">
             <label className="mb-1 text-lg font-bold">اسم كود الخصم</label>
             <input
               value={discountCodeName}
-              onChange={(e) =>
-                setDiscountCodeName(
-                  e.target.value.replace(/\s/g, "").toUpperCase()
-                )
-              }
+              onChange={(e) => {
+                const value = e.target.value.replace(/\s/g, "").toUpperCase();
+                setDiscountCodeName(value);
+              }}
               type="text"
               placeholder="أدخل اسم كود الخصم"
-              className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md text-right"
+              className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right"
             />
           </div>
 
-          {/* نوع الكود */}
+          {/* Discount Type */}
           <div className="flex flex-col text-[#085E9C] w-[48%]">
             <label className="mb-1 text-lg font-bold">نوع كود الخصم</label>
             <div className="flex items-center justify-between p-2 border border-[#085E9C] gap-2">
@@ -253,12 +281,13 @@ const AddDiscount = ({ onClose }: { onClose: () => void }) => {
             </div>
           </div>
 
-          {/* ايميلات لو خاص */}
+          {/* Email for private discount */}
           {discountType === 1 && (
             <div className="flex flex-col text-[#085E9C] w-full">
               <label className="mb-1 text-lg font-bold">
                 البريد الإلكتروني
               </label>
+
               {emails.map((em, index) => (
                 <div key={index} className="flex items-center gap-2 mb-2">
                   <input
@@ -266,7 +295,7 @@ const AddDiscount = ({ onClose }: { onClose: () => void }) => {
                     onChange={(e) => handleEmailChange(index, e.target.value)}
                     type="email"
                     placeholder="email"
-                    className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md text-right"
+                    className="w-full rounded border border-[#085E9C] p-2 text-sm shadow-md outline-none text-right"
                   />
                   <button
                     type="button"
@@ -277,6 +306,7 @@ const AddDiscount = ({ onClose }: { onClose: () => void }) => {
                   </button>
                 </div>
               ))}
+
               <button
                 type="button"
                 onClick={addEmailField}
@@ -288,15 +318,14 @@ const AddDiscount = ({ onClose }: { onClose: () => void }) => {
           )}
         </form>
 
-        {/* الأزرار */}
-        <div className="flex justify-center mt-5">
-          {isSubmitting ? (
+        <div className="flex items-center justify-center mt-5">
+          {isSaving ? (
             <button
               disabled
-              className="flex items-center gap-2 px-5 py-2 bg-[#085E9C] text-white rounded-md"
+              className="flex items-center gap-2 bg-[#085E9C] text-white px-4 py-2 rounded"
             >
-              <Loader2 className="animate-spin w-5 h-5" />
-              جاري الإضافة...
+              <Loader2 className="w-4 h-4 animate-spin" />
+              جاري الحفظ...
             </button>
           ) : (
             <ButtonGroup
@@ -311,4 +340,4 @@ const AddDiscount = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-export default AddDiscount;
+export default EditDiscount;

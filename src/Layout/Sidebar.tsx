@@ -92,7 +92,7 @@ const Sidebar: React.FC = () => {
     {
       icon: <MdOutlinePointOfSale className="size-6" />,
       label: "المبيعات",
-      path: "/sales",
+      path: "/payments",
     },
     {
       icon: <IoIosAlert className="size-6" />,

@@ -5,9 +5,9 @@ import { ApiResponse, Payment } from "../types/payment";
 import { useGetDataToken } from "../utils/api";
 import { useInUpdateData } from "../hooks/useUpdateData";
 import useDeleteData from "../hooks/useDeleteData";
+import { useInsertData } from "../hooks/useInsertData";
 
 export type PaginatedPayments = ApiResponse<Payment[]>;
-
 
 interface PaymentState {
   payments: PaginatedPayments | null;
@@ -59,35 +59,18 @@ export const getPaymentById = createAsyncThunk<
   }
 });
 
-// ============ Create Payment ============
-// export const createPayment = createAsyncThunk<
-//   Payment,
-//   Partial<Payment>,
-//   { rejectValue: string }
-// >("payments/createPayment", async (data, thunkAPI) => {
-//   try {
-//     const res = await useInsertData<Payment>(`admin/payments`, data);
-//     thunkAPI.dispatch(getPayments()); // refresh list
-//     return res;
-//   } catch (error) {
-//     const err = error as AxiosError<{ message: string }>;
-//     return thunkAPI.rejectWithValue(
-//       err.response?.data.message || "createPayment failed"
-//     );
-//   }
-// });
-
 // ============ Update Payment ============
 export const updatePayment = createAsyncThunk<
   Payment,
-  { id: number; data: Partial<Payment> },
+  { id: number; status: number },
   { rejectValue: string }
->("payments/updatePayment", async ({ id, data }, thunkAPI) => {
+>("payments/updatePayment", async ({ id, status }, thunkAPI) => {
   try {
-    const res = await useInUpdateData<Partial<Payment>, Payment>(
-      `admin/payments/${id}`,
-      data
+    const res = await useInUpdateData<any, Payment>(
+      `admin/payments/${id}?status=${status}`,
+      {}
     );
+    thunkAPI.dispatch(getPayments(1)); // تحديث القائمة بعد التعديل
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -111,6 +94,35 @@ export const deletePayment = createAsyncThunk<
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(
       err.response?.data.message || "deletePayment failed"
+    );
+  }
+});
+
+// ============ Refund Payment ============
+export const refundPayment = createAsyncThunk<
+  any,
+  {
+    paymentId: number;
+    data: {
+      name: string;
+      games_count: number;
+      price: number;
+      is_active: number;
+    };
+  },
+  { rejectValue: string }
+>("payments/refundPayment", async ({ paymentId, data }, thunkAPI) => {
+  try {
+    const res = await useInsertData<any>(
+      `admin/payments/refund/${paymentId}`,
+      data
+    );
+    thunkAPI.dispatch(getPayments(1)); // بعد الاسترداد رجع القائمة محدثة
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "refundPayment failed"
     );
   }
 });
