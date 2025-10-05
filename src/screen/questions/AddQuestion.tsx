@@ -120,8 +120,14 @@ const AddQuestion = ({
         });
     }
   }, [selectedId, gameOptions, dispatch]);
+  // Helper لتحويل URL إلى ملف (Blob)
+  const urlToFile = async (url: string, filename: string): Promise<File> => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new File([blob], filename, { type: blob.type });
+  };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!question.trim() || !answer.trim() || !selectedGame) {
       toast.error("يرجى ملء جميع الحقول المطلوبة");
       return;
@@ -138,12 +144,11 @@ const AddQuestion = ({
     if (question.trim() && question !== originalQuestion) {
       formData.append("question_text", question);
     }
-
     if (answer.trim() && answer !== originalAnswer) {
       formData.append("answer_text", answer);
     }
 
-    // ملفات السؤال
+    // === ملفات السؤال ===
     if (questionFile instanceof File) {
       if (questionFile.type.startsWith("image/")) {
         formData.append("question_image", questionFile);
@@ -152,9 +157,22 @@ const AddQuestion = ({
       } else if (questionFile.type.startsWith("video/")) {
         formData.append("question_video", questionFile);
       }
+    } else if (questionFile && "url" in questionFile) {
+      // تحويل URL إلى File
+      const file = await urlToFile(
+        questionFile.url,
+        `question_${questionFile.type}`
+      );
+      if (questionFile.type === "image") {
+        formData.append("question_image", file);
+      } else if (questionFile.type === "audio") {
+        formData.append("question_audio", file);
+      } else if (questionFile.type === "video") {
+        formData.append("question_video", file);
+      }
     }
 
-    // ملفات الجواب
+    // === ملفات الجواب ===
     if (answerFile instanceof File) {
       if (answerFile.type.startsWith("image/")) {
         formData.append("answer_image", answerFile);
@@ -163,35 +181,34 @@ const AddQuestion = ({
       } else if (answerFile.type.startsWith("video/")) {
         formData.append("answer_video", answerFile);
       }
+    } else if (answerFile && "url" in answerFile) {
+      const file = await urlToFile(answerFile.url, `answer_${answerFile.type}`);
+      if (answerFile.type === "image") {
+        formData.append("answer_image", file);
+      } else if (answerFile.type === "audio") {
+        formData.append("answer_audio", file);
+      } else if (answerFile.type === "video") {
+        formData.append("answer_video", file);
+      }
     }
 
     setLoading(true);
 
-    if (selectedId) {
-      formData.append("_method", "PUT");
-      dispatch(updateQuestion({ id: selectedId, formData }))
-        .unwrap()
-        .then(() => {
-          toast.success("تم التحديث بنجاح!");
-          resetHandle();
-          onClose();
-        })
-        .catch((err) => {
-          toast.error(err || "فشل التحديث!");
-        })
-        .finally(() => setLoading(false));
-    } else {
-      dispatch(createQuestion(formData))
-        .unwrap()
-        .then(() => {
-          toast.success("تم الحفظ بنجاح!");
-          resetHandle();
-          onClose();
-        })
-        .catch((err) => {
-          toast.error(err || "فشل الحفظ!");
-        })
-        .finally(() => setLoading(false));
+    try {
+      if (selectedId) {
+        formData.append("_method", "PUT");
+        await dispatch(updateQuestion({ id: selectedId, formData })).unwrap();
+        toast.success("تم التحديث بنجاح!");
+      } else {
+        await dispatch(createQuestion(formData)).unwrap();
+        toast.success("تم الحفظ بنجاح!");
+      }
+      resetHandle();
+      onClose();
+    } catch (err) {
+      toast.error(err || "حدث خطأ أثناء الحفظ!");
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -65,7 +65,7 @@ const ProductRow = ({
               setShowPriceModal(true);
             }}
           >
-          <EditIcon className="w-5 h-5" />
+            <EditIcon className="w-5 h-5" />
           </span>
           <span
             className="cursor-pointer text-red-700"
@@ -138,10 +138,10 @@ const PostedQuestions = () => {
   };
 
   // فلترة الأسئلة اللي active فقط
-const activeQuestions = useMemo(() => {
-  if (!questions?.data || !Array.isArray(questions.data)) return [];
-  return questions.data.filter((q) => q.is_active);
-}, [questions]);
+  const activeQuestions = useMemo(() => {
+    if (!questions?.data || !Array.isArray(questions.data)) return [];
+    return questions.data.filter((q) => q.is_active);
+  }, [questions]);
 
   // الترتيب محليًا
   const sortedQuestions = useMemo(() => {
@@ -259,7 +259,7 @@ const activeQuestions = useMemo(() => {
               ) : (
                 <tr>
                   <td colSpan={8} className="px-4 py-2 text-gray-700">
-                    لا توجد أسئلة منشورة
+                    لا توجد أسئلة منشورة نشطه
                   </td>
                 </tr>
               )}

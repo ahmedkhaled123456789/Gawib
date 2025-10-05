@@ -27,22 +27,39 @@ const ProductRow = ({
   };
 
   return (
-    <tr key={product.id}>
-      <td className="px-4 py-2 font-medium text-gray-900">{product.id}</td>
-      <td className="px-4 py-2 text-gray-700">
+    <tr className="text-xs md:text-sm">
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 font-medium text-gray-900 max-w-[80px] md:max-w-[160px] truncate"
+        title={product.id.toString()}
+      >
+        {product.id}
+      </td>
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[120px] md:max-w-[160px] truncate"
+        title={product.game_name}
+      >
         <Link to={`/productDetails/${product.id}`}>
-          <div className="w-20 truncate">{product.game_name}</div>
+          <div className="truncate">{product.game_name}</div>
         </Link>
       </td>
-      <td className="px-4 py-2 text-gray-700 w-72 truncate">
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[150px] md:max-w-[200px] truncate"
+        title={product.question?.text || "—"}
+      >
         {renderContent(product?.question)}
       </td>
-      <td className="px-4 py-2 text-gray-700 w-72 truncate">
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[150px] md:max-w-[200px] truncate"
+        title={product.answer?.text || "—"}
+      >
         {renderContent(product?.answer)}
       </td>
-      <td className="px-4 py-2 text-white">
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-white text-xs md:text-sm"
+        title={product.points.toString()}
+      >
         <div
-          className={`w-16 px-4 py-1 rounded ${
+          className={`w-14 md:w-16 px-2 py-1 rounded text-center ${
             product.points === 200
               ? "bg-[#309222]"
               : product.points === 400
@@ -55,12 +72,20 @@ const ProductRow = ({
           {product.points}
         </div>
       </td>
-      <td className="px-4 py-2 text-gray-700 w-20">{product.hint || "—"}</td>
-      <td className="px-4 py-2 text-gray-700 w-20">
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[120px] md:max-w-[160px] truncate"
+        title={product.hint || "—"}
+      >
+        {product.hint || "—"}
+      </td>
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[120px] md:max-w-[160px] truncate"
+        title={product.admin_name || "محمد الناصر"}
+      >
         {product.admin_name || "محمد الناصر"}
       </td>
-      <td className="px-4 py-2">
-        <div className="flex items-center justify-center w-40 gap-2 flex-wrap">
+      <td className="px-2 md:px-4 py-1 md:py-2">
+        <div className="flex items-center justify-center w-36 gap-2 flex-wrap">
           <span
             className="p-1 border cursor-pointer rounded bg-[#085E9C]"
             onClick={() => {
@@ -68,13 +93,17 @@ const ProductRow = ({
               setShowPriceModal(true);
             }}
           >
-            <img src="/images/group/edit.png" alt="" className="w-5 h-5" />
+            <img
+              src="/images/group/edit.png"
+              alt=""
+              className="w-4 h-4 md:w-5 md:h-5"
+            />
           </span>
           <span
             className="cursor-pointer text-red-700"
             onClick={() => handleDelete(product.id)}
           >
-            <Trash className="w-5 h-5" />
+            <Trash className="w-4 h-4 md:w-5 md:h-5" />
           </span>
         </div>
       </td>
@@ -93,7 +122,6 @@ const Questions = () => {
   const [selectedImg, setSelectedImg] = useState<any>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // جلب البيانات
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       dispatch(
@@ -120,7 +148,6 @@ const Questions = () => {
     );
   };
 
-  // الحذف
   const handleDelete = (id: string) => {
     toast("هل أنت متأكد من حذف السؤال؟", {
       action: {
@@ -142,34 +169,34 @@ const Questions = () => {
     });
   };
 
-const sortedQuestions = useMemo(() => {
-  if (!questions?.data || !Array.isArray(questions.data)) return [];
+  const sortedQuestions = useMemo(() => {
+    if (!questions?.data || !Array.isArray(questions.data)) return [];
 
-  if (statusFilter === "الفئة") {
-    return [...questions.data].sort((a, b) =>
-      (a.game_name || "").localeCompare(b.game_name || "")
+    if (statusFilter === "الفئة") {
+      return [...questions.data].sort((a, b) =>
+        (a.game_name || "").localeCompare(b.game_name || "")
+      );
+    }
+
+    if (statusFilter === "المشرف") {
+      return [...questions.data].sort((a, b) =>
+        (a.admin_name || "").localeCompare(b.admin_name || "")
+      );
+    }
+
+    return [...questions.data].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-  }
-
-  if (statusFilter === "المشرف") {
-    return [...questions.data].sort((a, b) =>
-      (a.admin_name || "").localeCompare(b.admin_name || "")
-    );
-  }
-
-  return [...questions.data].sort(
-    (a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
-}, [questions, statusFilter]);
+  }, [questions, statusFilter]);
 
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
         {/* Header */}
-        <div className="flex flex-col md:flex-row p-4 bg-white items-start md:items-center justify-between gap-2">
+        <div className="flex flex-col md:flex-row p-2 md:p-4 bg-white items-start md:items-center justify-between gap-2">
           <div className="flex flex-col md:flex-row gap-2 items-start md:items-center w-full md:w-auto">
-            <div className="text-md w-32 font-bold text-[#085E9C]">
+            <div className="text-sm md:text-md font-bold text-[#085E9C]">
               الأسئلة المعتمدة
             </div>
             <div className="relative w-full md:w-48 border rounded-md border-[#085E9C]">
@@ -178,9 +205,9 @@ const sortedQuestions = useMemo(() => {
                 placeholder="ابحث بالفئة او السؤال"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full py-2 pl-8 pr-4 border border-gray-300 rounded-md focus:outline-none"
+                className="w-full py-1 md:py-2 pl-6 md:pl-8 pr-2 border border-gray-300 rounded-md text-xs md:text-sm focus:outline-none"
               />
-              <FiSearch className="absolute left-3 top-3 text-gray-500" />
+              <FiSearch className="absolute left-2 md:left-3 top-2 md:top-3 text-gray-500 text-xs md:text-sm" />
             </div>
             <CustomDropdown
               options={[
@@ -194,11 +221,11 @@ const sortedQuestions = useMemo(() => {
           </div>
 
           {/* Points Filter */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1 md:gap-2">
             {[200, 400, 600].map((point) => (
               <span
                 key={point}
-                className={`text-[#ffc629] font-bold border cursor-pointer px-4 py-2 rounded ${
+                className={`text-xs md:text-sm text-[#ffc629] font-bold border cursor-pointer px-2 md:px-4 py-1 md:py-2 rounded ${
                   pointsFilter === point.toString()
                     ? "bg-[#085E9C] border-[#085E9C]"
                     : "border border-[#085E9C]"
@@ -214,10 +241,10 @@ const sortedQuestions = useMemo(() => {
             ))}
           </div>
 
-          {/* إضافة سؤال */}
+          {/* Add Question */}
           <div className="flex items-center mt-2 md:mt-0">
             <button
-              className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-4 py-2 rounded text-sm font-medium transition-colors"
+              className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-2 md:px-4 py-1 md:py-2 rounded text-xs md:text-sm font-medium transition-colors"
               onClick={() => {
                 setSelectedId(null);
                 setShowPriceModal(true);
@@ -228,19 +255,19 @@ const sortedQuestions = useMemo(() => {
           </div>
         </div>
 
-        {/* الجدول */}
+        {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm min-w-[700px] md:min-w-full">
+          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-xs md:text-sm min-w-[600px] md:min-w-full">
             <thead className="text-center">
-              <tr className="px-4 py-2 font-medium text-[#085E9C]">
-                <th className="px-4 py-2">ID</th>
-                <th className="px-4 py-2">أسم الفئة</th>
-                <th className="px-4 py-2">السؤال</th>
-                <th className="px-4 py-2">الجواب</th>
-                <th className="px-4 py-2">النقاط</th>
-                <th className="px-4 py-2">التلميح</th>
-                <th className="px-4 py-2">مشرف الفئة</th>
-                <th className="px-4 py-2">إدارة</th>
+              <tr className="px-2 md:px-4 py-1 md:py-2 font-medium text-[#085E9C]">
+                <th className="px-2 md:px-4 py-1">ID</th>
+                <th className="px-2 md:px-4 py-1">أسم الفئة</th>
+                <th className="px-2 md:px-4 py-1">السؤال</th>
+                <th className="px-2 md:px-4 py-1">الجواب</th>
+                <th className="px-2 md:px-4 py-1">النقاط</th>
+                <th className="px-2 md:px-4 py-1">التلميح</th>
+                <th className="px-2 md:px-4 py-1">مشرف الفئة</th>
+                <th className="px-2 md:px-4 py-1">إدارة</th>
               </tr>
             </thead>
             <tbody className="divide-y text-center divide-gray-200">
@@ -256,7 +283,7 @@ const sortedQuestions = useMemo(() => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-4 py-2 text-gray-700">
+                  <td colSpan={8} className="px-2 py-2 text-gray-700">
                     لم يتم العثور على أسئلة.
                   </td>
                 </tr>
@@ -265,7 +292,7 @@ const sortedQuestions = useMemo(() => {
           </table>
         </div>
 
-        {/* صورة */}
+        {/* Image Preview */}
         {selectedImg && (
           <div
             className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
