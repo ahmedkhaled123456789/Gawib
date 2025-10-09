@@ -20,6 +20,8 @@ import PostedQuestions from "../screen/PostedQuestions/posted-questions";
 import UpdateAdmin from "../screen/admins/UpdateAdmin";
 import UpdateGroup from "../screen/group/UpdateGroup";
 import Payment from "../screen/sales/Payment";
+import SocialMediaEdit from "../screen/socialLonk/SocialMediaEdit";
+import AddSocialMedia from "../screen/socialLonk/AddSocialMedia";
 
 export const ROUTES = [
   {
@@ -45,6 +47,8 @@ export const ROUTES = [
           { path: "game-packages", element: <GamePackages /> },
           { path: "settings", element: <SettingsPage /> },
           { path: "socialMedia", element: <SocialMedia /> },
+          { path: "add-socialMedia", element: <AddSocialMedia /> },
+          { path: "socialMedia/edit/:id", element: <SocialMediaEdit /> },
           { path: "game", element: <Game /> },
           { path: "groups", element: <Groups /> },
           { path: "group/edit/:id", element: <UpdateGroup /> },

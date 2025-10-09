@@ -124,7 +124,7 @@ const CategoriesRow = ({
           <img
             src={product.image}
             alt={`${product?.category?.name} logo`}
-            className="w-6 h-6 rounded-full cursor-pointer"
+            className="w-12 h-12 rounded-full cursor-pointer"
             onClick={() => setSelectedImg(product.img)}
           />
         </div>
@@ -213,7 +213,7 @@ const Categories = () => {
           <div className="relative w-full md:w-64 border rounded-md border-[#085E9C]">
             <input
               type="text"
-              placeholder="ابحث باسم الفئة او أسم المجموعة"
+              placeholder="أسم المجموعة"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-md focus:outline-none"
@@ -256,8 +256,8 @@ const Categories = () => {
           <thead className="text-center">
             <tr className="px-4 py-2 text-sm text-[#085E9C]">
               <th className="px-4 py-2 font-medium">ID</th>
-              <th className="px-4 py-2 font-medium">أسم المجموعة</th>
               <th className="px-4 py-2 font-medium">أسم الفئة</th>
+              <th className="px-4 py-2 font-medium">أسم المجموعة</th>
               <th className="px-4 py-2 font-medium">مشرف الفئة</th>
               <th className="px-4 py-2 font-medium">
                 <div className="mb-2">ألأسئلة المعتمدة</div>

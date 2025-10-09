@@ -2,18 +2,21 @@ import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { Trash2, Loader2 } from "lucide-react";
-
+import { Trash2, Loader2, RotateCcw } from "lucide-react";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
-import CustomModal from "../../components/Modals/CustomModal";
-import { getPayments, deletePayment, updatePayment } from "../../store/payment";
+import {
+  getPayments,
+  deletePayment,
+  updatePayment,
+  refundPayment,
+} from "../../store/payment";
 import { toast } from "sonner";
-import Refund from "./Refundt";
 
-const ProductRow = ({ product, setShowModal, dispatch }) => {
+const ProductRow = ({ product, dispatch }) => {
   const [isChecked, setIsChecked] = useState(product.status === 1);
   const [loading, setLoading] = useState(false);
+  const [refundLoading, setRefundLoading] = useState(false);
 
   const handleDelete = () => {
     toast("هل تريد الحذف؟", {
@@ -43,6 +46,25 @@ const ProductRow = ({ product, setShowModal, dispatch }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRefund = async () => {
+    toast("هل تريد تنفيذ عملية الاسترداد؟", {
+      action: {
+        label: "تأكيد",
+        onClick: async () => {
+          setRefundLoading(true);
+          try {
+            await dispatch(refundPayment({ paymentId: product.id })).unwrap();
+            toast.success("تم تنفيذ الاسترداد بنجاح ✅");
+          } catch (err) {
+            toast.error("فشل تنفيذ الاسترداد ❌");
+          } finally {
+            setRefundLoading(false);
+          }
+        },
+      },
+    });
   };
 
   return (
@@ -114,12 +136,22 @@ const ProductRow = ({ product, setShowModal, dispatch }) => {
           </label>
 
           {/* زر الاسترداد */}
-          <span
-            className="p-1 px-2 sm:px-3 border cursor-pointer text-white rounded bg-[#085E9C] text-xs sm:text-sm"
-            onClick={() => setShowModal(product.id)} // 👈 هنا نبعث الـ id
+          <button
+            onClick={handleRefund}
+            disabled={refundLoading}
+            className={`p-1 px-2 sm:px-3 border rounded text-xs sm:text-sm flex items-center gap-1 ${
+              refundLoading
+                ? "bg-gray-400 text-white cursor-not-allowed"
+                : "bg-[#085E9C] text-white hover:bg-[#0a6fb8]"
+            }`}
           >
+            {refundLoading ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <RotateCcw size={14} />
+            )}
             استرداد
-          </span>
+          </button>
 
           {/* زر الحذف */}
           <span
@@ -142,13 +174,12 @@ const Payment = () => {
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [showModal, setShowModal] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(getPayments(1));
   }, [dispatch]);
 
-  const onPress = async (page) => {
+  const onPress = async (page: number) => {
     await dispatch(getPayments(page));
   };
 
@@ -223,7 +254,6 @@ const Payment = () => {
                   <ProductRow
                     key={product.id}
                     product={product}
-                    setShowModal={setShowModal}
                     dispatch={dispatch}
                   />
                 ))
@@ -242,12 +272,6 @@ const Payment = () => {
       {payments?.meta?.last_page && (
         <Pagination pageCount={payments.meta.last_page} onPress={onPress} />
       )}
-
-      <CustomModal isOpen={!!showModal}>
-        {showModal && (
-          <Refund paymentId={showModal} onClose={() => setShowModal(null)} />
-        )}
-      </CustomModal>
     </div>
   );
 };

@@ -134,14 +134,14 @@ const UpdateGroup = () => {
             صورة المجموعة
           </label>
           <div
-            className="w-full h-[200px] border border-[#085E9C] flex items-center justify-center cursor-pointer rounded-md hover:shadow-lg transition"
+            className="w-full h-[300px] border border-[#085E9C] flex items-center justify-center cursor-pointer rounded-md hover:shadow-lg transition"
             onClick={handleImageClick}
           >
             {imagePreview ? (
               <img
                 src={imagePreview}
                 alt="Preview"
-                className="max-h-full object-contain"
+                className="max-h-full max-w-full object-cover"
               />
             ) : (
               <span className="text-gray-500">اضغط لاختيار صورة</span>

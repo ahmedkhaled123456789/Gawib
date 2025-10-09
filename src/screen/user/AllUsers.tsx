@@ -52,7 +52,7 @@ const ProductRow = ({
       <button
         onClick={onStatusClick}
         className={`flex-1 min-w-[70px] px-3 py-1 rounded font-semibold flex items-center justify-center gap-1 text-xs md:text-sm ${
-          product.status ? "bg-[#5da401]" : "bg-[#ff426e]"
+          product.status ? "bg-[#5da401]" : "bg-[#fa2154]"
         }`}
         disabled={loadingStatus}
       >

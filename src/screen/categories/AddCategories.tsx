@@ -91,7 +91,7 @@ const AddCategories = ({
   }, [image]);
 
   return (
-    <div className="w-[60%] p-5">
+    <div className="w-[90%] p-5">
       <div className="bg-white rounded-md p-10">
         <form className="flex flex-wrap justify-between gap-4 pt-5">
           {/* Category Name */}
@@ -151,7 +151,7 @@ const AddCategories = ({
                     image instanceof File ? URL.createObjectURL(image) : image
                   }
                   alt="Preview"
-                  className="w-[60px] h-[60px]"
+                  className="w-full h-[200px] object-contain"
                 />
               ) : (
                 <img

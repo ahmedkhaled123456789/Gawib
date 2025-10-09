@@ -16,7 +16,7 @@ interface InputFieldProps {
 }
 
 const InputField = ({ label, set, val, type = "text" }: InputFieldProps) => (
-  <div className="flex flex-col mb-2 w-[48%]">
+  <div className="flex flex-col mb-2 w-full md:w-[48%]">
     <label className="mb-2 text-lg text-[#085E9C] font-bold">{label}</label>
     <input
       value={val}
@@ -91,12 +91,12 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <div className="w-[70%] px-5 font-medium">
+    <div className="w-[100%] px-5 font-medium">
       <div className="bg-white rounded-md p-6">
         {/* Category Drop-down */}
         <div className="flex flex-col w-full">
           <label className="mb-2 text-lg text-[#085E9C] font-bold">
-            نوع الفئة
+            اسم المجموعه
           </label>
           <select
             value={category_id}
@@ -123,7 +123,7 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
           <InputField val={name} set={setName} label="أسم الفئة" />
 
           {/* Admin Drop-down */}
-          <div className="flex flex-col mb-2 w-[48%]">
+          <div className="flex flex-col mb-2 w-full md:w-[48%]">
             <label className="mb-2 text-lg text-[#085E9C] font-bold">
               أسم المشرف
             </label>
@@ -145,14 +145,14 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
           </div>
 
           {/* Description */}
-          <div className="w-full md:w-[48%]">
+          <div className="w-full md:w-[48%] flex flex-col">
             <label className="mb-2 text-lg font-bold block">
               تعليمات الفئة
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full resize-none h-[190px] text-black border border-[#085E9C] rounded-sm p-3 text-sm outline-none text-right shadow-md"
+              className="w-full resize-none h-[200px] text-black border border-[#085E9C] rounded-sm p-3 text-sm outline-none text-right shadow-md"
             />
           </div>
 
@@ -162,14 +162,14 @@ const AddGroup = ({ onClose }: { onClose: () => void }) => {
               صورة الفئة الرئيسية
             </label>
             <div
-              className="w-full h-[190px] border border-[#085E9C] flex items-center justify-center cursor-pointer rounded-sm hover:shadow-lg transition"
+              className="w-full h-[200px] border border-[#085E9C] flex items-center justify-center cursor-pointer rounded-sm hover:shadow-lg transition"
               onClick={handleImageClick}
             >
               {image ? (
                 <img
                   src={URL.createObjectURL(image)}
                   alt="Preview"
-                  className="w-[60px] h-[60px]"
+                  className="w-full h-[200px] object-contain"
                 />
               ) : (
                 <img

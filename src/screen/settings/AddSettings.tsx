@@ -1,3 +1,4 @@
+// src/components/settings/AddSettings.tsx
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
@@ -10,21 +11,49 @@ interface AddSettingsProps {
 
 const AddSettings: React.FC<AddSettingsProps> = ({ onClose }) => {
   const dispatch = useDispatch<AppDispatch>();
+
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
   const [type, setType] = useState("STRING");
 
-  const handleAdd = () => {
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validateNumber = (num: string) => {
+    return !isNaN(Number(num));
+  };
+
+  const handleAdd = (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!key || !value || !type) {
       toast.error("يرجى ملء جميع الحقول");
       return;
     }
 
-    dispatch(addSetting({ key, value, type }));
-    setKey("");
-    setValue("");
-    setType("STRING");
-    onClose();
+    // تحقق حسب النوع
+    if (type === "EMAIL" && !validateEmail(value)) {
+      toast.error("الرجاء إدخال بريد إلكتروني صحيح");
+      return;
+    }
+
+    if (type === "NUMBER" && !validateNumber(value)) {
+      toast.error("الرجاء إدخال رقم صحيح");
+      return;
+    }
+
+    dispatch(addSetting({ key, value, type }))
+      .unwrap()
+      .then(() => {
+        toast.success("تمت الإضافة بنجاح");
+        setKey("");
+        setValue("");
+        setType("STRING");
+        onClose();
+      })
+      .catch(() => toast.error("حدث خطأ أثناء الإضافة"));
   };
 
   return (
@@ -34,7 +63,10 @@ const AddSettings: React.FC<AddSettingsProps> = ({ onClose }) => {
           إضافة إعداد جديد
         </h2>
 
-        <form className="flex flex-wrap items-center justify-between gap-5">
+        <form
+          className="flex flex-wrap items-center justify-between gap-5"
+          onSubmit={handleAdd}
+        >
           {/* إدخال Key */}
           <div className="flex flex-col mb-4 w-[48%]">
             <label className="mb-1 text-lg text-center">المفتاح (Key)</label>
@@ -72,31 +104,29 @@ const AddSettings: React.FC<AddSettingsProps> = ({ onClose }) => {
               <option value="NUMBER">NUMBER</option>
             </select>
           </div>
+
+          {/* الأزرار */}
+          <div className="w-full mt-5 flex justify-between gap-4">
+            <button
+              type="submit"
+              className="w-[45%] px-7 py-2 bg-[#085E9C] text-white rounded-md"
+            >
+              إضافة
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-[45%] px-7 py-2 border border-[#085E9C] text-[#085E9C] rounded-md"
+            >
+              إغلاق
+            </button>
+          </div>
         </form>
 
-        {/* الرسائل في الأسفل */}
         <p className="text-center text-sm text-gray-500 mt-3">
           تأكد من إدخال القيم الصحيحة قبل الإضافة.
         </p>
-
-        {/* الأزرار */}
-        <div className="w-full mt-5 flex justify-between gap-4">
-          <button
-            type="button"
-            onClick={handleAdd}
-            className="w-[45%] px-7 py-2 bg-[#085E9C] text-white rounded-md"
-          >
-            إضافة
-          </button>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-[45%] px-7 py-2 border border-[#085E9C] text-[#085E9C] rounded-md"
-          >
-            إغلاق
-          </button>
-        </div>
       </div>
     </div>
   );

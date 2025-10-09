@@ -179,7 +179,7 @@ const ArabicFormLayout: React.FC = () => {
       </div>
 
       {/* شروط الاستخدام */}
-      <div className="bg-white rounded shadow-sm border border-[#085E9C] mb-6">
+      {/* <div className="bg-white rounded shadow-sm border border-[#085E9C] mb-6">
         <div className="flex items-center justify-between border-b border-[#085E9C] p-4 text-[#085E9C]">
           <h2 className="text-lg font-medium">شروط الاستخدام</h2>
           <div className="flex gap-2">
@@ -208,7 +208,7 @@ const ArabicFormLayout: React.FC = () => {
             }
           />
         </div>
-      </div>
+      </div> */}
 
       {/* ضريبة القيمة المضافة */}
       <div className="bg-white rounded shadow-sm border border-[#085E9C] mb-6">

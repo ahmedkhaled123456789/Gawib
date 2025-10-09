@@ -12,6 +12,7 @@ export type PaginatedPayments = ApiResponse<Payment[]>;
 interface PaymentState {
   payments: PaginatedPayments | null;
   selectedPayment: Payment | null;
+  refundedPayments: PaginatedPayments | null;
   loading: boolean;
   error: string | null;
 }
@@ -19,6 +20,7 @@ interface PaymentState {
 const initialState: PaymentState = {
   payments: null,
   selectedPayment: null,
+  refundedPayments: null,
   loading: false,
   error: null,
 };
@@ -70,7 +72,7 @@ export const updatePayment = createAsyncThunk<
       `admin/payments/${id}?status=${status}`,
       {}
     );
-    thunkAPI.dispatch(getPayments(1)); // تحديث القائمة بعد التعديل
+    thunkAPI.dispatch(getPayments(1));
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -101,28 +103,39 @@ export const deletePayment = createAsyncThunk<
 // ============ Refund Payment ============
 export const refundPayment = createAsyncThunk<
   any,
-  {
-    paymentId: number;
-    data: {
-      name: string;
-      games_count: number;
-      price: number;
-      is_active: number;
-    };
-  },
+  { paymentId: number },
   { rejectValue: string }
->("payments/refundPayment", async ({ paymentId, data }, thunkAPI) => {
+>("payments/refundPayment", async ({ paymentId }, thunkAPI) => {
   try {
     const res = await useInsertData<any>(
       `admin/payments/refund/${paymentId}`,
-      data
+      {}
     );
-    thunkAPI.dispatch(getPayments(1)); // بعد الاسترداد رجع القائمة محدثة
+    thunkAPI.dispatch(getPayments(1));
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(
       err.response?.data.message || "refundPayment failed"
+    );
+  }
+});
+
+// Get Refunded Payments
+export const getRefundedPayments = createAsyncThunk<
+  PaginatedPayments,
+  number,
+  { rejectValue: string }
+>("payments/getRefundedPayments", async (page, thunkAPI) => {
+  try {
+    const res = await useGetDataToken<PaginatedPayments>(
+      `admin/payments?filter[status]=2&page=${page}`
+    );
+    return res;
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "getRefundedPayments failed"
     );
   }
 });
@@ -143,6 +156,13 @@ const paymentSlice = createSlice({
       // Get By ID
       .addCase(getPaymentById.fulfilled, (state, action) => {
         state.selectedPayment = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+
+      // Get Refunded Payments
+      .addCase(getRefundedPayments.fulfilled, (state, action) => {
+        state.refundedPayments = action.payload;
         state.loading = false;
         state.error = null;
       })

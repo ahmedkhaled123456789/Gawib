@@ -1,22 +1,28 @@
-import React, { useRef, useState, useCallback } from "react";
+// src/components/questions/AddQuestion.tsx
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../store";
-import { createQuestion } from "../../store/questionsSlice";
+import {
+  createQuestion,
+  updateQuestion,
+  getQuestionById,
+} from "../../store/questionsSlice";
 import { getAllGamesForDropdown } from "../../store/gameSlice";
 import Dropdown from "../../components/DropDown";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-type FileData = {
-  file: File;
-  url: string;
-} | null;
+type FileData =
+  | { type: "image" | "audio" | "video"; url: string }
+  | File
+  | null;
 
 interface Props {
+  selectedId?: string;
   onClose: () => void;
 }
 
-const AddQuestion: React.FC<Props> = ({ onClose }) => {
+const AddBostedQuestion: React.FC<Props> = ({ selectedId, onClose }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { games } = useSelector((s: RootState) => s.game);
 
@@ -42,51 +48,73 @@ const AddQuestion: React.FC<Props> = ({ onClose }) => {
   const fileInputRefA = useRef<HTMLInputElement | null>(null);
 
   // Load games for dropdown
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(getAllGamesForDropdown());
   }, [dispatch]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (games) {
       setGameOptions(
-        games.data?.map((g: any) => ({
-          value: g.id,
-          label: g.is_free ? `🆓🆓  ${g.name}` : g.name,
-        })) || []
+        games.data?.map((g: any) => ({ value: g.id, label: g.name })) || []
       );
     }
   }, [games]);
 
-  // File selection handler
-  const handleFileSelect = useCallback(
-    (
-      e: React.ChangeEvent<HTMLInputElement>,
-      setFile: (f: FileData) => void
-    ) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        setFile({ file, url });
-      }
-    },
-    []
-  );
+  // Load question data when editing
+  useEffect(() => {
+    if (!selectedId) return;
+    // ensure gameOptions loaded (if you want to require it, keep it in deps)
+    dispatch(getQuestionById(selectedId))
+      .unwrap()
+      .then((res) => {
+        const data = res.data;
+        setQuestion(data.question_text || data.question?.text || "");
+        setAnswer(data.answer_text || "");
+        setHint(data.hint || "");
+        setPoints(Number(data.points) || 400);
+        setIsActive(Boolean(data.is_active));
+        setActiveCategory(data.activeCategory || "");
 
-  // Cleanup URLs when component unmounts
-  React.useEffect(() => {
-    return () => {
-      if (questionFile?.url) {
-        URL.revokeObjectURL(questionFile.url);
-      }
-      if (answerFile?.url) {
-        URL.revokeObjectURL(answerFile.url);
-      }
-    };
-  }, [questionFile?.url, answerFile?.url]);
+        setQuestionFile(
+          data.question?.video
+            ? { url: data.question.video, type: "video" }
+            : data.question?.image
+            ? { url: data.question.image, type: "image" }
+            : data.question?.audio
+            ? { url: data.question.audio, type: "audio" }
+            : null
+        );
+
+        setAnswerFile(
+          data.answer?.video
+            ? { url: data.answer.video, type: "video" }
+            : data.answer?.image
+            ? { url: data.answer.image, type: "image" }
+            : data.answer?.audio
+            ? { url: data.answer.audio, type: "audio" }
+            : null
+        );
+
+        const sel = (games?.data || []).find((g: any) => g.id === data.game_id);
+        setSelectedGame(sel ? { value: sel.id, label: sel.name } : null);
+      })
+      .catch(() => toast.error("فشل تحميل بيانات السؤال"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId, dispatch]);
+
+  // File selection handler
+  const handleFileSelect = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setFile: (f: FileData) => void
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) setFile(file);
+  };
 
   // Render preview
-  const renderFilePreview = useCallback((fileData: FileData) => {
-    if (!fileData)
+  // Render preview
+  const renderFilePreview = (file: FileData) => {
+    if (!file)
       return (
         <div className="flex flex-col items-center justify-center text-gray-500">
           <img
@@ -98,14 +126,14 @@ const AddQuestion: React.FC<Props> = ({ onClose }) => {
         </div>
       );
 
-    const { file, url } = fileData;
-    const type = file.type;
+    const src = file instanceof File ? URL.createObjectURL(file) : file.url;
+    const type = file instanceof File ? file.type : file.type;
 
     if (type.startsWith("image"))
       return (
         <div className="relative w-full h-full flex items-center justify-center bg-gray-50 rounded-lg shadow-md overflow-hidden">
           <img
-            src={url}
+            src={src}
             alt="Preview"
             className="max-h-[260px] object-contain rounded-lg"
           />
@@ -115,7 +143,7 @@ const AddQuestion: React.FC<Props> = ({ onClose }) => {
     if (type.startsWith("video"))
       return (
         <div className="relative w-full flex justify-center bg-gray-100 rounded-lg shadow-md overflow-hidden">
-          <video src={url} controls className="max-h-[260px] rounded-lg" />
+          <video src={src} controls className="max-h-[260px] rounded-lg" />
         </div>
       );
 
@@ -123,48 +151,37 @@ const AddQuestion: React.FC<Props> = ({ onClose }) => {
       return (
         <div className="w-full bg-gray-100 rounded-lg shadow-md p-4 flex flex-col items-center">
           <audio controls className="w-full max-w-[300px]">
-            <source src={url} type={type} />
+            <source src={src} type={type} />
           </audio>
           <p className="text-sm text-gray-600 mt-2">🎧 تشغيل الصوت</p>
         </div>
       );
 
     return null;
-  }, []);
+  };
 
-  // reset form - إزالة إعادة تعيين النقاط
+  // reset form
   const resetForm = () => {
     setQuestion("");
     setAnswer("");
     setHint("");
-    // تنظيف الـ URLs القديمة
-    if (questionFile?.url) {
-      URL.revokeObjectURL(questionFile.url);
-    }
-    if (answerFile?.url) {
-      URL.revokeObjectURL(answerFile.url);
-    }
+    setPoints(400);
+    setActiveCategory("");
     setQuestionFile(null);
     setAnswerFile(null);
-    setActiveCategory("");
-    // تم إزالة setSelectedGame(null) - الفئة تبقى كما هي
+    setSelectedGame(null);
     setIsActive(false);
   };
 
   // Build FormData helper
-  const appendFileToForm = (
-    fd: FormData,
-    fileData: FileData,
-    prefix: string
-  ) => {
-    if (!fileData) return;
-    const { file } = fileData;
+  const appendFileToForm = (fd: FormData, file: FileData, prefix: string) => {
+    if (!(file instanceof File)) return;
     if (file.type.startsWith("image/")) fd.append(`${prefix}_image`, file);
     else if (file.type.startsWith("audio/")) fd.append(`${prefix}_audio`, file);
     else if (file.type.startsWith("video/")) fd.append(`${prefix}_video`, file);
   };
 
-  // Submit (create only)
+  // Submit (create or update) — note: dispatch called directly per branch to keep typings safe
   const submitQuestion = async () => {
     if (!question.trim() || !answer.trim() || !selectedGame) {
       toast.error("يرجى ملء جميع الحقول المطلوبة");
@@ -185,17 +202,36 @@ const AddQuestion: React.FC<Props> = ({ onClose }) => {
 
     setLoading(true);
 
-    dispatch(createQuestion(formData))
-      .unwrap()
-      .then(() => {
-        toast.success("تم الحفظ بنجاح!");
-        resetForm(); // إعادة تعيين النموذج مع الاحتفاظ بالنقاط والفئة
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error("فشل الحفظ!");
-      })
-      .finally(() => setLoading(false));
+    if (selectedId) {
+      // Update branch (use _method=PUT if backend expects it via POST)
+      formData.append("_method", "PUT");
+      dispatch(updateQuestion({ id: selectedId, formData, isActivePage: true }))
+        .unwrap()
+        .then(() => {
+          toast.success("تم التحديث بنجاح!");
+          resetForm();
+          onClose();
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("فشل التحديث!");
+        })
+        .finally(() => setLoading(false));
+    } else {
+      // Create branch
+      dispatch(createQuestion(formData))
+        .unwrap()
+        .then(() => {
+          toast.success("تم الحفظ بنجاح!");
+          resetForm();
+          onClose();
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("فشل الحفظ!");
+        })
+        .finally(() => setLoading(false));
+    }
   };
 
   return (
@@ -217,7 +253,7 @@ const AddQuestion: React.FC<Props> = ({ onClose }) => {
             ))}
           </div>
 
-          <label className="text-[#085E9C] font-bold">اختر الفئه</label>
+          <label className="text-[#085E9C] font-bold">اختر اللعبة</label>
           <Dropdown
             options={gameOptions}
             selected={selectedGame?.value || ""}
@@ -349,4 +385,4 @@ const AddQuestion: React.FC<Props> = ({ onClose }) => {
   );
 };
 
-export default AddQuestion;
+export default AddBostedQuestion;

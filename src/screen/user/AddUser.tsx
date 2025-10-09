@@ -12,6 +12,7 @@ const AddUser = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(false);
   const [phone, setPhone] = useState("");
+  const [countryName, setCountryName] = useState("EGYPT"); // 🇪🇬 القيمة الافتراضية
 
   const navigate = useNavigate();
 
@@ -32,6 +33,8 @@ const AddUser = () => {
       password: (formData.get("password") as string) || "",
       played_games: Number(formData.get("played_games") || 0),
       status: formData.get("status") === "on" ? 1 : 0,
+      is_supervisor: formData.get("is_supervisor") === "on" ? 1 : 0,
+      nationality: countryName.toUpperCase(), // ✅ إضافة الجنسية بناءً على رقم الموبايل
     };
 
     if (
@@ -75,6 +78,12 @@ const AddUser = () => {
     }
   };
 
+  // ✅ نحدث الدولة لما المستخدم يغير رقم الموبايل
+  const handlePhoneChange = (value: string, data: any) => {
+    setPhone(value);
+    setCountryName(data?.name || "UNKNOWN");
+  };
+
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded shadow mt-6 relative">
       {/* زر العودة للخلف */}
@@ -108,10 +117,12 @@ const AddUser = () => {
           placeholder="البريد الإلكتروني"
           className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#085E9C]"
         />
+
+        {/* ✅ تعديل PhoneInput لقراءة اسم الدولة */}
         <PhoneInput
           country={"eg"}
           value={phone}
-          onChange={setPhone}
+          onChange={handlePhoneChange}
           inputClass="w-full"
           enableSearch
           containerClass="w-full"
@@ -130,6 +141,7 @@ const AddUser = () => {
             left: "0",
           }}
         />
+
         <input
           type="password"
           name="password"
@@ -142,15 +154,20 @@ const AddUser = () => {
           placeholder="عدد الألعاب"
           className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#085E9C]"
         />
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="status"
-            className="h-4 w-4"
-            defaultChecked
-          />
-          <label>نشط</label>
+
+        {/* ✅ Checkboxes للحالة والمشرف */}
+        <div className="flex flex-col gap-2 mt-2">
+          <div className="flex items-center gap-2">
+            <input type="checkbox" name="status" className="h-4 w-4" defaultChecked />
+            <label>نشط</label>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input type="checkbox" name="is_supervisor" className="h-4 w-4" />
+            <label>مستخدم يضيف لعبة</label>
+          </div>
         </div>
+
         <button
           type="submit"
           disabled={loading}

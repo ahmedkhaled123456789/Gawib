@@ -1,3 +1,4 @@
+// store/questionsSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useGetDataToken } from "../utils/api";
 import { AxiosError } from "axios";
@@ -35,24 +36,57 @@ const initialState: QuestionsState = {
   error: null,
 };
 
-// ========== Get All Questions ==========
+// ========== Get All Questions Not Active ==========
 export const getQuestions = createAsyncThunk<
   QuestionData,
   { page: number; search?: string; sort?: string; points?: string },
   { rejectValue: string }
->("questions/getQuestions", async ({ page, search, sort, points }, thunkAPI) => {
-  try {
-    let url = `admin/questions?page=${page}`;
-    if (search) url += `&filter[search]=${encodeURIComponent(search)}`;
-    if (sort) url += `&sort=${encodeURIComponent(sort)}`;
-    if (points) url += `&filter[points]=${encodeURIComponent(points)}`; 
-    const res = await useGetDataToken<QuestionData>(url);
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "getQuestions failed");
+>(
+  "questions/getQuestions",
+  async ({ page, search, sort, points }, thunkAPI) => {
+    try {
+      let url = `admin/questions?page=${page}&filter[is_active]=0`;
+
+      if (search) url += `&filter[search]=${encodeURIComponent(search)}`;
+      if (sort) url += `&sort=${encodeURIComponent(sort)}`;
+      if (points) url += `&filter[points]=${encodeURIComponent(points)}`;
+
+      const res = await useGetDataToken<QuestionData>(url);
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "getQuestions failed"
+      );
+    }
   }
-});
+);
+
+// ========== Get Active Questions ==========
+export const getQuestionsActive = createAsyncThunk<
+  QuestionData,
+  { page: number; search?: string; sort?: string; points?: string },
+  { rejectValue: string }
+>(
+  "questions/getQuestionsActive",
+  async ({ page, search, sort, points }, thunkAPI) => {
+    try {
+      let url = `admin/questions?page=${page}&filter[is_active]=1`;
+
+      if (search) url += `&filter[search]=${encodeURIComponent(search)}`;
+      if (sort) url += `&sort=${encodeURIComponent(sort)}`;
+      if (points) url += `&filter[points]=${encodeURIComponent(points)}`;
+
+      const res = await useGetDataToken<QuestionData>(url);
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "getQuestionsActive failed"
+      );
+    }
+  }
+);
 
 // ========== Get One Question ==========
 export const getQuestionById = createAsyncThunk<
@@ -65,40 +99,57 @@ export const getQuestionById = createAsyncThunk<
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "getQuestionById failed");
-  }
-});
-
-// ========== Create Question ==========
-export const createQuestion = createAsyncThunk<
-  QuestionData,
-  FormData
->("questions/createQuestion", async (formData, thunkAPI) => {
-  try {
-    const res = await useInsertData<QuestionData>(`admin/questions`, formData as any);
-    thunkAPI.dispatch(getQuestions({ page: 1 }));
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
     return thunkAPI.rejectWithValue(
-      err.response?.data.message || "createQuestion failed"
+      err.response?.data.message || "getQuestionById failed"
     );
   }
 });
 
+// ========== Create Question ==========
+export const createQuestion = createAsyncThunk<QuestionData, FormData>(
+  "questions/createQuestion",
+  async (formData, thunkAPI) => {
+    try {
+      const res = await useInsertData<QuestionData>(
+        `admin/questions`,
+        formData as any
+      );
+      thunkAPI.dispatch(getQuestions({ page: 1 }));
+      return res;
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      return thunkAPI.rejectWithValue(
+        err.response?.data.message || "createQuestion failed"
+      );
+    }
+  }
+);
+
 // ========== Update Question ==========
 export const updateQuestion = createAsyncThunk<
-  QuestionData,
-  { id: string; formData: Partial<QuestionData> | FormData },
+  any,
+  { id: string; formData: FormData; isActivePage?: boolean }, // إضافة isActivePage
   { rejectValue: string }
->("questions/updateQuestion", async ({ id, formData }, thunkAPI) => {
+>("questions/updateQuestion", async ({ id, formData, isActivePage = false }, thunkAPI) => {
   try {
-    const res = await useInsertData<QuestionData>(`admin/questions/${id}`, formData as any);
-    thunkAPI.dispatch(getQuestions({ page: 1 }));
-    return res;
+    const res = await useInsertData<any>(
+      `admin/questions/${id}`,
+      formData as any
+    );
+
+    // بناءً على نوع الصفحة، نقوم بإعادة تحميل البيانات المناسبة
+    if (isActivePage) {
+      thunkAPI.dispatch(getQuestionsActive({ page: 1 }));
+    } else {
+      thunkAPI.dispatch(getQuestions({ page: 1 }));
+    }
+
+    return { id, updatedData: res };
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "updateQuestion failed");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "updateQuestion failed"
+    );
   }
 });
 
@@ -113,54 +164,75 @@ export const deleteQuestion = createAsyncThunk<
     return res;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(err.response?.data.message || "deleteQuestion failed");
+    return thunkAPI.rejectWithValue(
+      err.response?.data.message || "deleteQuestion failed"
+    );
   }
 });
 
 const questionsSlice = createSlice({
   name: "questions",
   initialState,
-  reducers: {},
+  reducers: {
+    updateQuestionInList: (state, action) => {
+      if (state.questions?.data && Array.isArray(state.questions.data)) {
+        const updatedIndex = state.questions.data.findIndex(
+          (q) => q.id === action.payload.id
+        );
+        if (updatedIndex !== -1) {
+          state.questions.data[updatedIndex] = {
+            ...state.questions.data[updatedIndex],
+            ...action.payload.updatedData
+          };
+        }
+      }
+    }
+  },
   extraReducers: (builder) => {
-    builder.addCase(getQuestions.fulfilled, (state, action) => {
-      state.questions = action.payload;
-      state.loading = false;
-      state.error = null;
-    });
-
-    builder.addCase(getQuestionById.fulfilled, (state, action) => {
-      state.question = action.payload;
-      state.loading = false;
-      state.error = null;
-    });
-
-    builder.addCase(createQuestion.fulfilled, (state) => {
-      state.loading = false;
-      state.error = null;
-    });
-
-    builder.addCase(updateQuestion.fulfilled, (state, action) => {
-      state.questions = action.payload;
-      state.loading = false;
-      state.error = null;
-    });
-
-    builder.addCase(deleteQuestion.fulfilled, (state) => {
-      state.questions = null;
-      state.loading = false;
-      state.error = null;
-    });
-
     builder
-      .addMatcher((action) => action.type.endsWith("/rejected"), (state, action: any) => {
+      .addCase(getQuestions.fulfilled, (state, action) => {
+        state.questions = action.payload;
         state.loading = false;
-        state.error = action.payload || "Something went wrong";
-      })
-      .addMatcher((action) => action.type.endsWith("/pending"), (state) => {
-        state.loading = true;
         state.error = null;
-      });
+      })
+      .addCase(getQuestionsActive.fulfilled, (state, action) => {
+        state.questions = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(getQuestionById.fulfilled, (state, action) => {
+        state.question = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(createQuestion.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(updateQuestion.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(deleteQuestion.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addMatcher(
+        (action) => action.type.endsWith("/rejected"),
+        (state, action: any) => {
+          state.loading = false;
+          state.error = action.payload || "Something went wrong";
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith("/pending"),
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      );
   },
 });
 
+export const { updateQuestionInList } = questionsSlice.actions;
 export default questionsSlice.reducer;

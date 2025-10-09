@@ -1,31 +1,54 @@
 import { useEffect, useState, useMemo } from "react";
 import { FiSearch } from "react-icons/fi";
-import { Link } from "react-router-dom";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
 import AddQuestion from "./AddQuestion";
+import EditQuestion from "./EditeQuestion";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { getQuestions, deleteQuestion } from "../../store/questionsSlice";
-import { Trash } from "lucide-react";
+import {
+  getQuestions,
+  deleteQuestion,
+  updateQuestion,
+} from "../../store/questionsSlice";
+import { EditIcon, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 const ProductRow = ({
   product,
   setSelectedId,
-  setShowPriceModal,
+  setShowEditModal,
   handleDelete,
-}) => {
-  const renderContent = (data) => {
-    if (!data) return "—";
-    if (data.text) return data.text;
-    if (data.image) return <span className="text-blue-500">📷 صورة</span>;
-    if (data.video) return <span className="text-red-500">🎬 فيديو</span>;
-    if (data.sound) return <span className="text-green-500">🎵 صوت</span>;
-    return "—";
-  };
+  dispatch,
+}: any) => {
+  // في دالة handleToggleActive في ProductRow
+  const handleToggleActive = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("is_active", product.is_active ? "0" : "1");
+      formData.append("_method", "PUT");
 
+      await dispatch(
+        updateQuestion({
+          id: product.id.toString(),
+          formData,
+          isActivePage: false, // إضافة هذا السطر
+        })
+      ).unwrap();
+
+      toast.success("تم تحديث حالة السؤال بنجاح");
+
+      // إعادة تحميل البيانات بعد التحديث
+      dispatch(
+        getQuestions({
+          page: 1,
+        })
+      );
+    } catch (error) {
+      toast.error("فشل في تحديث حالة السؤال");
+    }
+  };
   return (
     <tr className="text-xs md:text-sm">
       <td
@@ -38,21 +61,19 @@ const ProductRow = ({
         className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[120px] md:max-w-[160px] truncate"
         title={product.game_name}
       >
-        <Link to={`/productDetails/${product.id}`}>
-          <div className="truncate">{product.game_name}</div>
-        </Link>
+        {product.game_name}
       </td>
       <td
         className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[150px] md:max-w-[200px] truncate"
         title={product.question?.text || "—"}
       >
-        {renderContent(product?.question)}
+        {product.question_text || "—"}
       </td>
       <td
         className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[150px] md:max-w-[200px] truncate"
         title={product.answer?.text || "—"}
       >
-        {renderContent(product?.answer)}
+        {product.answer_text || "—"}
       </td>
       <td
         className="px-2 md:px-4 py-1 md:py-2 text-white text-xs md:text-sm"
@@ -84,20 +105,24 @@ const ProductRow = ({
       >
         {product.admin_name || "محمد الناصر"}
       </td>
+      <td className="px-2 md:px-4 py-1 md:py-2 text-center">
+        <input
+          type="checkbox"
+          checked={!!product.is_active}
+          onChange={handleToggleActive}
+          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+        />
+      </td>
       <td className="px-2 md:px-4 py-1 md:py-2">
-        <div className="flex items-center justify-center w-36 gap-2 flex-wrap">
+        <div className="flex items-center justify-end w-36 gap-2 flex-wrap">
           <span
             className="p-1 border cursor-pointer rounded bg-[#085E9C]"
             onClick={() => {
               setSelectedId(product.id);
-              setShowPriceModal(true);
+              setShowEditModal(true);
             }}
           >
-            <img
-              src="/images/group/edit.png"
-              alt=""
-              className="w-4 h-4 md:w-5 md:h-5"
-            />
+            <EditIcon className="w-4 h-4 md:w-5 md:h-5 cursor-pointer text-white bg-[#085E9C] hover:bg-[#0c4f7b]" />
           </span>
           <span
             className="cursor-pointer text-red-700"
@@ -118,8 +143,8 @@ const Questions = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [pointsFilter, setPointsFilter] = useState<string | null>(null);
-  const [showPriceModal, setShowPriceModal] = useState(false);
-  const [selectedImg, setSelectedImg] = useState<any>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -133,7 +158,6 @@ const Questions = () => {
         })
       );
     }, 500);
-
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, statusFilter, pointsFilter, dispatch]);
 
@@ -171,19 +195,16 @@ const Questions = () => {
 
   const sortedQuestions = useMemo(() => {
     if (!questions?.data || !Array.isArray(questions.data)) return [];
-
     if (statusFilter === "الفئة") {
       return [...questions.data].sort((a, b) =>
         (a.game_name || "").localeCompare(b.game_name || "")
       );
     }
-
     if (statusFilter === "المشرف") {
       return [...questions.data].sort((a, b) =>
         (a.admin_name || "").localeCompare(b.admin_name || "")
       );
     }
-
     return [...questions.data].sort(
       (a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -247,7 +268,7 @@ const Questions = () => {
               className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-2 md:px-4 py-1 md:py-2 rounded text-xs md:text-sm font-medium transition-colors"
               onClick={() => {
                 setSelectedId(null);
-                setShowPriceModal(true);
+                setShowAddModal(true);
               }}
             >
               إضافة سؤال
@@ -267,6 +288,7 @@ const Questions = () => {
                 <th className="px-2 md:px-4 py-1">النقاط</th>
                 <th className="px-2 md:px-4 py-1">التلميح</th>
                 <th className="px-2 md:px-4 py-1">مشرف الفئة</th>
+                <th className="px-2 md:px-4 py-1">تفعيل</th>
                 <th className="px-2 md:px-4 py-1">إدارة</th>
               </tr>
             </thead>
@@ -276,14 +298,15 @@ const Questions = () => {
                   <ProductRow
                     key={question.id}
                     product={question}
-                    setShowPriceModal={setShowPriceModal}
+                    setShowEditModal={setShowEditModal}
                     setSelectedId={setSelectedId}
                     handleDelete={handleDelete}
+                    dispatch={dispatch}
                   />
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-2 py-2 text-gray-700">
+                  <td colSpan={9} className="px-2 py-2 text-gray-700">
                     لم يتم العثور على أسئلة.
                   </td>
                 </tr>
@@ -292,34 +315,23 @@ const Questions = () => {
           </table>
         </div>
 
-        {/* Image Preview */}
-        {selectedImg && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-            onClick={() => setSelectedImg(null)}
-          >
-            <img
-              src={selectedImg}
-              alt="عرض الصورة"
-              className="max-w-full max-h-full rounded shadow-lg"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        )}
-
         {/* Pagination */}
         {questions?.meta?.last_page && (
           <Pagination pageCount={questions.meta.last_page} onPress={onPress} />
         )}
 
-        {/* Add/Edit Modal */}
-        <CustomModal isOpen={showPriceModal}>
-          <AddQuestion
-            key={selectedId || "new"}
+        {/* Add Modal */}
+        <CustomModal isOpen={showAddModal}>
+          <AddQuestion onClose={() => setShowAddModal(false)} />
+        </CustomModal>
+
+        {/* Edit Modal */}
+        <CustomModal isOpen={showEditModal}>
+          <EditQuestion
             selectedId={selectedId}
             onClose={() => {
               setSelectedId(null);
-              setShowPriceModal(false);
+              setShowEditModal(false);
             }}
           />
         </CustomModal>

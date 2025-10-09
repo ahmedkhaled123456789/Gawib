@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { EditIcon, Search, Trash2 } from "lucide-react";
+import { EditIcon, Loader2, Search, Trash2 } from "lucide-react";
 // import CustomDropdown from "../../components/CustomDropdown";
 import CustomModalGroup from "../../components/Modals/CustomModalGroup";
 import CustomModal from "../../components/Modals/CustomModal";
@@ -32,6 +32,7 @@ const Groups: React.FC = () => {
   const [descriptionGroup, setDescriptionGroap] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -74,17 +75,40 @@ const Groups: React.FC = () => {
     });
   };
 
-  const handleConfirmStatus = (data: { id: string; is_active: boolean }) => {
+  const handleConfirmStatus = async (data: {
+    id: string;
+    is_active: boolean;
+  }) => {
     const formData = new FormData();
-    formData.append("is_active", JSON.stringify(data.is_active));
+    formData.append("_method", "PUT"); // عشان Laravel يفهم إنها PUT
+    formData.append("is_active", data.is_active ? "1" : "0");
 
-    dispatch(
-      updateCategory({
-        id: data.id,
-        formData: formData,
-      })
-    );
-    setModalOpen(false);
+    try {
+      setIsPublishing(true); // 🔹 بدأ التحميل
+
+      const resultAction = await dispatch(
+        updateCategory({
+          id: data.id,
+          formData: formData,
+        })
+      );
+
+      if (updateCategory.fulfilled.match(resultAction)) {
+        // ✅ تم بنجاح
+        toast.success(
+          data.is_active
+            ? "تم نشر المجموعة بنجاح ✅"
+            : "تم إيقاف نشر المجموعة ⛔"
+        );
+      } else {
+        toast.error("حدث خطأ أثناء تحديث الحالة ❌");
+      }
+    } catch (error) {
+      toast.error("فشل الاتصال بالسيرفر ⚠️");
+    } finally {
+      setIsPublishing(false); // 🔹 انهاء التحميل
+      setModalOpen(false);
+    }
   };
 
   const handleFormClick = (Group?) => {
@@ -135,7 +159,7 @@ const Groups: React.FC = () => {
   };
 
   const GroupsCard = ({ Group, onStatusClick, onDeleteClick }) => (
-    <div className="bg-[#fafbff] border border-[#000] rounded p-4 w-full max-w-[200px] flex flex-col items-center relative">
+    <div className="bg-[#fafbff] border border-[#000] rounded p-4 w-full max-w-[300px] flex flex-col items-center relative">
       <div className="text-center mb-3 w-full">
         <div className="border border-[#085E9C] rounded p-2 text-sm font-medium text-[#000] text-center">
           {Group.name}
@@ -162,7 +186,7 @@ const Groups: React.FC = () => {
 
       <div className="text-center mb-3 w-full">
         <div className="border border-[#085E9C] text-[#000] rounded px-3 py-1 text-sm font-medium text-center">
-          445
+          {Group.games_count}
         </div>
       </div>
 
@@ -170,8 +194,15 @@ const Groups: React.FC = () => {
         <button
           className="bg-[#085E9C] text-white px-3 py-1.5 rounded text-xs font-medium hover:bg-blue-700 transition-colors w-full"
           onClick={onStatusClick}
+          disabled={isPublishing}
         >
-          نشر / إيقاف النشر
+          {isPublishing ? (
+            <Loader2 className="animate-spin h-5 w-5" />
+          ) : Group.is_active ? (
+            "ايقاف نشر المجموعة"
+          ) : (
+            "نشر المجموعة"
+          )}
         </button>
       </div>
 
@@ -226,20 +257,6 @@ const Groups: React.FC = () => {
             />
             <Search className="absolute left-3 top-3 text-gray-500" />
           </div>
-
-          {/* Dropdown */}
-          {/* <CustomDropdown
-            options={[
-              { value: "", label: "الأحدث" },
-              { value: "الجنسية", label: "الجنسية" },
-              { value: "تاريخ التسجيل", label: "تاريخ التسجيل" },
-              { value: "عدد الألعاب", label: "عدد الألعاب" },
-              { value: "المشتريات", label: "المشتريات" },
-              { value: "حالة الحساب", label: "حالة الحساب" },
-            ]}
-            selected={statusFilter}
-            onChange={setStatusFilter}
-          /> */}
         </div>
 
         <div className="flex items-center space-x-4 space-x-reverse mt-2 md:mt-0">
@@ -253,11 +270,11 @@ const Groups: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-full mx-auto px-4 py-6">
         <div className="bg-white border-2 border-[#085E9C] overflow-hidden">
-          <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between p-4">
+          <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-center p-4">
             <button className="w-full sm:w-[40%] bg-white rounded py-4 px-6 text-center font-bold text-[#085E9C] border border-[#085E9C]">
-              جغرافيا والعالم
+              المجموعات
             </button>
             <button
               className="w-full sm:w-[40%] bg-yellow-500 rounded py-4 px-6 text-center font-bold text-[#085E9C] border border-[#085E9C]"
@@ -265,13 +282,15 @@ const Groups: React.FC = () => {
             >
               إضافة فئة فرعية
             </button>
-            <button className="w-full sm:w-[20%] py-4 px-6 bg-[#085E9C] rounded text-center font-bold text-white border border-[#085E9C]">
+            {/* <button className="w-full sm:w-[20%] py-4 px-6 bg-[#085E9C] rounded text-center font-bold text-white border border-[#085E9C]">
               حفظ
-            </button>
+            </button> */}
           </div>
 
           <CustomModal isOpen={showGroupModal}>
-            <AddGroup onClose={() => setShowGroupModal(false)} />
+            <div className="max-h-[90vh] overflow-y-auto">
+              <AddGroup onClose={() => setShowGroupModal(false)} />
+            </div>
           </CustomModal>
 
           <div className="p-3">
@@ -344,7 +363,7 @@ const Groups: React.FC = () => {
                     <img
                       src={URL.createObjectURL(image)}
                       alt="Preview"
-                      className="w-[60px] h-[60px]"
+                      className="w-full h-[200px] object-contain"
                     />
                   ) : (
                     <img

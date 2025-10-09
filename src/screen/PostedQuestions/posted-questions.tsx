@@ -3,43 +3,51 @@ import { FiSearch } from "react-icons/fi";
 import CustomDropdown from "../../components/CustomDropdown";
 import Pagination from "../../components/pagination/Pagination";
 import CustomModal from "../../components/Modals/CustomModal";
-import AddQuestion from "../questions/AddQuestion";
+import EditQuestion from "./EditeQuestion"; 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
-import { getQuestions, deleteQuestion } from "../../store/questionsSlice";
-import { EditIcon, Trash } from "lucide-react";
+import { getQuestionsActive, deleteQuestion } from "../../store/questionsSlice";
+import { Trash, EditIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const ProductRow = ({
   product,
   setSelectedId,
-  setShowPriceModal,
+  setShowEditModal,
   handleDelete,
-}: any) => {
-  const renderContent = (data) => {
-    if (!data) return "—";
-    if (data.text) return data.text;
-    if (data.image) return <span className="text-blue-500">📷 صورة</span>;
-    if (data.video) return <span className="text-red-500">🎬 فيديو</span>;
-    if (data.sound) return <span className="text-green-500">🎵 صوت</span>;
-    return "—";
-  };
-
+}) => {
   return (
-    <tr key={product.id}>
-      <td className="px-4 py-2 font-medium text-gray-900">{product.id}</td>
-      <td className="px-4 py-2 text-gray-700 w-32 truncate">
-        {product.game_name || "—"}
+    <tr className="text-xs md:text-sm">
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 font-medium text-gray-900 max-w-[80px] md:max-w-[160px] truncate"
+        title={product.id.toString()}
+      >
+        {product.id}
       </td>
-      <td className="px-4 py-2 text-gray-700 w-72 truncate">
-        {renderContent(product?.question)}
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[120px] md:max-w-[160px] truncate"
+        title={product.game_name}
+      >
+        <div className="truncate">{product.game_name || "—"}</div>
       </td>
-      <td className="px-4 py-2 text-gray-700 w-72 truncate">
-        {renderContent(product?.answer)}
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[150px] md:max-w-[200px] truncate"
+        title={product.question_text || "—"}
+      >
+        {product.question_text}
       </td>
-      <td className="px-4 py-2 text-white">
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[150px] md:max-w-[200px] truncate"
+        title={product.answer_text || "—"}
+      >
+        {product.answer_text}
+      </td>
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-white text-xs md:text-sm"
+        title={product.points.toString()}
+      >
         <div
-          className={`w-16 px-4 py-1 rounded ${
+          className={`w-14 md:w-16 px-2 py-1 rounded text-center ${
             product.points === 200
               ? "bg-[#309222]"
               : product.points === 400
@@ -52,26 +60,34 @@ const ProductRow = ({
           {product.points}
         </div>
       </td>
-      <td className="px-4 py-2 text-gray-700 w-20">{product.hint || "—"}</td>
-      <td className="px-4 py-2 text-gray-700 w-20">
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[120px] md:max-w-[160px] truncate"
+        title={product.hint || "—"}
+      >
+        {product.hint || "—"}
+      </td>
+      <td
+        className="px-2 md:px-4 py-1 md:py-2 text-gray-700 max-w-[120px] md:max-w-[160px] truncate"
+        title={product.admin_name || "—"}
+      >
         {product.admin_name || "—"}
       </td>
-      <td className="px-4 py-2">
-        <div className="flex items-center justify-center w-40 gap-2 flex-wrap">
+      <td className="px-2 md:px-4 py-1 md:py-2">
+        <div className="flex items-center justify-center w-36 gap-2 flex-wrap">
           <span
-            className="p-1 border cursor-pointer rounded bg-[#085E9C] text-white border-[#085E9C]"
+            className="p-1 border cursor-pointer rounded bg-[#085E9C]"
             onClick={() => {
               setSelectedId(product.id);
-              setShowPriceModal(true);
+              setShowEditModal(true);
             }}
           >
-            <EditIcon className="w-5 h-5" />
+            <EditIcon className="w-4 h-4 md:w-5 md:h-5 text-white" />
           </span>
           <span
             className="cursor-pointer text-red-700"
             onClick={() => handleDelete(product.id)}
           >
-            <Trash className="w-5 h-5" />
+            <Trash className="w-4 h-4 md:w-5 md:h-5" />
           </span>
         </div>
       </td>
@@ -83,17 +99,18 @@ const PostedQuestions = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { questions } = useSelector((state: RootState) => state.questions);
 
+  console.log("questions", questions);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [pointsFilter, setPointsFilter] = useState<string | null>(null);
-  const [showPriceModal, setShowPriceModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // جلب البيانات
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       dispatch(
-        getQuestions({
+        getQuestionsActive({
           page: 1,
           search: searchQuery,
           sort: statusFilter,
@@ -101,13 +118,12 @@ const PostedQuestions = () => {
         })
       );
     }, 500);
-
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, statusFilter, pointsFilter, dispatch]);
 
   const onPress = async (page: number) => {
     await dispatch(
-      getQuestions({
+      getQuestionsActive({
         page,
         search: searchQuery,
         sort: statusFilter,
@@ -123,7 +139,7 @@ const PostedQuestions = () => {
         onClick: () => {
           dispatch(deleteQuestion(id)).then(() => {
             dispatch(
-              getQuestions({
+              getQuestionsActive({
                 page: 1,
                 search: searchQuery,
                 sort: statusFilter,
@@ -137,41 +153,34 @@ const PostedQuestions = () => {
     });
   };
 
-  // فلترة الأسئلة اللي active فقط
-  const activeQuestions = useMemo(() => {
-    if (!questions?.data || !Array.isArray(questions.data)) return [];
-    return questions.data.filter((q) => q.is_active);
-  }, [questions]);
-
-  // الترتيب محليًا
   const sortedQuestions = useMemo(() => {
-    if (!activeQuestions) return [];
+    if (!questions?.data || !Array.isArray(questions.data)) return [];
 
     if (statusFilter === "الفئة") {
-      return [...activeQuestions].sort((a, b) =>
+      return [...questions.data].sort((a, b) =>
         (a.game_name || "").localeCompare(b.game_name || "")
       );
     }
 
     if (statusFilter === "المشرف") {
-      return [...activeQuestions].sort((a, b) =>
+      return [...questions.data].sort((a, b) =>
         (a.admin_name || "").localeCompare(b.admin_name || "")
       );
     }
 
-    return [...activeQuestions].sort(
+    return [...questions.data].sort(
       (a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-  }, [activeQuestions, statusFilter]);
+  }, [questions, statusFilter]);
 
   return (
     <div className="overflow-x-hidden">
       <div className="mx-2">
         {/* Header */}
-        <div className="flex flex-col md:flex-row p-4 bg-white items-start md:items-center justify-between gap-2">
+        <div className="flex flex-col md:flex-row p-2 md:p-4 bg-white items-start md:items-center justify-between gap-2">
           <div className="flex flex-col md:flex-row gap-2 items-start md:items-center w-full md:w-auto">
-            <div className="text-md w-32 font-bold text-[#085E9C]">
+            <div className="text-sm md:text-md font-bold text-[#085E9C]">
               الأسئلة المنشورة
             </div>
             <div className="relative w-full md:w-48 border rounded-md border-[#085E9C]">
@@ -180,9 +189,9 @@ const PostedQuestions = () => {
                 placeholder="ابحث بالفئة او السؤال"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full py-2 pl-8 pr-4 border border-gray-300 rounded-md focus:outline-none"
+                className="w-full py-1 md:py-2 pl-6 md:pl-8 pr-2 border border-gray-300 rounded-md text-xs md:text-sm focus:outline-none"
               />
-              <FiSearch className="absolute left-3 top-3 text-gray-500" />
+              <FiSearch className="absolute left-2 md:left-3 top-2 md:top-3 text-gray-500 text-xs md:text-sm" />
             </div>
             <CustomDropdown
               options={[
@@ -196,11 +205,11 @@ const PostedQuestions = () => {
           </div>
 
           {/* Points Filter */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1 md:gap-2">
             {[200, 400, 600].map((point) => (
               <span
                 key={point}
-                className={`text-[#ffc629] font-bold border cursor-pointer px-4 py-2 rounded ${
+                className={`text-xs md:text-sm text-[#ffc629] font-bold border cursor-pointer px-2 md:px-4 py-1 md:py-2 rounded ${
                   pointsFilter === point.toString()
                     ? "bg-[#085E9C] border-[#085E9C]"
                     : "border border-[#085E9C]"
@@ -215,34 +224,21 @@ const PostedQuestions = () => {
               </span>
             ))}
           </div>
-
-          {/* إضافة سؤال */}
-          <div className="flex items-center mt-2 md:mt-0">
-            <button
-              className="bg-yellow-500 hover:bg-yellow-600 text-[#085E9C] border border-[#085E9C] px-4 py-2 rounded text-sm font-medium transition-colors"
-              onClick={() => {
-                setSelectedId(null);
-                setShowPriceModal(true);
-              }}
-            >
-              إضافة سؤال
-            </button>
-          </div>
         </div>
 
-        {/* الجدول */}
+        {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-sm min-w-[700px] md:min-w-full">
+          <table className="w-full table-auto divide-y-2 divide-[#085E9C] bg-white text-xs md:text-sm min-w-[600px] md:min-w-full">
             <thead className="text-center">
-              <tr className="px-4 py-2 font-medium text-[#085E9C]">
-                <th>ID</th>
-                <th>الفئة</th>
-                <th>السؤال</th>
-                <th>الجواب</th>
-                <th>النقاط</th>
-                <th>التلميح</th>
-                <th>المشرف</th>
-                <th>إدارة</th>
+              <tr className="px-2 md:px-4 py-1 md:py-2 font-medium text-[#085E9C]">
+                <th className="px-2 md:px-4 py-1">ID</th>
+                <th className="px-2 md:px-4 py-1">أسم الفئة</th>
+                <th className="px-2 md:px-4 py-1">السؤال</th>
+                <th className="px-2 md:px-4 py-1">الجواب</th>
+                <th className="px-2 md:px-4 py-1">النقاط</th>
+                <th className="px-2 md:px-4 py-1">التلميح</th>
+                <th className="px-2 md:px-4 py-1">مشرف الفئة</th>
+                <th className="px-2 md:px-4 py-1">إدارة</th>
               </tr>
             </thead>
             <tbody className="divide-y text-center divide-gray-200">
@@ -251,15 +247,15 @@ const PostedQuestions = () => {
                   <ProductRow
                     key={question.id}
                     product={question}
-                    setShowPriceModal={setShowPriceModal}
+                    setShowEditModal={setShowEditModal}
                     setSelectedId={setSelectedId}
                     handleDelete={handleDelete}
                   />
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-4 py-2 text-gray-700">
-                    لا توجد أسئلة منشورة نشطه
+                  <td colSpan={8} className="px-2 py-2 text-gray-700">
+                    لا توجد أسئلة منشورة.
                   </td>
                 </tr>
               )}
@@ -272,13 +268,13 @@ const PostedQuestions = () => {
           <Pagination pageCount={questions.meta.last_page} onPress={onPress} />
         )}
 
-        {/* Add/Edit Modal */}
-        <CustomModal isOpen={showPriceModal}>
-          <AddQuestion
+        {/* Edit Modal */}
+        <CustomModal isOpen={showEditModal}>
+          <EditQuestion
             selectedId={selectedId}
             onClose={() => {
               setSelectedId(null);
-              setShowPriceModal(false);
+              setShowEditModal(false);
             }}
           />
         </CustomModal>

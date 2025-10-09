@@ -55,7 +55,7 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
       toast.success("تم حفظ التصنيف بنجاح!");
       onClose();
     } catch (err) {
-    toast.error(err as string); // ⬅️ هنا التعديل
+      toast.error(err as string); // ⬅️ هنا التعديل
     } finally {
       setLoading(false);
     }
@@ -71,13 +71,13 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
     <div className="w-full p-5">
       <div className="bg-white rounded-md p-4 border shadow">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="text-[#085E9C] font-bold">اختر الفئه</label>
+          <label className="text-[#085E9C] font-bold">اسم المجموعه</label>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="border border-[#085E9C] rounded px-3 py-2 text-sm outline-none"
           >
-            <option value="">-- اختر الفئه --</option>
+            <option value="">-- اختر اسم المجموعة --</option>
             {dropdownCategories?.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
@@ -106,20 +106,20 @@ const AddNewCategories = ({ onClose, adminId }: AddNewCategoriesProps) => {
 
           <label className="text-[#085E9C] font-bold">الصورة</label>
           <div
-            className="border border-[#085E9C] flex justify-center items-center h-40 cursor-pointer rounded"
+            className="border border-[#085E9C] flex justify-center items-center h-60 cursor-pointer rounded-lg overflow-hidden"
             onClick={handleImageClick}
           >
             {image ? (
               <img
                 src={URL.createObjectURL(image)}
                 alt="Preview"
-                className="w-[120px] h-[120px] object-cover"
+                className=" h-[240px] object-cover rounded-lg"
               />
             ) : (
               <img
                 src="/images/group/img.png"
                 alt="Placeholder"
-                className="w-[60px] h-[60px]"
+                className="w-[100px] h-[100px]"
               />
             )}
             <input

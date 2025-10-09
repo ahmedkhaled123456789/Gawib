@@ -23,6 +23,7 @@ const UpdateUser = () => {
     password: "",
     remaining_games: "",
     status: 1,
+    is_supervisor: 0, // ✅ تمت الإضافة هنا
   });
 
   const [loadingUser, setLoadingUser] = useState(true);
@@ -34,9 +35,11 @@ const UpdateUser = () => {
       dispatch(getUserById(id))
         .unwrap()
         .then((user: any) => {
+          // ✅ تحويل boolean إلى 1 أو 0
           setFormData({
             ...user,
             status: user.status ? 1 : 0,
+            is_supervisor: user.is_supervisor ? 1 : 0,
           });
         })
         .catch((err: any) => {
@@ -83,7 +86,15 @@ const UpdateUser = () => {
 
     try {
       setSubmitting(true);
-      const res = await dispatch(updateUser({ id, ...formData })).unwrap();
+
+      // ✅ تحويل الحقول المنطقية إلى أرقام قبل الإرسال
+      const updatedData = {
+        ...formData,
+        status: formData.status ? 1 : 0,
+        is_supervisor: formData.is_supervisor ? 1 : 0,
+      };
+
+      const res = await dispatch(updateUser({ id, ...updatedData })).unwrap();
       toast.success(res?.message || "تم تحديث بيانات المستخدم بنجاح");
       navigate("/");
     } catch (err: any) {
@@ -94,9 +105,7 @@ const UpdateUser = () => {
   };
 
   if (loadingUser) {
-    return (
-      <Loader />
-    );
+    return <Loader />;
   }
 
   return (
@@ -151,7 +160,7 @@ const UpdateUser = () => {
           />
         </div>
 
-        {/* رقم الهاتف بـ PhoneInput */}
+        {/* رقم الهاتف */}
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-700">
             رقم الهاتف
@@ -166,26 +175,20 @@ const UpdateUser = () => {
                 phone_number: `+${phone}`,
               }))
             }
-            inputClass="!w-full !px-3 !py-2 !border !rounded-md !shadow-sm focus:!ring-2 focus:!ring-[#085E9C] focus:!border-[#085E9C]"
-            inputProps={{
-              name: "phone_number",
-              dir: "rtl",
-              disabled: submitting,
-            }}
-            containerStyle={{ direction: "rtl" }}
-            inputStyle={{
-              width: "100%",
-              textAlign: "right",
-              borderRadius: "6px",
-              paddingRight: "50px",
-              padding: "20px 10px",
-            }}
-            buttonStyle={{
-              backgroundColor: "transparent",
-              border: "none",
-              position: "absolute",
-              left: "0",
-            }}
+               containerStyle={{ direction: "rtl" }}
+          inputStyle={{
+            width: "100%",
+            textAlign: "right",
+            borderRadius: "6px",
+            paddingRight: "50px",
+            padding: "20px 10px",
+          }}
+          buttonStyle={{
+            backgroundColor: "transparent",
+            border: "none",
+            position: "absolute",
+            left: "0",
+          }}
           />
         </div>
 
@@ -245,6 +248,19 @@ const UpdateUser = () => {
             className="w-4 h-4 text-[#085E9C] border-gray-300 rounded focus:ring-[#085E9C]"
           />
           <label className="text-gray-700">الحساب نشط</label>
+        </div>
+
+        {/* ✅ مستخدم يضيف لعبة */}
+        <div className="flex items-center gap-2 mt-6">
+          <input
+            type="checkbox"
+            name="is_supervisor"
+            checked={formData.is_supervisor === 1}
+            onChange={handleChange}
+            disabled={submitting}
+            className="w-4 h-4 text-[#085E9C] border-gray-300 rounded focus:ring-[#085E9C]"
+          />
+          <label className="text-gray-700">مستخدم يضيف لعبة</label>
         </div>
 
         {/* أزرار */}
