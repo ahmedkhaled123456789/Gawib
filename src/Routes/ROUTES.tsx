@@ -1,27 +1,49 @@
+import { lazy, Suspense } from "react";
 import Auth from "../Auth/Auth";
 import DashboardLayout from "../Layout/DashboardLayout";
 import PrivateRoute from "./PrivateRoute";
-import AllUsers from "../screen/user/AllUsers";
-import Categories from "../screen/categories/Categories";
-// import Prices from "../screen/prices/Prices";
-import Admins from "../screen/admins/Admins";
-import Questions from "../screen/questions/Questions";
-import SettingsPage from "../screen/settings/SettingsPage";
-import Game from "../screen/game/Game";
-import Groups from "../screen/group/Groups";
-import SalesRecovered from "../screen/salesRecovered/SalesRecovered";
-import ContactUs from "../screen/contactUs/ContactUs";
-import Discount from "../screen/discount/Discount";
-import UpdateUser from "../screen/user/UpdateUser";
-import SocialMedia from "../screen/socialLonk/SocialMedia";
-import AddUser from "../screen/user/AddUser";
-import GamePackages from "../screen/GamePackages/GamePackages";
-import PostedQuestions from "../screen/PostedQuestions/posted-questions";
-import UpdateAdmin from "../screen/admins/UpdateAdmin";
-import UpdateGroup from "../screen/group/UpdateGroup";
-import Payment from "../screen/sales/Payment";
-import SocialMediaEdit from "../screen/socialLonk/SocialMediaEdit";
-import AddSocialMedia from "../screen/socialLonk/AddSocialMedia";
+
+// Lazy load all components
+const AllUsers = lazy(() => import("../screen/user/AllUsers"));
+const Categories = lazy(() => import("../screen/categories/Categories"));
+const Admins = lazy(() => import("../screen/admins/Admins"));
+const Questions = lazy(() => import("../screen/questions/Questions"));
+const SettingsPage = lazy(() => import("../screen/settings/SettingsPage"));
+const Game = lazy(() => import("../screen/game/Game"));
+const Groups = lazy(() => import("../screen/group/Groups"));
+const SalesRecovered = lazy(
+  () => import("../screen/salesRecovered/SalesRecovered")
+);
+const ContactUs = lazy(() => import("../screen/contactUs/ContactUs"));
+const Discount = lazy(() => import("../screen/discount/Discount"));
+const UpdateUser = lazy(() => import("../screen/user/UpdateUser"));
+const SocialMedia = lazy(() => import("../screen/socialLonk/SocialMedia"));
+const AddUser = lazy(() => import("../screen/user/AddUser"));
+const GamePackages = lazy(() => import("../screen/GamePackages/GamePackages"));
+const PostedQuestions = lazy(
+  () => import("../screen/PostedQuestions/posted-questions")
+);
+const UpdateAdmin = lazy(() => import("../screen/admins/UpdateAdmin"));
+const UpdateGroup = lazy(() => import("../screen/group/UpdateGroup"));
+const Payment = lazy(() => import("../screen/sales/Payment"));
+const SocialMediaEdit = lazy(
+  () => import("../screen/socialLonk/SocialMediaEdit")
+);
+const AddSocialMedia = lazy(
+  () => import("../screen/socialLonk/AddSocialMedia")
+);
+
+// Loading component
+const LoadingFallback = () => (
+  <div className="flex justify-center items-center min-h-64">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
+
+// Wrapper component with Suspense
+const SuspenseWrapper = ({ children }) => (
+  <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
+);
 
 export const ROUTES = [
   {
@@ -30,33 +52,172 @@ export const ROUTES = [
   },
   {
     path: "/",
-    element: <PrivateRoute />, // protect everything inside
+    element: <PrivateRoute />,
     children: [
       {
         path: "/",
         element: <DashboardLayout />,
         children: [
-          { path: "", element: <AllUsers /> },
-          { path: "add-user", element: <AddUser /> },
-          { path: "categories", element: <Categories /> },
-          // { path: "prices", element: <Prices /> },
-          { path: "admins", element: <Admins /> },
-          { path: "admin/edit/:id", element: <UpdateAdmin /> },
-          { path: "questions", element: <Questions /> },
-          { path: "posted-questions", element: <PostedQuestions /> },
-          { path: "game-packages", element: <GamePackages /> },
-          { path: "settings", element: <SettingsPage /> },
-          { path: "socialMedia", element: <SocialMedia /> },
-          { path: "add-socialMedia", element: <AddSocialMedia /> },
-          { path: "socialMedia/edit/:id", element: <SocialMediaEdit /> },
-          { path: "game", element: <Game /> },
-          { path: "groups", element: <Groups /> },
-          { path: "group/edit/:id", element: <UpdateGroup /> },
-          { path: "payments", element: <Payment /> },
-          { path: "salesRecovered", element: <SalesRecovered /> },
-          { path: "contactus", element: <ContactUs /> },
-          { path: "discount", element: <Discount /> },
-          { path: "user/:id", element: <UpdateUser /> },
+          {
+            path: "",
+            element: (
+              <SuspenseWrapper>
+                <AllUsers />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "add-user",
+            element: (
+              <SuspenseWrapper>
+                <AddUser />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "categories",
+            element: (
+              <SuspenseWrapper>
+                <Categories />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "admins",
+            element: (
+              <SuspenseWrapper>
+                <Admins />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "admin/edit/:id",
+            element: (
+              <SuspenseWrapper>
+                <UpdateAdmin />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "questions",
+            element: (
+              <SuspenseWrapper>
+                <Questions />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "posted-questions",
+            element: (
+              <SuspenseWrapper>
+                <PostedQuestions />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "game-packages",
+            element: (
+              <SuspenseWrapper>
+                <GamePackages />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "settings",
+            element: (
+              <SuspenseWrapper>
+                <SettingsPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "socialMedia",
+            element: (
+              <SuspenseWrapper>
+                <SocialMedia />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "add-socialMedia",
+            element: (
+              <SuspenseWrapper>
+                <AddSocialMedia />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "socialMedia/edit/:id",
+            element: (
+              <SuspenseWrapper>
+                <SocialMediaEdit />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "game",
+            element: (
+              <SuspenseWrapper>
+                <Game />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "groups",
+            element: (
+              <SuspenseWrapper>
+                <Groups />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "group/edit/:id",
+            element: (
+              <SuspenseWrapper>
+                <UpdateGroup />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "payments",
+            element: (
+              <SuspenseWrapper>
+                <Payment />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "salesRecovered",
+            element: (
+              <SuspenseWrapper>
+                <SalesRecovered />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "contactus",
+            element: (
+              <SuspenseWrapper>
+                <ContactUs />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "discount",
+            element: (
+              <SuspenseWrapper>
+                <Discount />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "user/:id",
+            element: (
+              <SuspenseWrapper>
+                <UpdateUser />
+              </SuspenseWrapper>
+            ),
+          },
         ],
       },
     ],

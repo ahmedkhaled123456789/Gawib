@@ -129,7 +129,7 @@ export const getRefundedPayments = createAsyncThunk<
 >("payments/getRefundedPayments", async (page, thunkAPI) => {
   try {
     const res = await useGetDataToken<PaginatedPayments>(
-      `admin/payments?filter[status]=2&page=${page}`
+      `admin/payments?filter[status]=3&page=${page}`
     );
     return res;
   } catch (error) {

@@ -4,18 +4,18 @@ import { RootState, AppDispatch } from "../../store";
 import {
   getSettings,
   updateSetting,
-  deleteSetting,
 } from "../../store/settingSlice";
-import CustomModal from "../../components/Modals/CustomModal";
-import AddSettings from "./AddSettings";
+// import CustomModal from "../../components/Modals/CustomModal";
+// import AddSettings from "./AddSettings";
 import { toast } from "sonner";
-import { TrashIcon } from "lucide-react";
+// import { TrashIcon } from "lucide-react";
 
 const ArabicFormLayout: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { settings } = useSelector((state: RootState) => state.settings);
 
   const [formData, setFormData] = useState<Record<string, string>>({});
+  // @ts-ignore
   const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
@@ -57,43 +57,34 @@ const ArabicFormLayout: React.FC = () => {
       .catch(() => toast.error("حدث خطأ أثناء الحفظ"));
   };
 
-  const handleDelete = (key: string) => {
-    const setting = settings?.data?.find((s) => s.key === key);
-    if (!setting) return;
+  // const handleDelete = (key: string) => {
+  //   const setting = settings?.data?.find((s) => s.key === key);
+  //   if (!setting) return;
 
-    toast("هل تريد الحذف؟", {
-      action: {
-        label: "نعم",
-        onClick: () => {
-          dispatch(deleteSetting(setting.id!))
-            .unwrap()
-            .then(() => {
-              toast.success("تم الحذف بنجاح");
-              dispatch(getSettings());
-            })
-            .catch(() => toast.error("حدث خطأ أثناء الحذف"));
-        },
-      },
-    });
-  };
+  //   toast("هل تريد الحذف؟", {
+  //     action: {
+  //       label: "نعم",
+  //       onClick: () => {
+  //         dispatch(deleteSetting(setting.id!))
+  //           .unwrap()
+  //           .then(() => {
+  //             toast.success("تم الحذف بنجاح");
+  //             dispatch(getSettings());
+  //           })
+  //           .catch(() => toast.error("حدث خطأ أثناء الحذف"));
+  //       },
+  //     },
+  //   });
+  // };
 
   return (
     <div dir="rtl" className="p-4">
       <h1 className="text-lg font-bold mb-4 text-[#085E9C]">الإعدادات</h1>
 
-      {/* زر إضافة إعداد جديد */}
-      <div className="mb-6">
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-        >
-          إضافة إعداد جديد
-        </button>
-      </div>
 
-      <CustomModal isOpen={showAddModal}>
+      {/* <CustomModal isOpen={showAddModal}>
         <AddSettings onClose={() => setShowAddModal(false)} />
-      </CustomModal>
+      </CustomModal> */}
 
       {/* الرسائل والبريد الإلكتروني */}
       <div className="bg-white shadow-sm border border-[#085E9C] mb-6">
@@ -109,13 +100,13 @@ const ArabicFormLayout: React.FC = () => {
             >
               حفظ
             </button>
-            <button
+            {/* <button
               onClick={() => handleDelete("buy_message")}
               className="bg-red-500 text-white px-4 py-2 text-sm font-bold rounded flex items-center gap-1"
             >
               <TrashIcon size={16} />
               حذف
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -159,13 +150,13 @@ const ArabicFormLayout: React.FC = () => {
             >
               حفظ
             </button>
-            <button
+            {/* <button
               onClick={() => handleDelete("about_us")}
               className="bg-red-500 text-white px-4 py-2 text-sm font-bold rounded flex items-center gap-1"
             >
               <TrashIcon size={16} />
               حذف
-            </button>
+            </button> */}
           </div>
         </div>
         <div className="p-6">
@@ -221,13 +212,13 @@ const ArabicFormLayout: React.FC = () => {
             >
               حفظ
             </button>
-            <button
+            {/* <button
               onClick={() => handleDelete("app_stamp_tax")}
               className="bg-red-500 text-white px-4 py-2 text-sm font-bold rounded flex items-center gap-1"
             >
               <TrashIcon size={16} />
               حذف
-            </button>
+            </button> */}
           </div>
         </div>
         <div className="p-6 flex items-center gap-4">
