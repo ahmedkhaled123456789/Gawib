@@ -75,25 +75,6 @@ export const getAllGamesForDropdown = createAsyncThunk<
   }
 });
 
-// ---- Get Free Games ----
-export const getGameFree = createAsyncThunk<
-  GameData,
-  number,
-  { rejectValue: string }
->("game/getGameFree", async (page, thunkAPI) => {
-  try {
-    const res = await useGetDataToken<GameData>(
-      `admin/games?filter[is_free]=1&page=${page}`
-    );
-    return res;
-  } catch (error) {
-    const err = error as AxiosError<{ message: string }>;
-    return thunkAPI.rejectWithValue(
-      err.response?.data.message || "getGameFree failed"
-    );
-  }
-});
-
 // ---- Get One Game by ID ----
 export const getGameById = createAsyncThunk<
   GameData,
@@ -179,11 +160,7 @@ const gameSlice = createSlice({
         state.loading = false;
         state.error = null;
       })
-      .addCase(getGameFree.fulfilled, (state, action) => {
-        state.gameFree = action.payload;
-        state.loading = false;
-        state.error = null;
-      })
+
       .addCase(getGameById.fulfilled, (state, action) => {
         state.game = action.payload;
         state.loading = false;

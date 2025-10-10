@@ -13,6 +13,7 @@ import userReducer from "./userSlice";
 import adminReducer from "./adminSlice";
 import paymentReducer from "./payment";
 import userActionsReducer from "./UserActionsSlic";
+import freeGameSlice from "./GameFreeSlic";
 
 const store = configureStore({
   reducer: {
@@ -28,8 +29,8 @@ const store = configureStore({
     user: userReducer,
     admin: adminReducer,
     payment: paymentReducer,
-
     userActions: userActionsReducer,
+    freeGame: freeGameSlice,
   },
 });
 

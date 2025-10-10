@@ -45,7 +45,7 @@ export const getQuestions = createAsyncThunk<
   "questions/getQuestions",
   async ({ page, search, sort, points }, thunkAPI) => {
     try {
-      let url = `admin/questions?page=${page}&filter[is_active]=0`;
+let url = `admin/questions?page=${page}&filter[is_active]=0&filter[free_game_questions]=0`;
 
       if (search) url += `&filter[search]=${encodeURIComponent(search)}`;
       if (sort) url += `&sort=${encodeURIComponent(sort)}`;
@@ -71,7 +71,7 @@ export const getQuestionsActive = createAsyncThunk<
   "questions/getQuestionsActive",
   async ({ page, search, sort, points }, thunkAPI) => {
     try {
-      let url = `admin/questions?page=${page}&filter[is_active]=1`;
+let url = `admin/questions?page=${page}&filter[is_active]=1&filter[free_game_questions]=0`;
 
       if (search) url += `&filter[search]=${encodeURIComponent(search)}`;
       if (sort) url += `&sort=${encodeURIComponent(sort)}`;
